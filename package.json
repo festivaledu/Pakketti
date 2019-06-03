@@ -1,0 +1,19 @@
+{
+  "name": "pakketti",
+  "version": "1.0.0",
+  "description": "A package manager and storefront for multi-platform packages",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/festivaledu/Pakketti.git"
+  },
+  "author": "festivaledu, SniperGER, vainamov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/festivaledu/Pakketti/issues"
+  },
+  "homepage": "https://github.com/festivaledu/Pakketti#readme"
+}
