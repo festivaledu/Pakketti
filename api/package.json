@@ -1,0 +1,11 @@
+{
+  "name": "pakketti-api",
+  "version": "1.0.0",
+  "description": "Management API for Pakketti, the Team FESTIVAL repository manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "festivaledu, SniperGER, vainamov",
+  "license": "ISC"
+}
