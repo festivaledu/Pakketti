@@ -7,6 +7,13 @@ const cookieParser = require("cookie-parser");
 const fileupload = require("express-fileupload");
 
 //#region Database Setup
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
+const models = require("./models");
+const env = process.env.NODE_ENV || 'development';
+const config = require(__dirname + '/config/config.json')[env];
+const db = {};
 //#endregion
 
 //#region Database Seed
