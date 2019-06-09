@@ -42,19 +42,25 @@ const RequestType = {
 	 */
 	USER_REPORT: 1,
 	
+	/**
+	 * This type is used when a User requests a refund. Pakketti wasn't originally designed for paid packages, but for the sake of completion this is added anyways
+	 */
+	REFUND: 2,
+	
 	/** 
 	 * This type is used when a User applies as a Developer 
 	 */
-	DEV_APPLICATION: 2,
+	DEV_APPLICATION: 3,
 	
 	/**
 	 *  This type is used when a User applies as a Moderator
 	 */
-	MOD_APPLICATION: 3,
+	MOD_APPLICATION: 4,
+	
 	/**
 	 * This type is used when a Moderator creates a deletion request for a package because it doesn't meet quality standards or is breaking the rules, eg. it has been edited after it was accepted.
 	 */
-	DELETE_REQUEST: 4
+	DELETE_REQUEST: 5
 };
 
 module.exports = {
