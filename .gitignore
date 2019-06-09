@@ -105,3 +105,6 @@ typings/
 
 #DynamoDB Local files 
 .dynamodb/ 
+
+# Pakketti specific files
+*.sqlite3
