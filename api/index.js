@@ -70,7 +70,7 @@ db.sequelize.sync({
 const httpServer = express();
 const controllers = require("./controllers");
 
-httpServer.use(morgan("\x1b[34m[INFO]\x1b[0m [:date[iso]] :remote-addr \":method :url HTTP/:http-version\" :status (:res[content-length] bytes)"));
+httpServer.use(morgan("\x1b[34m[INFO]\x1b[0m [:date[iso]] :remote-addr \":method :url HTTP/:http-version\" :status (:req[Content-Length]/:res[content-length] bytes)"));
 
 httpServer.use(cors());
 httpServer.use(bodyParser.json());
