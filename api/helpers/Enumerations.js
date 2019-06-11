@@ -58,9 +58,14 @@ const RequestType = {
 	MOD_APPLICATION: 4,
 	
 	/**
-	 * This type is used when a Moderator creates a deletion request for a package because it doesn't meet quality standards or is breaking the rules, eg. it has been edited after it was accepted.
+	 * This type is used when a Developer or Moderator wants to step down from this role or both
 	 */
-	DELETE_REQUEST: 5
+	ROLE_TERMINATION: 5,
+	
+	/**
+	 * This type is used when a Moderator creates a deletion request for a package because it doesn't meet quality standards or is breaking the rules, eg. it has been edited after it was accepted, or a Developer wants to delete his account, but has associated packages
+	 */
+	DELETE_REQUEST: 6
 };
 
 module.exports = {
