@@ -48,7 +48,9 @@ db.Sequelize = Sequelize;
 //#endregion
 
 //#region Database Seed
-db.sequelize.sync().then(() => {
+db.sequelize.sync({
+	force: env === "development"
+}).then(() => {
 	db.models.Account.findOrCreate({
 		where: {
 			role: UserRole.ROOT

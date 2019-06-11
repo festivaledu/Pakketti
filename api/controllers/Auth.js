@@ -53,7 +53,7 @@ router.post("/register", (req, res) => {
 				email: accountObj.email,
 				role: accountObj.role
 			}, JWT_SECRET, {
-				expiresIn: 7200
+				expiresIn: process.env.NODE_ENV === "production" ? 7200 : 86400
 			});
 			
 			return res
@@ -112,7 +112,7 @@ router.post("/login", (req, res) => {
 			email: accountObj.email,
 			role: accountObj.role
 		}, JWT_SECRET, {
-			expiresIn: 7200
+			expiresIn: process.env.NODE_ENV === "production" ? 7200 : 86400
 		});
 		
 		return res
@@ -144,7 +144,7 @@ router.get("/verify", (req, res) => {
 		email: req.account.email,
 		role: req.account.role
 	}, JWT_SECRET, {
-		expiresIn: 7200
+		expiresIn: process.env.NODE_ENV === "production" ? 7200 : 86400
 	});
 	
 	return res
