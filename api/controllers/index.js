@@ -5,6 +5,8 @@ const express = require("express");
 const router = express.Router();
 const httpStatus = require("http-status");
 
+router.use("/", require("../helpers/AuthHelper"));
+
 fs
 	.readdirSync(__dirname)
 	.filter(file => {
