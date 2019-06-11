@@ -6,7 +6,7 @@ const cryptoBuiltin = require("crypto");
 const camelcase = require("camelcase");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
-const UserRole = require("../../helpers/Enumerations");
+const { UserRole } = require("../../helpers/Enumerations");
 const ArchiveParser = require("../../helpers/ArchiveParser");
 
 Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({[k]: v}) ));

@@ -217,7 +217,7 @@ router.delete("/:userId", (req, res) => {
 	if (account.id == req.params.userId) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
-		message: "You cannot delete your acount via DELETE /account/:userId. Please check if you can delete your account using DELETE /me"
+		message: "You cannot delete your acount via DELETE /account/:userId. Please check if you can delete your account using DELETE /account/me"
 	});
 	if (account.role < UserRole.MODERATOR) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],

@@ -4,7 +4,7 @@ const httpStatus = require("http-status");
 const Sequelize = require("sequelize");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
-const UserRole = require("../../helpers/Enumerations");
+const { UserRole } = require("../../helpers/Enumerations");
 
 
 
