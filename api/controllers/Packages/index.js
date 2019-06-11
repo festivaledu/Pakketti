@@ -12,11 +12,7 @@ const ErrorHandler = require("../../helpers/ErrorHandler");
 const UserRole = require("../../helpers/Enumerations");
 const ArchiveParser = require("../../helpers/ArchiveParser");
 
-
-
 Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({[k]: v}) ));
-
-
 
 /**
  * GET /packages
@@ -72,34 +68,34 @@ router.get("/", (req, res) => {
  */
 router.post("/new", async (req, res) => {
 	const { account } = req;
-	// if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-	// 	name: httpStatus[httpStatus.UNAUTHORIZED],
-	// 	code: httpStatus.UNAUTHORIZED,
-	// 	message: "Invalid authorization token"
-	// });
-	// if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.UNAUTHORIZED).send({
-	// 	name: httpStatus[httpStatus.UNAUTHORIZED],
-	// 	code: httpStatus.UNAUTHORIZED,
-	// 	message: "You are not allowed to perform this action"
-	// });
+	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
+		name: httpStatus[httpStatus.UNAUTHORIZED],
+		code: httpStatus.UNAUTHORIZED,
+		message: "Invalid authorization token"
+	});
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.UNAUTHORIZED).send({
+		name: httpStatus[httpStatus.UNAUTHORIZED],
+		code: httpStatus.UNAUTHORIZED,
+		message: "You are not allowed to perform this action"
+	});
 	
 	const { Package, PackageVersion } = req.models;
 	let packageData = req.body;
 	
-	// let packageObj = await Package.findOne({
-	// 	where: { identifier: packageData.identifier }
-	// });
-	// if (packageObj) return res.status(httpStatus.CONFLICT).send({
-	// 	name: httpStatus[httpStatus.CONFLICT],
-	// 	code: httpStatus.CONFLICT,
-	// 	message: `Package with identifier ${packageData.identifier} already exists`
-	// });
+	let packageObj = await Package.findOne({
+		where: { identifier: packageData.identifier }
+	});
+	if (packageObj) return res.status(httpStatus.CONFLICT).send({
+		name: httpStatus[httpStatus.CONFLICT],
+		code: httpStatus.CONFLICT,
+		message: `Package with identifier ${packageData.identifier} already exists`
+	});
 	
-	// if (!req.files || !req.files.file) return res.status(httpStatus.NOT_FOUND).send({
-	// 	name: httpStatus[httpStatus.BAD_REQUEST],
-	// 	code: httpStatus.BAD_REQUEST,
-	// 	message: "No package file specified"
-	// });
+	if (!req.files || !req.files.file) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.BAD_REQUEST],
+		code: httpStatus.BAD_REQUEST,
+		message: "No package file specified"
+	});
 	
 	let packageFile = req.files.file;
 	let iconFile = req.files.icon;
@@ -112,64 +108,10 @@ router.post("/new", async (req, res) => {
 		message: "Failed to parse archive data"
 	});
 	
+	// Parsing the archive data resulted in an error, so we send that error as a response
 	if (archiveData.code) {
 		return res.status(archiveData.code).send(archiveData);
 	}
-	
-	return res.status(200).send(archiveData);
-	/*switch (packageFile.mimetype) {
-		case "application/x-debian-package":
-		case "application/x-deb":
-			// Debian package (APT)
-			controlData = await new Promise((resolve, reject) => {
-				let archive = new ar.Archive(packageFile.data);
-				archive.getFiles().forEach(file => {
-					let filename = file.name();
-
-					if (filename.includes("control.tar.gz")) {
-						let extractor = tar.extract();
-
-						extractor.on("entry", (header, stream, next) => {
-							if (header.name.indexOf("control") !== -1) {
-								let controlFile = controlParser(stream);
-								controlFile.on("stanza", parsedControl => {
-									return resolve(Object.fromEntries(Object.entries(parsedControl).map(([k, v]) => [camelcase(k), v])));
-								});
-							} else {
-								next();
-							}
-						});
-
-						bufferstream(file.fileData()).pipe(gunzip()).pipe(extractor);
-					}
-				});
-			});
-			
-			if (!controlData) return res.status(httpStatus.NOT_FOUND).send({
-				name: httpStatus[httpStatus.BAD_REQUEST],
-				code: httpStatus.BAD_REQUEST,
-				message: "Package file does not contain any control file"
-			});
-			
-			if (controlData["package"] !== req.body.identifier ||
-				controlData["name"] !== req.body.name ||
-				controlData["architecture"] !== req.body.architecture) return res.status(httpStatus.CONFLICT).send({
-				name: httpStatus[httpStatus.CONFLICT],
-				code: httpStatus.CONFLICT,
-				message: "Package file information does not match package data"
-			});
-			break;
-		case "application/zip":
-			// Zip package (packed applications)
-		case "application/gzip":
-			// GNU Zip package (source code))
-			break;
-		default: return res.status(httpStatus.BAD_REQUEST).send({
-			name: httpStatus[httpStatus.BAD_REQUEST],
-			code: httpStatus.BAD_REQUEST,
-			message: "Package file does not have any known format"
-		});
-	}*/
 
 	Package.create(Object.assign(packageData, {
 		id: String.prototype.concat(packageData.name, packageData.identifier, new Date().getTime()),
@@ -177,22 +119,28 @@ router.post("/new", async (req, res) => {
 		icon: iconFile ? iconFile.data : null,
 		screenshots: {},
 	})).then(packageObj => {
-		PackageVersion.create(Object.assign(controlData, {
+		PackageVersion.create(Object.assign(archiveData, {
 			id: String.prototype.concat(packageObj.id, account.id, new Date().getTime()),
 			packageId: packageObj.id,
-			version: controlData["version"] || packageData.version,
+			version: archiveData["version"] || packageData.version,
 			changeText: packageData.releaseText,
 			visible: true,
-			// depends: controlData["depends"] ? controlData["depends"].split(", ") : [],
-			// conflicts: controlData["conflicts"] ? controlData["conflicts"].split(", ") : [],
 			depends: (() => {
-				return []
+				if (!archiveData || !archiveData.depends) return {};
+				return archiveData.depends.split(", ").map(item => {
+					let match = item.match(/(^\S*)(?:.\((.+)\))?/);
+					return { [match[1]]: match[2] };
+				}).reduce((obj, item) => (obj[Object.keys(item)[0]] = item[Object.keys(item)[0]] || true, obj), {});
 			})(),
 			conflicts: (() => {
-				return []
+				if (!archiveData || !archiveData.conflicts) return {};
+				return archiveData.conflicts.split(", ").map(item => {
+					let match = item.match(/(^\S*)(?:.\((.+)\))?/);
+					return { [match[1]]: match[2] };
+				}).reduce((obj, item) => (obj[Object.keys(item)[0]] = item[Object.keys(item)[0]] || true, obj), {});
 			})(),
 			filename: `/files/${packageFile.name}`,
-			fileData: packageFile.data,
+			//fileData: packageFile.data,
 			fileMime: packageFile.mimetype,
 			md5sum: cryptoBuiltin.createHash("md5").update(packageFile.data).digest("hex"),
 			sha1: cryptoBuiltin.createHash("sha1").update(packageFile.data).digest("hex"),
