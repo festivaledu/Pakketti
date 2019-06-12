@@ -219,9 +219,9 @@ router.delete("/:userId", (req, res) => {
 		code: httpStatus.FORBIDDEN,
 		message: "You cannot delete your acount via DELETE /account/:userId. Please check if you can delete your account using DELETE /account/me"
 	});
-	if (account.role < UserRole.MODERATOR) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
+	if (account.role < UserRole.MODERATOR) return res.status(httpStatus.FORBIDDEN).send({
+		name: httpStatus[httpStatus.FORBIDDEN],
+		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
 	
@@ -235,9 +235,9 @@ router.delete("/:userId", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: "User not found"
 		});
-		if (accountObj.role >= account.role || accountObj.role == 1) return res.status(httpStatus.UNAUTHORIZED).send({
-			name: httpStatus[httpStatus.UNAUTHORIZED],
-			code: httpStatus.UNAUTHORIZED,
+		if (accountObj.role >= account.role || accountObj.role == 1) return res.status(httpStatus.FORBIDDEN).send({
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
 			message: "You are not allowed to perform this action"
 		});
 		

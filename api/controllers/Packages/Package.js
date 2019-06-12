@@ -73,9 +73,9 @@ router.put("/:packageId", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+		name: httpStatus[httpStatus.FORBIDDEN],
+		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
 
@@ -95,9 +95,9 @@ router.put("/:packageId", (req, res) => {
 			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
-		if (packageObj.accountId != account.id) return res.status(httpStatus.UNAUTHORIZED).send({
-			name: httpStatus[httpStatus.UNAUTHORIZED],
-			code: httpStatus.UNAUTHORIZED,
+		if (packageObj.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
 			message: "You are not allowed to perform this action"
 		});
 
@@ -128,9 +128,9 @@ router.delete("/:packageId", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	if (account.role < UserRole.DEVELOPER) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
+	if (account.role < UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+		name: httpStatus[httpStatus.FORBIDDEN],
+		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
 
@@ -154,9 +154,9 @@ router.delete("/:packageId", (req, res) => {
 			(account.role & UserRole.MODERATOR) == 0 &&
 			(account.role & UserRole.ADMINISTRATOR) == 0) &&
 			packageObj.accountId != account.id) {
-			return res.status(httpStatus.UNAUTHORIZED).send({
-				name: httpStatus[httpStatus.UNAUTHORIZED],
-				code: httpStatus.UNAUTHORIZED,
+			return res.status(httpStatus.FORBIDDEN).send({
+				name: httpStatus[httpStatus.FORBIDDEN],
+				code: httpStatus.FORBIDDEN,
 				message: "You are not allowed to perform this action"
 			});
 		}

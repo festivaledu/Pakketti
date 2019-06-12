@@ -73,9 +73,9 @@ router.post("/new", async (req, res) => {
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
-	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+		name: httpStatus[httpStatus.FORBIDDEN],
+		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
 	

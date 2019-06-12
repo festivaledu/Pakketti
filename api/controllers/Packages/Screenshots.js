@@ -97,9 +97,9 @@ router.delete("/:packageId/screenshots/:screenshotId", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	if (account.role < UserRole.DEVELOPER) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
+	if (account.role < UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+		name: httpStatus[httpStatus.FORBIDDEN],
+		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
 	
@@ -120,9 +120,9 @@ router.delete("/:packageId/screenshots/:screenshotId", (req, res) => {
 		});
 		
 		if (packageObj.accountId != account.id) {
-			return res.status(httpStatus.UNAUTHORIZED).send({
-				name: httpStatus[httpStatus.UNAUTHORIZED],
-				code: httpStatus.UNAUTHORIZED,
+			return res.status(httpStatus.FORBIDDEN).send({
+				name: httpStatus[httpStatus.FORBIDDEN],
+				code: httpStatus.FORBIDDEN,
 				message: "You are not allowed to perform this action"
 			});
 		}

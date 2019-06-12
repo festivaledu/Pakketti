@@ -51,9 +51,9 @@ router.put("/:packageId/icon", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+		name: httpStatus[httpStatus.FORBIDDEN],
+		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
 	
@@ -73,9 +73,9 @@ router.put("/:packageId/icon", (req, res) => {
 			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
-		if (packageObj.accountId != account.id) return res.status(httpStatus.UNAUTHORIZED).send({
-			name: httpStatus[httpStatus.UNAUTHORIZED],
-			code: httpStatus.UNAUTHORIZED,
+		if (packageObj.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
 			message: "You are not allowed to perform this action"
 		});
 		
@@ -109,9 +109,9 @@ router.delete("/:packageId/icon", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+		name: httpStatus[httpStatus.FORBIDDEN],
+		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
 	
@@ -131,9 +131,9 @@ router.delete("/:packageId/icon", (req, res) => {
 			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
-		if (packageObj.accountId != account.id) return res.status(httpStatus.UNAUTHORIZED).send({
-			name: httpStatus[httpStatus.UNAUTHORIZED],
-			code: httpStatus.UNAUTHORIZED,
+		if (packageObj.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
 			message: "You are not allowed to perform this action"
 		});
 
