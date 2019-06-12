@@ -28,7 +28,7 @@ router.get("/:packageId/versions", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		return PackageVersion.findAll({
@@ -67,7 +67,7 @@ router.get("/:packageId/versions/latest", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		return PackageVersion.findOne({
@@ -82,7 +82,7 @@ router.get("/:packageId/versions/latest", (req, res) => {
 		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package does not have any versions"
+			message: `Package ${req.params.packageId} does not have any versions`
 		});
 		
 		return res.status(httpStatus.OK).send(packageVersionObj);
@@ -106,7 +106,7 @@ router.get("/:packageId/versions/latest/file", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		return PackageVersion.findOne({
@@ -120,7 +120,7 @@ router.get("/:packageId/versions/latest/file", (req, res) => {
 		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package does not have any versions"
+			message: `Package ${req.params.packageId} does not have any versions`
 		});
 		
 		res.header("Content-Type", packageVersionObj.fileMime);
@@ -158,7 +158,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.NOT_FOUND],
 		code: httpStatus.NOT_FOUND,
-		message: "Package not found"
+		message: `No package with identifier ${req.params.packageId} found`
 	});
 	
 	if (packageObj.accountId != account.id) return res.status(httpStatus.UNAUTHORIZED).send({
@@ -198,7 +198,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 		if (packageVersionObj) return res.status(httpStatus.CONFLICT).send({
 			name: httpStatus[httpStatus.CONFLICT],
 			code: httpStatus.CONFLICT,
-			message: `Package already has a version ${archiveData.version || versionData.version}`
+			message: `Package ${req.params.packageId} already has a version ${archiveData.version || versionData.version}`
 		});
 		
 		PackageVersion.create(Object.assign(archiveData, {
@@ -256,7 +256,7 @@ router.get("/:packageId/versions/:versionId", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		return PackageVersion.findOne({
@@ -274,7 +274,7 @@ router.get("/:packageId/versions/:versionId", (req, res) => {
 		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: `Package does not have a version ${req.params.versionId}`
+			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 		});
 		
 		return res.status(httpStatus.OK).send(packageVersionObj);
@@ -298,7 +298,7 @@ router.get("/:packageId/versions/:versionId/file", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		return PackageVersion.findOne({
@@ -315,7 +315,7 @@ router.get("/:packageId/versions/:versionId/file", (req, res) => {
 		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: `Package does not have a version ${req.params.versionId}`
+			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 		});
 		
 		res.header("Content-Type", packageVersionObj.fileMime);
@@ -355,7 +355,7 @@ router.put("/:packageId/versions/:versionId", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		if (packageObj.accountId != account.id) return res.status(httpStatus.UNAUTHORIZED).send({
@@ -379,7 +379,7 @@ router.put("/:packageId/versions/:versionId", (req, res) => {
 		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: `Package does not have a version ${req.params.versionId}`
+			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 		});
 		
 		packageVersionObj.update(Object.assign(req.body, {
@@ -437,7 +437,7 @@ router.put("/:packageId/versions/:versionId/file", async (req, res) => {
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.NOT_FOUND],
 		code: httpStatus.NOT_FOUND,
-		message: "Package not found"
+		message: `No package with identifier ${req.params.packageId} found`
 	});
 	
 	if (packageObj.accountId != account.id) return res.status(httpStatus.UNAUTHORIZED).send({
@@ -518,7 +518,7 @@ router.put("/:packageId/versions/:versionId/file", async (req, res) => {
 		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: `Package does not have a version ${controlData.version || versionData.version}`
+			message: `Package ${req.params.packageId} does not have a version ${controlData.version || versionData.version}`
 		});
 		
 		packageVersionObj.update({
@@ -571,7 +571,7 @@ router.delete("/:packageId/versions/:versionId", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		if (((account.role & UserRole.DEVELOPER) == UserRole.DEVELOPER &&
@@ -600,7 +600,7 @@ router.delete("/:packageId/versions/:versionId", (req, res) => {
 		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: `Package does not have a version ${req.params.versionId}`
+			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 		});
 		
 		packageVersionObj.destroy().then(() => {

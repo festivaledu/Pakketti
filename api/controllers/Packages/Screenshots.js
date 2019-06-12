@@ -25,7 +25,7 @@ router.get("/:packageId/screenshots", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		return PackageScreenshot.findAll({
@@ -37,7 +37,7 @@ router.get("/:packageId/screenshots", (req, res) => {
 		if (!packageScreenshotList || !packageScreenshotList.length) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package does not have any screenshots"
+			message: `Package ${req.params.packageId} does not have any screenshots`
 		});
 		
 		return res.status(httpStatus.OK).send(packageScreenshotList.reduce((obj, item) => ({
@@ -64,7 +64,7 @@ router.get("/:packageId/screenshots/:screenshotId", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		return PackageScreenshot.findOne({
@@ -77,7 +77,7 @@ router.get("/:packageId/screenshots/:screenshotId", (req, res) => {
 		if (!packageScreenshotObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: `Package does not have any screenshot with identifier ${req.params.screenshotId}`
+			message: `Package ${req.params.packageId} does not have any screenshot with identifier ${req.params.screenshotId}`
 		});
 
 		res.write(packageScreenshotObj.fileData, "binary");
@@ -116,7 +116,7 @@ router.delete("/:packageId/screenshots/:screenshotId", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		if (packageObj.accountId != account.id) {
@@ -137,7 +137,7 @@ router.delete("/:packageId/screenshots/:screenshotId", (req, res) => {
 		if (!packageScreenshotObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: `Package does not have any screenshot with identifier ${req.params.screenshotId}`
+			message: `Package ${req.params.packageId} does not have any screenshot with identifier ${req.params.screenshotId}`
 		});
 
 		packageScreenshotObj.destroy().then(() => {

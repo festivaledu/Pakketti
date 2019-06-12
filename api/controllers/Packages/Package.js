@@ -92,7 +92,7 @@ router.put("/:packageId", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		if (packageObj.accountId != account.id) return res.status(httpStatus.UNAUTHORIZED).send({
@@ -147,7 +147,7 @@ router.delete("/:packageId", (req, res) => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
-			message: "Package not found"
+			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
 		if (((account.role & UserRole.DEVELOPER) == UserRole.DEVELOPER &&
