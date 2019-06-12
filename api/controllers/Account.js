@@ -17,7 +17,7 @@ router.get("/me", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	return res.status(200).send(account);
+	return res.status(httpStatus.OK).send(account);
 });
 
 
@@ -59,7 +59,7 @@ router.put("/me", async (req, res) => {
 		createdAt: account.createdAt,
 		updatedAt: account.updatedAt
 	})).then(accountObj => {
-		return res.status(200).json({
+		return res.status(httpStatus.OK).json({
 			id: accountObj.id,
 			username: accountObj.username,
 			email: accountObj.email,
@@ -96,7 +96,7 @@ router.delete("/me", (req, res) => {
 		});
 		
 		account.destroy().then(() => {
-			return res.status(200).send({
+			return res.status(httpStatus.OK).send({
 				name: httpStatus[httpStatus.OK],
 				code: httpStatus.OK
 			});
@@ -242,7 +242,7 @@ router.delete("/:userId", (req, res) => {
 		});
 		
 		accountObj.destroy().then(() => {
-			return res.status(200).send({
+			return res.status(httpStatus.OK).send({
 				name: httpStatus[httpStatus.OK],
 				code: httpStatus.OK
 			});

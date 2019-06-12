@@ -166,6 +166,7 @@ fs
 	.filter(file => {
 		return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
 	})
+	.reverse()
 	.forEach(file => {
 		router.use("/", require(path.join(__dirname, file)));
 	});
