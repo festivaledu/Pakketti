@@ -6,8 +6,6 @@ const Sequelize = require("sequelize");
 const ErrorHandler = require("../../helpers/ErrorHandler");
 const { UserRole } = require("../../helpers/Enumerations");
 
-
-
 /**
  * GET /packages/:packageId/screenshots
  */
@@ -46,6 +44,8 @@ router.get("/:packageId/screenshots", (req, res) => {
 		}), {}));
 	}).catch(error => ErrorHandler(req, res, error));
 });
+
+
 
 /**
  * GET /packages/:packageId/screenshots/:screenshotId

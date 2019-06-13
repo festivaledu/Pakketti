@@ -20,8 +20,6 @@ router.get("/me", (req, res) => {
 	return res.status(httpStatus.OK).send(account);
 });
 
-
-
 /**
  * PUT /account/me
  */
@@ -69,8 +67,6 @@ router.put("/me", async (req, res) => {
 		});
 	}).catch(error => ErrorHandler(req, res, error));
 });
-
-
 
 /**
  * DELETE /account/me
@@ -136,8 +132,6 @@ router.get("/me/avatar", (req, res) => {
 		return res.end(undefined, "binary");
 	}).catch(error => ErrorHandler(req, res, error));
 });
-
-
 
 /**
  * PUT /account/me/avatar
@@ -230,8 +224,6 @@ router.get("/:userId", (req, res) => {
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
-
-
 /**
  * DELETE /account/:userId
  */
@@ -279,6 +271,8 @@ router.delete("/:userId", (req, res) => {
 		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));
 });
+
+
 
 /**
  * GET /account/:userId/avatar
