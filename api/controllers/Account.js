@@ -176,6 +176,36 @@ router.put("/me/avatar", (req, res) => {
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
+/**
+ * DELETE /account/me/avatar
+ */
+router.delete("/me/avatar", (req, res) => {
+	const { account } = req;
+	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
+		name: httpStatus[httpStatus.UNAUTHORIZED],
+		code: httpStatus.UNAUTHORIZED,
+		message: "Invalid authorization token"
+	});
+	
+	const { Account } = req.models;
+	
+	Account.findOne({
+		where: {
+			id: account.id
+		},
+	}).then(accountObj => {
+		accountObj.update({
+			profileImage: null,
+			profileImageMime: null
+		}).then(() => {
+			return res.status(httpStatus.OK).send({
+				name: "OK",
+				code: httpStatus.OK
+			});
+		}).catch(error => ErrorHandler(req, res, error));
+	}).catch(error => ErrorHandler(req, res, error));
+});
+
 
 
 /**
