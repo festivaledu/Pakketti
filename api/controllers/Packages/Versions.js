@@ -93,7 +93,7 @@ router.get("/:packageId/versions/latest", (req, res) => {
  * GET /packages/:packageId/versions/latest/file
  */
 router.get("/:packageId/versions/latest/file", (req, res) => {
-	const { Package, PackageVersion } = req.models;
+	/*const { Package, PackageVersion } = req.models;
 
 	Package.findOne({
 		where: {
@@ -126,7 +126,7 @@ router.get("/:packageId/versions/latest/file", (req, res) => {
 		res.header("Content-Type", packageVersionObj.fileMime);
 		res.write(packageVersionObj.fileData, "binary");
 		return res.end(undefined, "binary");
-	}).catch(error => ErrorHandler(req, res, error));
+	}).catch(error => ErrorHandler(req, res, error));*/
 });
 
 /**
@@ -285,7 +285,7 @@ router.get("/:packageId/versions/:versionId", (req, res) => {
  * GET /packages/:packageId/version/:versionId/file
  */
 router.get("/:packageId/versions/:versionId/file", (req, res) => {
-	const { Package, PackageVersion } = req.models;
+	/*const { Package, PackageVersion } = req.models;
 
 	Package.findOne({
 		where: {
@@ -321,7 +321,7 @@ router.get("/:packageId/versions/:versionId/file", (req, res) => {
 		res.header("Content-Type", packageVersionObj.fileMime);
 		res.write(packageVersionObj.fileData, "binary");
 		return res.end(undefined, "binary");
-	}).catch(error => ErrorHandler(req, res, error));
+	}).catch(error => ErrorHandler(req, res, error));*/
 });
 
 /**
@@ -412,7 +412,7 @@ router.put("/:packageId/versions/:versionId", (req, res) => {
  * PUT /packages/:packageId/versions/:versionId/file
  */
 router.put("/:packageId/versions/:versionId/file", async (req, res) => {
-	const { account } = req;
+	/*const { account } = req;
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
@@ -537,7 +537,7 @@ router.put("/:packageId/versions/:versionId/file", async (req, res) => {
 			
 			return res.status(httpStatus.OK).send(packageVersionObj);
 		}).catch(error => ErrorHandler(req, res, error));
-	}).catch(error => ErrorHandler(req, res, error));
+	}).catch(error => ErrorHandler(req, res, error));*/
 });
 
 /**
