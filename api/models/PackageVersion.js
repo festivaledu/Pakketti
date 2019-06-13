@@ -85,8 +85,18 @@ module.exports = (sequelize, DataTypes) => {
 		}
 	});
 	
-	PackageVersion.associate = ({}) => {
-		// associations can be defined here
+	PackageVersion.associate = ({ PackageReview, PackageRating }) => {
+		PackageVersion.hasMany(PackageReview, {
+			as: "reviews",
+			foreignKey: "packageVersionId",
+			onDelete: "CASCADE",
+		});
+		
+		PackageVersion.hasMany(PackageRating, {
+			as: "ratings",
+			foreignKey: "packageVersionId",
+			onDelete: "CASCADE"
+		});
 	};
 	
 	return PackageVersion;
