@@ -78,6 +78,13 @@ router.put("/:packageId", (req, res) => {
 	});
 
 	const { Package } = req.models;
+	
+	const packageData = req.body;
+	if (!packageData) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.BAD_REQUEST],
+		code: httpStatus.BAD_REQUEST,
+		message: "No package data specified"
+	});
 
 	Package.findOne({
 		where: {
@@ -85,7 +92,8 @@ router.put("/:packageId", (req, res) => {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			}
-		}
+		},
+		attributes: { exclude: ["icon"] },
 	}).then(packageObj => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
@@ -99,7 +107,7 @@ router.put("/:packageId", (req, res) => {
 			message: "You are not allowed to perform this action"
 		});
 
-		packageObj.update(Object.assign(req.body, {
+		packageObj.update(Object.assign(packageData, {
 			id: packageObj.id,
 			identifier: packageObj.identifier,
 			icon: undefined,
@@ -107,8 +115,6 @@ router.put("/:packageId", (req, res) => {
 			createdAt: packageObj.createdAt,
 			updatedAt: packageObj.updatedAt
 		})).then(packageObj => {
-			delete packageObj.icon;
-			
 			return res.status(httpStatus.OK).send(packageObj);
 		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));
