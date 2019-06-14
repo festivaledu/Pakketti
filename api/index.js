@@ -5,7 +5,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const fileupload = require("express-fileupload");
-const { UserRole } = require("./helpers/Enumerations");
+const { UserRole, LogItemType } = require("./helpers/Enumerations");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto-js");
 
@@ -63,6 +63,14 @@ db.sequelize.sync({
 		}
 	}).then(([accountObj, created]) => {
 		if (created) console.log("\x1b[34m[INFO]\x1b[0m Created root account");
+		
+		db.models.LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.API_STARTUP,
+			accountId: accountObj.id,
+			detailText: `The API has finished startup at ${new Date().toISOString()}`,
+			status: 2
+		});
 	});
 });
 //#endregion
