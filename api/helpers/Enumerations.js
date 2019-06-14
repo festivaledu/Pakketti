@@ -34,41 +34,118 @@ const UserRole = {
 };
 
 /**
- * The RequestType enumeration describes the type of requests made by Users, Developers or Moderators. Requests also serve as a moderation log.
+ * The LogItemType enumeration describes the type of log items created by certain actions inside the API. Log Items that have been automatically created by the API (thus serving their actual logging purpose) are marked as being used for the log (status = 2). Other items, such as DevApplication are used for User Requests.
  */
-const RequestType = {
+const LogItemType = {
 	/**
-	 * This type is used when a User reports a package or review for breaking the rules (eg. racism)
+	 * This type is used when the API has finished the startup process
 	 */
-	USER_REPORT: 1,
+	API_STARTUP: 1,
 	
 	/**
-	 * This type is used when a User requests a refund. Pakketti wasn't originally designed for paid packages, but for the sake of completion this is added anyways
+	 * This type is used when a User has created an account
 	 */
-	REFUND: 2,
+	USER_REGISTRATION: 2,
+	
+	/**
+	 * This type is used when a User successfully logged in. Failed login attempts are ignored
+	 */
+	USER_LOGIN: 3,
+	
+	/**
+	 * This type is used when a User has edited themselves (username, password, etc)
+	 */
+	USER_EDITED: 4,
+	
+	/**
+	 * This type is used when a User's role has been downgraded by a Moderator or Administrator (punishment or request fulfilment)
+	 */
+	USER_ROLE_DOWNGRADED: 5,
+	
+	/**
+	 * This type is used when a User deletes themselves or has been deleted by an Adminstrator
+	 */
+	USER_DELETED: 6,
+	
+	/**
+	 * This type is used when a Developer created a package
+	 */
+	PACKAGE_CREATED: 7,
+	
+	/**
+	 * This type is used when a Developer or Moderator edited a package
+	 */
+	PACKAGE_EDITED: 8,
+	
+	/**
+	 * This type is used when a Developer or Administrator deleted a package
+	 */
+	PACKAGE_DELETED: 9,
+	
+	/**
+	 * This type is used when a Developer created a package version
+	 */
+	VERSION_CREATED: 10,
+	
+	/**
+	 * This type is used when a Developer or Moderator edited a package version
+	 */
+	VERSION_EDITED: 11,
+	
+	/**
+	 * This type is used when a Developer or Administrator deleted a package version
+	 */
+	VERSION_DELETED: 12,
+	
+	/**
+	 * This type is used when a User created a package review
+	 */
+	REVIEW_CREATED: 13,
+	
+	/**
+	 * This type is used when a User edited a package review or rating
+	 */
+	REVIEW_EDITED: 14,
+	
+	/**
+	 * This type is used when a User, Developer or Moderator deleted a package review
+	 */
+	REVIEW_DELETED: 15,
+	
+	
+	
+	/**
+	 * This type is used when a User creates a report against another User, a package or a review
+	 */
+	USER_REPORT: 33,
+	
+	/**
+	 * This type is used when a User requests a refund for a paid package. Pakketti wasn't originally designed for paid packages, but for the sake of completion this is added anyways
+	 */
+	REFUND: 34,
 	
 	/** 
 	 * This type is used when a User applies as a Developer 
 	 */
-	DEV_APPLICATION: 3,
+	DEV_APPLICATION: 35,
+	
+	/** 
+	 * This type is used when a User applies as a Moderator 
+	 */
+	MOD_APPLICATION: 36,
 	
 	/**
-	 *  This type is used when a User applies as a Moderator
+	 * This type is used when a Developer or Moderator wants to step down from either role
 	 */
-	MOD_APPLICATION: 4,
-	
-	/**
-	 * This type is used when a Developer or Moderator wants to step down from this role or both
-	 */
-	ROLE_TERMINATION: 5,
+	ROLE_DOWNGRADE: 37,
 	
 	/**
 	 * This type is used when a Moderator creates a deletion request for a package because it doesn't meet quality standards or is breaking the rules, eg. it has been edited after it was accepted, or a Developer wants to delete his account, but has associated packages
 	 */
-	DELETE_REQUEST: 6
+	DELETE_REQUEST: 38
 };
 
 module.exports = {
 	UserRole: UserRole,
-	RequestType: RequestType
+	LogItemType: LogItemType
 };
