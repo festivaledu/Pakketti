@@ -20,16 +20,28 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		width: DataTypes.INTEGER,
 		height: DataTypes.INTEGER,
-		fileData: {
-			type: DataTypes.BLOB,
-			allowNull: false
-		},
+		// fileData: {
+		// 	type: DataTypes.BLOB,
+		// 	allowNull: false
+		// },
 		fileMime: {
 			type: DataTypes.STRING,
 			allowNull: false
+		},
+		sha256: { 
+			type: DataTypes.STRING,
+			allowNull: false,
+			unique: true
 		}
 	}, {
 		hooks: {
+			beforeBulkCreate: (packageScreenshotList, options) => {
+				packageScreenshotList.forEach(packageScreenshotObj => {
+					packageScreenshotObj.dataValues.id = crypto.SHA256(packageScreenshotObj.dataValues.id).toString(crypto.enc.Hex).substr(0, 32);
+				});
+				
+				return packageScreenshotList;
+			},
 			beforeCreate: (packageScreenshotObj, options) => {
 				packageScreenshotObj.dataValues.id = crypto.SHA256(packageScreenshotObj.dataValues.id).toString(crypto.enc.Hex).substr(0, 32);
 				return packageScreenshotObj;
