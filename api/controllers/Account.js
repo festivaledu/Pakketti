@@ -249,7 +249,7 @@ router.get("/:userId", (req, res) => {
 		},
 		attributes: ["id", "username", [Sequelize.fn("COUNT", Sequelize.col('profileImage')), "profileImage"], "role", "createdAt"]
 	}).then(accountObj => {
-		if (!accountObj) return res.status(httpStatus.NOT_FOUND).send({
+		if (!accountObj || !accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
 			message: "User not found"
@@ -287,11 +287,12 @@ router.delete("/:userId", (req, res) => {
 			id: req.params.userId
 		}
 	}).then(accountObj => {
-		if (!accountObj) return res.status(httpStatus.NOT_FOUND).send({
+		if (!accountObj || !accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
 			message: "User not found"
 		});
+		
 		if (accountObj.role >= account.role || accountObj.role == 1) return res.status(httpStatus.FORBIDDEN).send({
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,
@@ -330,12 +331,11 @@ router.get("/:userId/avatar", (req, res) => {
 		},
 		attributes: ["profileImage", "profileImageMime"]
 	}).then(accountObj => {
-		if (!accountObj) return res.status(httpStatus.NOT_FOUND).send({
+		if (!accountObj || accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
 			message: "User not found"
 		});
-		
 		
 		if (!accountObj.profileImage) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
