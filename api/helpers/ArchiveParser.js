@@ -14,7 +14,6 @@ module.exports = {
 	 * If not, it returns an error object describing the parse error.
 	 */
 	parseArchive: async (archiveData, identifier, name, architecture) => {
-		console.log(path.extname(archiveData.name));
 		switch (archiveData.mimetype) {
 			case "application/x-deb":
 			case "application/x-debian-package":
