@@ -4,7 +4,7 @@ const httpStatus = require("http-status");
 const Sequelize = require("sequelize");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
-const { UserRole } = require("../../helpers/Enumerations");
+const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 
 /**
  * GET /packages/:packageId/icon
@@ -55,7 +55,7 @@ router.put("/:packageId/icon", (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 	
-	const { Package } = req.models;
+	const { Package, LogItem } = req.models;
 
 	Package.findOne({
 		where: {
@@ -87,6 +87,15 @@ router.put("/:packageId/icon", (req, res) => {
 		packageObj.update({
 			icon: iconFile.data
 		}).then(() => {
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.PACKAGE_EDITED,
+				accountId: account.id,
+				affectedPackageId: packageObj.id,
+				detailText: `Package ${packageObj.identifier} <${packageObj.id}> received a new icon`,
+				status: 2
+			});
+			
 			return res.status(httpStatus.OK).send({
 				name: httpStatus[httpStatus.OK],
 				code: httpStatus.OK
@@ -113,7 +122,7 @@ router.delete("/:packageId/icon", (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 	
-	const { Package } = req.models;
+	const { Package, LogItem } = req.models;
 
 	Package.findOne({
 		where: {
@@ -138,6 +147,15 @@ router.delete("/:packageId/icon", (req, res) => {
 		packageObj.update({
 			icon: null
 		}).then(() => {
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.PACKAGE_EDITED,
+				accountId: account.id,
+				affectedPackageId: packageObj.id,
+				detailText: `Package ${packageObj.identifier} <${packageObj.id}> received a null icon`,
+				status: 2
+			});
+			
 			return res.status(httpStatus.OK).send({
 				name: httpStatus[httpStatus.OK],
 				code: httpStatus.OK

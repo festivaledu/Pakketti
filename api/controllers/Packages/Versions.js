@@ -3,10 +3,9 @@ const router = express.Router();
 const httpStatus = require("http-status");
 const Sequelize = require("sequelize");
 const cryptoBuiltin = require("crypto");
-const camelcase = require("camelcase");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
-const { UserRole } = require("../../helpers/Enumerations");
+const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 const ArchiveParser = require("../../helpers/ArchiveParser");
 
 Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({[k]: v}) ));
@@ -145,7 +144,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 	
-	const { Package, PackageVersion } = req.models;
+	const { Package, PackageVersion, LogItem } = req.models;
 	
 	let packageObj = await Package.findOne({
 		where: {
@@ -231,6 +230,15 @@ router.post("/:packageId/versions/new", async (req, res) => {
 			installedSize: controlData.installedSize || -1
 		})).then(packageVersionObj => {
 			delete packageVersionObj.dataValues.fileData;
+			
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.VERSION_CREATED,
+				accountId: account.id,
+				affectedPackageId: packageObj.id,
+				detailText: `User ${account.username} <${account.email}> created version ${packageVersionObj.version} <${packageVersionObj.id}> for package ${packageObj.identifier} <${packageObj.id}>`,
+				status: 2
+			});
 			
 			return res.status(httpStatus.OK).send(packageVersionObj);
 		}).catch(error => ErrorHandler(req, res, error));
@@ -342,7 +350,7 @@ router.put("/:packageId/versions/:versionId", (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 	
-	const { Package, PackageVersion } = req.models;
+	const { Package, PackageVersion, LogItem } = req.models;
 	
 	Package.findOne({
 		where: {
@@ -402,6 +410,15 @@ router.put("/:packageId/versions/:versionId", (req, res) => {
 			updatedAt: packageVersionObj.updatedAt
 		})).then(packageVersionObj => {
 			delete packageVersionObj.fileData;
+			
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.VERSION_EDITED,
+				accountId: account.id,
+				affectedPackageId: packageObj.id,
+				detailText: `User ${account.username} <${account.email}> edited version ${packageVersionObj.version} <${packageVersionObj.id}> of package ${packageObj.identifier} <${packageObj.id}>`,
+				status: 2
+			});
 			
 			return res.status(httpStatus.OK).send(packageVersionObj);
 		}).catch(error => ErrorHandler(req, res, error));
@@ -558,7 +575,7 @@ router.delete("/:packageId/versions/:versionId", (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	const { Package, PackageVersion } = req.models;
+	const { Package, PackageVersion, LogItem } = req.models;
 
 	Package.findOne({
 		where: {
@@ -604,6 +621,15 @@ router.delete("/:packageId/versions/:versionId", (req, res) => {
 		});
 		
 		packageVersionObj.destroy().then(() => {
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.VERSION_DELETED,
+				accountId: account.id,
+				affectedPackageId: packageObj.id,
+				detailText: `User ${account.username} <${account.email}> deleted version ${packageVersionObj.version} <${packageVersionObj.id}> of package ${packageObj.identifier} <${packageObj.id}>`,
+				status: 2
+			});
+			
 			return res.status(httpStatus.OK).send({
 				name: httpStatus[httpStatus.OK],
 				code: httpStatus.OK

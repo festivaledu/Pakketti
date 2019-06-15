@@ -112,6 +112,21 @@ const LogItemType = {
 	 */
 	REVIEW_DELETED: 15,
 	
+	/**
+	 * This type is used when a User or Developer adds a message to a review
+	 */
+	REVIEW_MESSAGE_CREATED: 16,
+	
+	/**
+	 * This type is used when a User or Developer edits their review message
+	 */
+	REVIEW_MESSAGE_EDITED: 17,
+	
+	/**
+	 * This type is used when a User or Developer deletes their review message
+	 */
+	REVIEW_MESSAGE_DELETED: 18,
+	
 	
 	
 	/**

@@ -4,7 +4,7 @@ const httpStatus = require("http-status");
 const Sequelize = require("sequelize");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
-const { UserRole } = require("../../helpers/Enumerations");
+const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 
 /**
  * GET /packages/:packageId
@@ -77,7 +77,7 @@ router.put("/:packageId", (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	const { Package } = req.models;
+	const { Package, LogItem } = req.models;
 	
 	const packageData = req.body;
 	if (!packageData) return res.status(httpStatus.NOT_FOUND).send({
@@ -115,6 +115,15 @@ router.put("/:packageId", (req, res) => {
 			createdAt: packageObj.createdAt,
 			updatedAt: packageObj.updatedAt
 		})).then(packageObj => {
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.PACKAGE_EDITED,
+				accountId: account.id,
+				affectedPackageId: packageObj.id,
+				detailText: `Package ${packageObj.identifier} <${packageObj.id}> was edited by ${account.username} <${account.email}>`,
+				status: 2
+			});
+			
 			return res.status(httpStatus.OK).send(packageObj);
 		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));
@@ -138,7 +147,7 @@ router.delete("/:packageId", (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	const { Package } = req.models;
+	const { Package, LogItem } = req.models;
 
 	Package.findOne({
 		where: {
@@ -166,6 +175,15 @@ router.delete("/:packageId", (req, res) => {
 		}
 
 		packageObj.destroy().then(() => {
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.PACKAGE_DELETED,
+				accountId: account.id,
+				affectedPackageId: packageObj.id,
+				detailText: `Package ${packageObj.identifier} <${packageObj.id}> was deleted by ${account.username} <${account.email}>`,
+				status: 2
+			});
+			
 			return res.status(httpStatus.OK).send({
 				name: httpStatus[httpStatus.OK],
 				code: httpStatus.OK

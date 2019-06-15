@@ -4,7 +4,7 @@ const Sequelize = require("sequelize");
 const httpStatus = require("http-status");
 
 const ErrorHandler = require("../helpers/ErrorHandler");
-const { UserRole } = require("../helpers/Enumerations");
+const { UserRole, LogItemType } = require("../helpers/Enumerations");
 
 /**
  * GET /account/me
@@ -31,7 +31,7 @@ router.put("/me", async (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	let { Account } = req.models;
+	let { Account, LogItem } = req.models;
 	let existing = await Account.findOne({
 		where: Object.assign(JSON.parse(JSON.stringify({
 			username: req.body.username || undefined,
@@ -57,6 +57,14 @@ router.put("/me", async (req, res) => {
 		createdAt: account.createdAt,
 		updatedAt: account.updatedAt
 	})).then(accountObj => {
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.USER_EDITED,
+			accountId: account.id,
+			affectedAccountId: accountObj.id,
+			detailText: `User ${accountObj.username} <${accountObj.email}> has been edited`,
+			status: 2
+		});
 		return res.status(httpStatus.OK).json({
 			id: accountObj.id,
 			username: accountObj.username,
@@ -73,7 +81,7 @@ router.put("/me", async (req, res) => {
  */
 router.delete("/me", (req, res) => {
 	const { account } = req;
-	const { Package } = req.models;
+	const { Package, LogItem } = req.models;
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
@@ -92,6 +100,15 @@ router.delete("/me", (req, res) => {
 		});
 		
 		account.destroy().then(() => {
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.USER_DELETED,
+				accountId: account.id,
+				affectedAccountId: accountObj.id,
+				detailText: `User ${accountObj.username} <${accountObj.email}> has been deleted`,
+				status: 2
+			});
+			
 			return res.status(httpStatus.OK).send({
 				name: httpStatus[httpStatus.OK],
 				code: httpStatus.OK
@@ -144,7 +161,7 @@ router.put("/me/avatar", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	const { Account } = req.models;
+	const { Account, LogItem } = req.models;
 	
 	if (!req.files || !req.files.file) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
@@ -162,6 +179,15 @@ router.put("/me/avatar", (req, res) => {
 			profileImage: avatarFile.data,
 			profileImageMime: avatarFile.mimetype
 		}).then(() => {
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.USER_EDITED,
+				accountId: account.id,
+				affectedAccountId: accountObj.id,
+				detailText: `User ${accountObj.username} <${accountObj.email}> has received a new avatar`,
+				status: 2
+			});
+			
 			return res.status(httpStatus.OK).send({
 				name: "OK",
 				code: httpStatus.OK
@@ -192,6 +218,15 @@ router.delete("/me/avatar", (req, res) => {
 			profileImage: null,
 			profileImageMime: null
 		}).then(() => {
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.USER_EDITED,
+				accountId: account.id,
+				affectedAccountId: accountObj.id,
+				detailText: `User ${accountObj.username} <${accountObj.email}> has deleted their avatar`,
+				status: 2
+			});
+			
 			return res.status(httpStatus.OK).send({
 				name: "OK",
 				code: httpStatus.OK
@@ -264,6 +299,15 @@ router.delete("/:userId", (req, res) => {
 		});
 		
 		accountObj.destroy().then(() => {
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.USER_DELETED,
+				accountId: account.id,
+				affectedAccountId: accountObj.id,
+				detailText: `User ${accountObj.username} <${accountObj.email}> was deleted by ${account.username}`,
+				status: 2
+			});
+			
 			return res.status(httpStatus.OK).send({
 				name: httpStatus[httpStatus.OK],
 				code: httpStatus.OK

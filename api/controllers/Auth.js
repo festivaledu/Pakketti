@@ -4,7 +4,7 @@ const Sequelize = require("sequelize");
 const httpStatus = require("http-status");
 
 const ErrorHandler = require("../helpers/ErrorHandler");
-const { UserRole } = require("../helpers/Enumerations");
+const { UserRole, LogItemType } = require("../helpers/Enumerations");
 
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
@@ -14,7 +14,7 @@ const bcrypt = require("bcryptjs");
  * POST /auth/register
  */
 router.post("/register", (req, res) => {
-	const { Account } = req.models;
+	const { Account, LogItem } = req.models;
 	
 	if (!req.body.username || !req.body.password) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
@@ -56,6 +56,14 @@ router.post("/register", (req, res) => {
 				expiresIn: process.env.NODE_ENV === "production" ? 7200 : 86400
 			});
 			
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.USER_REGISTRATION,
+				accountId: accountObj.id,
+				detailText: `User ${accountObj.username} <${accountObj.email}> registered`,
+				status: 2
+			});
+			
 			return res
 				.status(httpStatus.OK)
 				.cookie("authToken", token, {
@@ -75,7 +83,7 @@ router.post("/register", (req, res) => {
  * POST /auth/login
  */
 router.post("/login", (req, res) => {
-	const { Account } = req.models;
+	const { Account, LogItem } = req.models;
 	
 	if (!req.body.username || !req.body.password) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
@@ -113,6 +121,14 @@ router.post("/login", (req, res) => {
 			role: accountObj.role
 		}, JWT_SECRET, {
 			expiresIn: process.env.NODE_ENV === "production" ? 7200 : 86400
+		});
+		
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.USER_LOGIN,
+			accountId: accountObj.id,
+			detailText: `User ${accountObj.username} <${accountObj.email}> successfully logged in`,
+			status: 2
 		});
 		
 		return res

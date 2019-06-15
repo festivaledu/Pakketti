@@ -9,7 +9,7 @@ const Sequelize = require("sequelize");
 const cryptoBuiltin = require("crypto");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
-const { UserRole } = require("../../helpers/Enumerations");
+const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 const ArchiveParser = require("../../helpers/ArchiveParser");
 
 Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({[k]: v}) ));
@@ -79,7 +79,7 @@ router.post("/new", async (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 	
-	const { Package, PackageVersion } = req.models;
+	const { Package, PackageVersion, LogItem } = req.models;
 	let packageData = req.body;
 	
 	let packageObj = await Package.findOne({
@@ -149,6 +149,15 @@ router.post("/new", async (req, res) => {
 		})).then(packageVersionObj => {
 			delete packageObj.dataValues.icon;
 			delete packageVersionObj.dataValues.fileData;
+			
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.PACKAGE_CREATED,
+				accountId: account.id,
+				affectedPackageId: packageObj.id,
+				detailText: `Package ${packageObj.identifier} <${packageObj.id}> was created by ${account.username} <${account.email}>`,
+				status: 2
+			});
 			
 			return res.status(httpStatus.OK).send({
 				package: packageObj,

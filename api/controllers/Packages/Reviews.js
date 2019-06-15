@@ -4,7 +4,7 @@ const httpStatus = require("http-status");
 const Sequelize = require("sequelize");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
-const { UserRole } = require("../../helpers/Enumerations");
+const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 
 /**
  * GET /packages/reviews
@@ -49,7 +49,7 @@ router.get("/reviews", (req, res) => {
 		
 		let reviewData = reviewList;
 		if (account.role < UserRole.DEVELOPER) {
-			reviewData = reviewList.filter(reviewObj => reviewObj.accountId == account.id);
+			reviewData = reviewList.filter(packageReviewObj => packageReviewObj.accountId == account.id);
 		} else if (account.role < UserRole.MODERATOR) {
 			let packageList = await Package.findAll({
 				where: {
@@ -57,8 +57,8 @@ router.get("/reviews", (req, res) => {
 				}
 			});
 			
-			reviewData = reviewList.filter(reviewObj => {
-				return reviewObj.accountId == account.id || packageList.map(packageObj => packageObj.id).includes(reviewObj.packageId);
+			reviewData = reviewList.filter(packageReviewObj => {
+				return packageReviewObj.accountId == account.id || packageList.map(packageObj => packageObj.id).includes(packageReviewObj.packageId);
 			});
 		}
 		
@@ -142,7 +142,7 @@ router.post("/:packageId/reviews/new", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	const { Package, PackageVersion, PackageReview, PackageReviewMessage, PackageRating } = req.models;
+	const { Package, PackageVersion, PackageReview, PackageReviewMessage, PackageRating, LogItem } = req.models;
 	
 	const reviewData = req.body;
 	if (!reviewData.title || !reviewData.text || !reviewData.value) return res.status(httpStatus.BAD_REQUEST).send({
@@ -202,25 +202,35 @@ router.post("/:packageId/reviews/new", (req, res) => {
 					packageId: packageVersionObj.packageId,
 					packageVersionId: packageVersionObj.id,
 					accountId: account.id
-				})).then(reviewObj => {
+				})).then(packageReviewObj => {
 					PackageReviewMessage.create(Object.assign(reviewData, {
-						id: String.prototype.concat(reviewObj.packageId, reviewObj.versionId, reviewObj.id, Math.random(), new Date().getTime()),
-						packageId: reviewObj.packageId,
-						packageVersionId: reviewObj.versionId,
-						packageReviewId: reviewObj.id,
+						id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.versionId, packageReviewObj.id, Math.random(), new Date().getTime()),
+						packageId: packageReviewObj.packageId,
+						packageVersionId: packageReviewObj.versionId,
+						packageReviewId: packageReviewObj.id,
 						fromDeveloper: account.id == packageVersionObj.accountId,
 						accountId: account.id
 					}));
 					
 					PackageRating.create(Object.assign(reviewData, {
-						id: String.prototype.concat(reviewObj.packageId, reviewObj.versionId, reviewObj.id, Math.random(), new Date().getTime()),
-						packageId: reviewObj.packageId,
-						packageVersionId: reviewObj.versionId,
-						packageReviewId: reviewObj.id,
+						id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.versionId, packageReviewObj.id, Math.random(), new Date().getTime()),
+						packageId: packageReviewObj.packageId,
+						packageVersionId: packageReviewObj.versionId,
+						packageReviewId: packageReviewObj.id,
 						accountId: account.id
 					}));
 					
-					return res.status(httpStatus.OK).send(reviewObj);
+					LogItem.create({
+						id: String.prototype.concat(new Date().getTime, Math.random()),
+						type: LogItemType.REVIEW_CREATED,
+						accountId: account.id,
+						affectedPackageId: packageObj.id,
+						affectedReviewId: packageReviewObj.id,
+						detailText: `User ${account.username} <${account.email}> created review ${packageReviewObj.id}`,
+						status: 2
+					});
+					
+					return res.status(httpStatus.OK).send(packageReviewObj);
 				}).catch(error => ErrorHandler(req, res, error));
 			}).catch(error => ErrorHandler(req, res, error));
 		}).catch(error => ErrorHandler(req, res, error));
@@ -272,14 +282,14 @@ router.get("/:packageId/reviews/:reviewId", (req, res) => {
 				},
 				as: "device"
 			}]
-		}).then(reviewObj => {
-			if (!reviewObj) return res.status(httpStatus.NOT_FOUND).send({
+		}).then(packageReviewObj => {
+			if (!packageReviewObj) return res.status(httpStatus.NOT_FOUND).send({
 				name: httpStatus[httpStatus.NOT_FOUND],
 				code: httpStatus.NOT_FOUND,
 				message: `Package ${req.params.packageId} does not have any review with identifier ${req.params.reviewId}`
 			});
 			
-			return res.status(httpStatus.OK).send(reviewObj);
+			return res.status(httpStatus.OK).send(packageReviewObj);
 		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -296,7 +306,7 @@ router.delete("/:packageId/reviews/:reviewId", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	const { Package } = req.models;
+	const { Package, PackageReview, LogItem } = req.models;
 	
 	Package.findOne({
 		where: {
@@ -313,14 +323,14 @@ router.delete("/:packageId/reviews/:reviewId", (req, res) => {
 			message: `No package with identifier ${req.params.packageId} found`
 		});
 		
-		PackageVersionReview.findOne({
+		PackageReview.findOne({
 			where: {
 				id: req.params.reviewId,
 				packageId: packageObj.id,
 			}
 		}).then(packageReviewObj => {
 			if (account.id != packageObj.accountId &&	// Developer
-				account.id != reviewObj.accountId &&	// Review Author
+				account.id != packageReviewObj.accountId &&	// Review Author
 				(account.role & UserRole.MODERATOR) != UserRole.MODERATOR) {
 				return res.status(httpStatus.FORBIDDEN).send({
 					name: httpStatus[httpStatus.FORBIDDEN],
@@ -330,6 +340,16 @@ router.delete("/:packageId/reviews/:reviewId", (req, res) => {
 			}
 			
 			packageReviewObj.destroy().then(() => {
+				LogItem.create({
+					id: String.prototype.concat(new Date().getTime, Math.random()),
+					type: LogItemType.REVIEW_DELETED,
+					accountId: account.id,
+					affectedPackageId: packageObj.id,
+					affectedReviewId: packageReviewObj.id,
+					detailText: `User ${account.username} <${account.email}> deleted review ${packageReviewObj.id}`,
+					status: 2
+				});
+				
 				return res.status(httpStatus.OK).send({
 					name: httpStatus[httpStatus.OK],
 					code: httpStatus.OK
@@ -353,7 +373,7 @@ router.post("/:packageId/reviews/:reviewId/message", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	const { Package, PackageReview, PackageReviewMessage } = req.models;
+	const { Package, PackageReview, PackageReviewMessage, LogItem } = req.models;
 	const reviewData = req.body;
 	
 	if (!reviewData || !reviewData.text || !reviewData.text.length) return res.status(httpStatus.NOT_FOUND).send({
@@ -382,15 +402,15 @@ router.post("/:packageId/reviews/:reviewId/message", (req, res) => {
 				id: req.params.reviewId,
 				packageId: packageObj.id,
 			}
-		}).then(reviewObj => {
-			if (!reviewObj) return res.status(httpStatus.NOT_FOUND).send({
+		}).then(packageReviewObj => {
+			if (!packageReviewObj) return res.status(httpStatus.NOT_FOUND).send({
 				name: httpStatus[httpStatus.NOT_FOUND],
 				code: httpStatus.NOT_FOUND,
 				message: `Package ${req.params.packageId} does not have any review with identifier ${req.params.reviewId}`
 			});
 			
 			if (account.id != packageObj.accountId &&	// Developer
-				account.id != reviewObj.accountId &&	// Review Author
+				account.id != packageReviewObj.accountId &&	// Review Author
 				(account.role & UserRole.MODERATOR) != UserRole.MODERATOR) {
 				return res.status(httpStatus.FORBIDDEN).send({
 					name: httpStatus[httpStatus.FORBIDDEN],
@@ -400,14 +420,24 @@ router.post("/:packageId/reviews/:reviewId/message", (req, res) => {
 			}
 			
 			PackageReviewMessage.create(Object.assign(reviewData, {
-				id: String.prototype.concat(reviewObj.packageId, reviewObj.versionId, reviewObj.id, new Date().getTime()),
-				packageId: reviewObj.packageId,
-				packageVersionId: reviewObj.packageVersionId,
-				packageReviewId: reviewObj.id,
+				id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.versionId, packageReviewObj.id, new Date().getTime()),
+				packageId: packageReviewObj.packageId,
+				packageVersionId: packageReviewObj.packageVersionId,
+				packageReviewId: packageReviewObj.id,
 				fromDeveloper: account.id == packageObj.accountId,
 				accountId: account.id
-			})).then(reviewObj => {
-				return res.status(httpStatus.OK).send(reviewObj);
+			})).then(packageReviewObj => {
+				LogItem.create({
+					id: String.prototype.concat(new Date().getTime, Math.random()),
+					type: LogItemType.REVIEW_MESSAGE_CREATED,
+					accountId: account.id,
+					affectedPackageId: packageObj.id,
+					affectedReviewId: packageReviewObj.id,
+					detailText: `User ${account.username} <${account.email}> added message to review ${packageReviewObj.id}`,
+					status: 2
+				});
+				
+				return res.status(httpStatus.OK).send(packageReviewObj);
 			}).catch(error => ErrorHandler(req, res, error));
 		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));
@@ -454,14 +484,14 @@ router.put("/:packageId/reviews/:reviewId/:messageId", (req, res) => {
 				id: req.params.reviewId,
 				packageId: packageObj.id,
 			}
-		}).then(reviewObj => {
-			if (!reviewObj) return res.status(httpStatus.NOT_FOUND).send({
+		}).then(packageReviewObj => {
+			if (!packageReviewObj) return res.status(httpStatus.NOT_FOUND).send({
 				name: httpStatus[httpStatus.NOT_FOUND],
 				code: httpStatus.NOT_FOUND,
 				message: `Package ${req.params.packageId} does not have any review with identifier ${req.params.reviewId}`
 			});
 			
-			if (account.id != reviewObj.accountId) return res.status(httpStatus.FORBIDDEN).send({
+			if (account.id != packageReviewObj.accountId) return res.status(httpStatus.FORBIDDEN).send({
 				name: httpStatus[httpStatus.FORBIDDEN],
 				code: httpStatus.FORBIDDEN,
 				message: "You are not allowed to perform this action"
@@ -470,20 +500,30 @@ router.put("/:packageId/reviews/:reviewId/:messageId", (req, res) => {
 			PackageReviewMessage.findOne({
 				where: {
 					id: req.params.messageId,
-					packageId: reviewObj.packageId,
-					packageReviewId: reviewObj.id
+					packageId: packageReviewObj.packageId,
+					packageReviewId: packageReviewObj.id
 				}
 			}).then(reviewMessageObj => {
 				if (!reviewMessageObj) return res.status(httpStatus.NOT_FOUND).send({
 					name: httpStatus[httpStatus.NOT_FOUND],
 					code: httpStatus.NOT_FOUND,
-					message: `Review ${req.params.reviewId} does not have any review with identifier ${req.params.messageOd}`
+					message: `Review ${req.params.reviewId} does not have any review with identifier ${req.params.messageId}`
 				});
 				
 				reviewMessageObj.update({
 					text: reviewData.text
-				}).then(reviewObj => {
-					return res.status(httpStatus.OK).send(reviewObj);
+				}).then(packageReviewObj => {
+					LogItem.create({
+						id: String.prototype.concat(new Date().getTime, Math.random()),
+						type: LogItemType.REVIEW_MESSAGE_CREATED,
+						accountId: account.id,
+						affectedPackageId: packageObj.id,
+						affectedReviewId: packageReviewObj.id,
+						detailText: `User ${account.username} <${account.email}> edited message ${reviewMessageObj.id} of review ${packageReviewObj.id}`,
+						status: 2
+					});
+					
+					return res.status(httpStatus.OK).send(packageReviewObj);
 				}).catch(error => ErrorHandler(req, res, error));
 			}).catch(error => ErrorHandler(req, res, error));
 		}).catch(error => ErrorHandler(req, res, error));
@@ -502,7 +542,7 @@ router.delete("/:packageId/reviews/:reviewId/:messageId", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	const { Package, PackageReview, PackageReviewMessage } = req.models;
+	const { Package, PackageReview, PackageReviewMessage, LogItem } = req.models;
 	const reviewData = req.body;
 	
 	if (!reviewData || !reviewData.text) return res.status(httpStatus.NOT_FOUND).send({
@@ -531,15 +571,15 @@ router.delete("/:packageId/reviews/:reviewId/:messageId", (req, res) => {
 				id: req.params.reviewId,
 				packageId: packageObj.id,
 			}
-		}).then(reviewObj => {
-			if (!reviewObj) return res.status(httpStatus.NOT_FOUND).send({
+		}).then(packageReviewObj => {
+			if (!packageReviewObj) return res.status(httpStatus.NOT_FOUND).send({
 				name: httpStatus[httpStatus.NOT_FOUND],
 				code: httpStatus.NOT_FOUND,
 				message: `Package ${req.params.packageId} does not have any review with identifier ${req.params.reviewId}`
 			});
 			
 			if (account.id != packageObj.accountId &&	// Developer
-				account.id != reviewObj.accountId &&	// Review Author
+				account.id != packageReviewObj.accountId &&	// Review Author
 				(account.role & UserRole.MODERATOR) != UserRole.MODERATOR) {
 				return res.status(httpStatus.FORBIDDEN).send({
 					name: httpStatus[httpStatus.FORBIDDEN],
@@ -551,8 +591,8 @@ router.delete("/:packageId/reviews/:reviewId/:messageId", (req, res) => {
 			PackageReviewMessage.findOne({
 				where: {
 					id: req.params.messageId,
-					packageId: reviewObj.packageId,
-					packageReviewId: reviewObj.id
+					packageId: packageReviewObj.packageId,
+					packageReviewId: packageReviewObj.id
 				}
 			}).then(reviewMessageObj => {
 				if (!reviewMessageObj) return res.status(httpStatus.NOT_FOUND).send({
@@ -562,6 +602,16 @@ router.delete("/:packageId/reviews/:reviewId/:messageId", (req, res) => {
 				});
 				
 				reviewMessageObj.destroy().then(() => {
+					LogItem.create({
+						id: String.prototype.concat(new Date().getTime, Math.random()),
+						type: LogItemType.REVIEW_MESSAGE_DELETED,
+						accountId: account.id,
+						affectedPackageId: packageObj.id,
+						affectedReviewId: packageReviewObj.id,
+						detailText: `User ${account.username} <${account.email}> deleted message ${reviewMessageObj.id} of review ${packageReviewObj.id}`,
+						status: 2
+					});
+					
 					return res.status(httpStatus.OK).send({
 						name: httpStatus[httpStatus.OK],
 						code: httpStatus.OK

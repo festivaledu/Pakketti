@@ -4,6 +4,7 @@ const httpStatus = require("http-status");
 const Sequelize = require("sequelize");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
+const { LogItemType } = require("../../helpers/Enumerations");
 
 const emptyRatingsObject =() => {
 	let _ratings = {
@@ -241,7 +242,7 @@ router.put("/:packageId/reviews/:reviewId/rating", (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	const { Package, PackageReview, PackageRating } = req.models;
+	const { Package, PackageReview, PackageRating, LogItem } = req.models;
 	const ratingData = req.body;
 	if (!ratingData || isNaN(ratingData.value)) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
@@ -291,6 +292,16 @@ router.put("/:packageId/reviews/:reviewId/rating", (req, res) => {
 		packageReviewObj.rating.update({
 			value: ratingData.value
 		}).then(packageRatingObj => {
+			LogItem.create({
+				id: String.prototype.concat(new Date().getTime, Math.random()),
+				type: LogItemType.REVIEW_EDITED,
+				accountId: account.id,
+				affectedPackageId: packageObj.id,
+				affectedReviewId: packageReviewObj.id,
+				detailText: `User ${account.username} <${account.email}> edited rating value of review ${packageReviewObj.id} to ${ratingData.value}`,
+				status: 2
+			});
+			
 			return res.status(httpStatus.OK).send(packageRatingObj);
 		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));
