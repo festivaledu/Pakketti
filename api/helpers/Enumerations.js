@@ -130,14 +130,14 @@ const LogItemType = {
 	
 	
 	/**
-	 * This type is used when a User creates a report against another User, a package or a review
-	 */
-	USER_REPORT: 33,
-	
-	/**
 	 * This type is used when a User requests a refund for a paid package. Pakketti wasn't originally designed for paid packages, but for the sake of completion this is added anyways
 	 */
-	REFUND: 34,
+	REFUND: 33,
+	
+	/**
+	 * This type is used when a User creates a report against another User, a package or a review
+	 */
+	USER_REPORT: 34,
 	
 	/** 
 	 * This type is used when a User applies as a Developer 
