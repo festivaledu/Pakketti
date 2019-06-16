@@ -13,79 +13,79 @@ Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ 
 /**
  * GET /packages/:packageId/versions
  */
-router.get("/:packageId/versions", (req, res) => {
+router.get("/:packageId/versions", async (req, res) => {
 	const { Package, PackageVersion } = req.models;
 
-	Package.findOne({
+	let packageObj = await Package.findOne({
 		where: {
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			}
 		}
-	}).then(packageObj => {
-		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: `No package with identifier ${req.params.packageId} found`
-		});
+	});
+	
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: `No package with identifier ${req.params.packageId} found`
+	});
 
-		return PackageVersion.findAll({
-			where: {
-				packageId: packageObj.id,
-				visible: true
-			},
-			attributes: { exclude: ["fileData"] },
-			order: [["createdAt", "DESC"]]
-		});
-	}).then(packageVersionList => {
-		if (!packageVersionList || !packageVersionList.length) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: "Package does not have any versions"
-		});
+	let packageVersionList = await PackageVersion.findAll({
+		where: {
+			packageId: packageObj.id,
+			visible: true
+		},
+		attributes: { exclude: ["fileData"] },
+		order: [["createdAt", "DESC"]]
+	});
 
-		return res.status(httpStatus.OK).send(packageVersionList);
-	}).catch(error => ErrorHandler(req, res, error));
+	if (!packageVersionList || !packageVersionList.length) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: "Package does not have any versions"
+	});
+
+	return res.status(httpStatus.OK).send(packageVersionList);
 });
 
 /**
  * GET /packages/:packageId/versions/latest
  */
-router.get("/:packageId/versions/latest", (req, res) => {
+router.get("/:packageId/versions/latest", async (req, res) => {
 	const { Package, PackageVersion } = req.models;
 
-	Package.findOne({
+	let packageObj = await Package.findOne({
 		where: {
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			}
 		}
-	}).then(packageObj => {
-		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: `No package with identifier ${req.params.packageId} found`
-		});
+	});
+	
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: `No package with identifier ${req.params.packageId} found`
+	});
 
-		return PackageVersion.findOne({
-			where: {
-				packageId: packageObj.id,
-				visible: true
-			},
-			attributes: { exclude: ["fileData"] },
-			order: [["createdAt", "DESC"]]
-		});
-	}).then(packageVersionObj => {
-		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: `Package ${req.params.packageId} does not have any versions`
-		});
+	let packageVersionObj = await PackageVersion.findOne({
+		where: {
+			packageId: packageObj.id,
+			visible: true
+		},
+		attributes: { exclude: ["fileData"] },
+		order: [["createdAt", "DESC"]]
+	});
 
-		return res.status(httpStatus.OK).send(packageVersionObj);
-	}).catch(error => ErrorHandler(req, res, error));
+	if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: `Package ${req.params.packageId} does not have any versions`
+	});
+
+	return res.status(httpStatus.OK).send(packageVersionObj);
 });
 
 /**
@@ -133,11 +133,13 @@ router.get("/:packageId/versions/latest/file", (req, res) => {
  */
 router.post("/:packageId/versions/new", async (req, res) => {
 	const { account } = req;
+	
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
+	
 	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
@@ -154,6 +156,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 			}
 		}
 	});
+	
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.NOT_FOUND],
 		code: httpStatus.NOT_FOUND,
@@ -188,62 +191,62 @@ router.post("/:packageId/versions/new", async (req, res) => {
 		return res.status(archiveData.code).send(archiveData);
 	}
 
-	PackageVersion.findOne({
+	let packageVersionObj = await PackageVersion.findOne({
 		where: {
 			packageId: packageObj.id,
 			version: controlData.version
 		}
-	}).then(packageVersionObj => {
-		if (packageVersionObj) return res.status(httpStatus.CONFLICT).send({
-			name: httpStatus[httpStatus.CONFLICT],
-			code: httpStatus.CONFLICT,
-			message: `Package ${req.params.packageId} already has a version ${archiveData.version || versionData.version}`
+	});
+	
+	if (packageVersionObj) return res.status(httpStatus.CONFLICT).send({
+		name: httpStatus[httpStatus.CONFLICT],
+		code: httpStatus.CONFLICT,
+		message: `Package ${req.params.packageId} already has a version ${archiveData.version || versionData.version}`
+	});
+
+	PackageVersion.create(Object.assign(archiveData, {
+		id: String.prototype.concat(packageObj.id, account.id, new Date().getTime()),
+		packageId: packageObj.id,
+		version: archiveData["version"] || versionData.version,
+		changeText: versionData.changeText,
+		visible: versionData.visible,
+		depends: (() => {
+			if (!archiveData || !archiveData.depends) return {};
+
+			return archiveData.depends.split(", ").map(item => {
+				let match = item.match(/(^\S*)(?:.\((.+)\))?/);
+				return { [match[1]]: match[2] };
+			}).reduce((obj, item) => (obj[Object.keys(item)[0]] = item[Object.keys(item)[0]] || true, obj), {});
+		})(),
+		conflicts: (() => {
+			if (!archiveData || !archiveData.conflicts) return {};
+
+			return archiveData.conflicts.split(", ").map(item => {
+				let match = item.match(/(^\S*)(?:.\((.+)\))?/);
+				return { [match[1]]: match[2] };
+			}).reduce((obj, item) => (obj[Object.keys(item)[0]] = item[Object.keys(item)[0]] || true, obj), {});
+		})(),
+		filename: `/files/${packageFile.name}`,
+		//fileData: packageFile.data,
+		fileMime: packageFile.mimetype,
+		md5sum: cryptoBuiltin.createHash("md5").update(packageFile.data).digest("hex"),
+		sha1: cryptoBuiltin.createHash("sha1").update(packageFile.data).digest("hex"),
+		sha256: cryptoBuiltin.createHash("sha256").update(packageFile.data).digest("hex"),
+		size: packageFile.size,
+		installedSize: controlData.installedSize || -1
+	})).then(packageVersionObj => {
+		delete packageVersionObj.dataValues.fileData;
+
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.VERSION_CREATED,
+			accountId: account.id,
+			affectedPackageId: packageObj.id,
+			detailText: `User ${account.username} <${account.email}> created version ${packageVersionObj.version} <${packageVersionObj.id}> for package ${packageObj.identifier} <${packageObj.id}>`,
+			status: 2
 		});
 
-		PackageVersion.create(Object.assign(archiveData, {
-			id: String.prototype.concat(packageObj.id, account.id, new Date().getTime()),
-			packageId: packageObj.id,
-			version: archiveData["version"] || versionData.version,
-			changeText: versionData.changeText,
-			visible: versionData.visible,
-			depends: (() => {
-				if (!archiveData || !archiveData.depends) return {};
-
-				return archiveData.depends.split(", ").map(item => {
-					let match = item.match(/(^\S*)(?:.\((.+)\))?/);
-					return { [match[1]]: match[2] };
-				}).reduce((obj, item) => (obj[Object.keys(item)[0]] = item[Object.keys(item)[0]] || true, obj), {});
-			})(),
-			conflicts: (() => {
-				if (!archiveData || !archiveData.conflicts) return {};
-
-				return archiveData.conflicts.split(", ").map(item => {
-					let match = item.match(/(^\S*)(?:.\((.+)\))?/);
-					return { [match[1]]: match[2] };
-				}).reduce((obj, item) => (obj[Object.keys(item)[0]] = item[Object.keys(item)[0]] || true, obj), {});
-			})(),
-			filename: `/files/${packageFile.name}`,
-			//fileData: packageFile.data,
-			fileMime: packageFile.mimetype,
-			md5sum: cryptoBuiltin.createHash("md5").update(packageFile.data).digest("hex"),
-			sha1: cryptoBuiltin.createHash("sha1").update(packageFile.data).digest("hex"),
-			sha256: cryptoBuiltin.createHash("sha256").update(packageFile.data).digest("hex"),
-			size: packageFile.size,
-			installedSize: controlData.installedSize || -1
-		})).then(packageVersionObj => {
-			delete packageVersionObj.dataValues.fileData;
-
-			LogItem.create({
-				id: String.prototype.concat(new Date().getTime, Math.random()),
-				type: LogItemType.VERSION_CREATED,
-				accountId: account.id,
-				affectedPackageId: packageObj.id,
-				detailText: `User ${account.username} <${account.email}> created version ${packageVersionObj.version} <${packageVersionObj.id}> for package ${packageObj.identifier} <${packageObj.id}>`,
-				status: 2
-			});
-
-			return res.status(httpStatus.OK).send(packageVersionObj);
-		}).catch(error => ErrorHandler(req, res, error));
+		return res.status(httpStatus.OK).send(packageVersionObj);
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
@@ -252,43 +255,43 @@ router.post("/:packageId/versions/new", async (req, res) => {
 /**
  * GET /packages/:packageId/version/:versionId
  */
-router.get("/:packageId/versions/:versionId", (req, res) => {
+router.get("/:packageId/versions/:versionId", async (req, res) => {
 	const { Package, PackageVersion } = req.models;
 
-	Package.findOne({
+	let packageObj = await Package.findOne({
 		where: {
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			}
 		}
-	}).then(packageObj => {
-		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: `No package with identifier ${req.params.packageId} found`
-		});
+	});
+	
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: `No package with identifier ${req.params.packageId} found`
+	});
 
-		return PackageVersion.findOne({
-			where: {
-				packageId: packageObj.id,
-				[Sequelize.Op.or]: {
-					id: req.params.versionId,
-					version: req.params.versionId
-				},
-				visible: true
+	let packageVersionObj = await PackageVersion.findOne({
+		where: {
+			packageId: packageObj.id,
+			[Sequelize.Op.or]: {
+				id: req.params.versionId,
+				version: req.params.versionId
 			},
-			attributes: { exclude: ["fileData"] }
-		});
-	}).then(packageVersionObj => {
-		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
-		});
+			visible: true
+		},
+		attributes: { exclude: ["fileData"] }
+	});
 
-		return res.status(httpStatus.OK).send(packageVersionObj);
-	}).catch(error => ErrorHandler(req, res, error));
+	if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
+	});
+
+	return res.status(httpStatus.OK).send(packageVersionObj);
 });
 
 /**
@@ -337,7 +340,7 @@ router.get("/:packageId/versions/:versionId/file", (req, res) => {
 /**
  * PUT /packages/:packageId/versions/:versionId
  */
-router.put("/:packageId/versions/:versionId", (req, res) => {
+router.put("/:packageId/versions/:versionId", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
@@ -354,76 +357,76 @@ router.put("/:packageId/versions/:versionId", (req, res) => {
 
 	const { Package, PackageVersion, LogItem } = req.models;
 
-	Package.findOne({
+	let packageObj = await Package.findOne({
 		where: {
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			}
 		}
-	}).then(packageObj => {
-		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: `No package with identifier ${req.params.packageId} found`
-		});
+	});
+	
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: `No package with identifier ${req.params.packageId} found`
+	});
 
-		if (packageObj.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
-			name: httpStatus[httpStatus.FORBIDDEN],
-			code: httpStatus.FORBIDDEN,
-			message: "You are not allowed to perform this action"
-		});
+	if (packageObj.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
+		name: httpStatus[httpStatus.FORBIDDEN],
+		code: httpStatus.FORBIDDEN,
+		message: "You are not allowed to perform this action"
+	});
 
-		return PackageVersion.findOne({
-			where: {
-				packageId: packageObj.id,
-				[Sequelize.Op.or]: {
-					id: req.params.versionId,
-					version: req.params.versionId
-				},
-				visible: true
+	let packageVersionObj = await PackageVersion.findOne({
+		where: {
+			packageId: packageObj.id,
+			[Sequelize.Op.or]: {
+				id: req.params.versionId,
+				version: req.params.versionId
 			},
-			attributes: { exclude: ["fileData"] }
+			visible: true
+		},
+		attributes: { exclude: ["fileData"] }
+	});
+
+	if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
+	});
+
+	packageVersionObj.update(Object.assign(req.body, {
+		id: packageVersionObj.id,
+		packageId: packageVersionObj.packageId,
+		version: packageVersionObj.version,
+		downloadCount: packageVersionObj.downloadCount,
+		depends: packageVersionObj.depends,
+		conflicts: packageVersionObj.conflicts,
+		filename: packageVersionObj.filename,
+		fileData: packageVersionObj.fileData,
+		fileMime: packageVersionObj.fileMime,
+		md5sum: packageVersionObj.md5sum,
+		sha1: packageVersionObj.sha1,
+		sha256: packageVersionObj.sha256,
+		section: packageVersionObj.section,
+		size: packageVersionObj.size,
+		installedSize: packageVersionObj.installedSize,
+		createdAt: packageVersionObj.createdAt,
+		updatedAt: packageVersionObj.updatedAt
+	})).then(packageVersionObj => {
+		delete packageVersionObj.fileData;
+
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.VERSION_EDITED,
+			accountId: account.id,
+			affectedPackageId: packageObj.id,
+			detailText: `User ${account.username} <${account.email}> edited version ${packageVersionObj.version} <${packageVersionObj.id}> of package ${packageObj.identifier} <${packageObj.id}>`,
+			status: 2
 		});
-	}).then(packageVersionObj => {
-		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
-		});
 
-		packageVersionObj.update(Object.assign(req.body, {
-			id: packageVersionObj.id,
-			packageId: packageVersionObj.packageId,
-			version: packageVersionObj.version,
-			downloadCount: packageVersionObj.downloadCount,
-			depends: packageVersionObj.depends,
-			conflicts: packageVersionObj.conflicts,
-			filename: packageVersionObj.filename,
-			fileData: packageVersionObj.fileData,
-			fileMime: packageVersionObj.fileMime,
-			md5sum: packageVersionObj.md5sum,
-			sha1: packageVersionObj.sha1,
-			sha256: packageVersionObj.sha256,
-			section: packageVersionObj.section,
-			size: packageVersionObj.size,
-			installedSize: packageVersionObj.installedSize,
-			createdAt: packageVersionObj.createdAt,
-			updatedAt: packageVersionObj.updatedAt
-		})).then(packageVersionObj => {
-			delete packageVersionObj.fileData;
-
-			LogItem.create({
-				id: String.prototype.concat(new Date().getTime, Math.random()),
-				type: LogItemType.VERSION_EDITED,
-				accountId: account.id,
-				affectedPackageId: packageObj.id,
-				detailText: `User ${account.username} <${account.email}> edited version ${packageVersionObj.version} <${packageVersionObj.id}> of package ${packageObj.identifier} <${packageObj.id}>`,
-				status: 2
-			});
-
-			return res.status(httpStatus.OK).send(packageVersionObj);
-		}).catch(error => ErrorHandler(req, res, error));
+		return res.status(httpStatus.OK).send(packageVersionObj);
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
@@ -562,7 +565,7 @@ router.put("/:packageId/versions/:versionId/file", async (req, res) => {
 /**
  * DELETE /packages/:packageId/versions/:versionId
  */
-router.delete("/:packageId/versions/:versionId", (req, res) => {
+router.delete("/:packageId/versions/:versionId", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
@@ -579,63 +582,63 @@ router.delete("/:packageId/versions/:versionId", (req, res) => {
 
 	const { Package, PackageVersion, LogItem } = req.models;
 
-	Package.findOne({
+	let packageObj = await Package.findOne({
 		where: {
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			}
 		}
-	}).then(packageObj => {
-		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: `No package with identifier ${req.params.packageId} found`
+	});
+	
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: `No package with identifier ${req.params.packageId} found`
+	});
+
+	if (((account.role & UserRole.DEVELOPER) == UserRole.DEVELOPER &&
+		(account.role & UserRole.ADMINISTRATOR) == 0) &&
+		packageObj.accountId != account.id) {
+		return res.status(httpStatus.FORBIDDEN).send({
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
 		});
+	}
 
-		if (((account.role & UserRole.DEVELOPER) == UserRole.DEVELOPER &&
-			(account.role & UserRole.ADMINISTRATOR) == 0) &&
-			packageObj.accountId != account.id) {
-			return res.status(httpStatus.FORBIDDEN).send({
-				name: httpStatus[httpStatus.FORBIDDEN],
-				code: httpStatus.FORBIDDEN,
-				message: "You are not allowed to perform this action"
-			});
-		}
-
-		return PackageVersion.findOne({
-			where: {
-				packageId: packageObj.id,
-				[Sequelize.Op.or]: {
-					id: req.params.versionId,
-					version: req.params.versionId
-				},
-				visible: true
+	let packageVersionObj = await PackageVersion.findOne({
+		where: {
+			packageId: packageObj.id,
+			[Sequelize.Op.or]: {
+				id: req.params.versionId,
+				version: req.params.versionId
 			},
-			attributes: { exclude: ["fileData"] }
-		});
-	}).then(packageVersionObj => {
-		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
+			visible: true
+		},
+		attributes: { exclude: ["fileData"] }
+	});
+	
+	if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
+	});
+
+	packageVersionObj.destroy().then(() => {
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.VERSION_DELETED,
+			accountId: account.id,
+			affectedPackageId: packageObj.id,
+			detailText: `User ${account.username} <${account.email}> deleted version ${packageVersionObj.version} <${packageVersionObj.id}> of package ${packageObj.identifier} <${packageObj.id}>`,
+			status: 2
 		});
 
-		packageVersionObj.destroy().then(() => {
-			LogItem.create({
-				id: String.prototype.concat(new Date().getTime, Math.random()),
-				type: LogItemType.VERSION_DELETED,
-				accountId: account.id,
-				affectedPackageId: packageObj.id,
-				detailText: `User ${account.username} <${account.email}> deleted version ${packageVersionObj.version} <${packageVersionObj.id}> of package ${packageObj.identifier} <${packageObj.id}>`,
-				status: 2
-			});
-
-			return res.status(httpStatus.OK).send({
-				name: httpStatus[httpStatus.OK],
-				code: httpStatus.OK
-			});
-		}).catch(error => ErrorHandler(req, res, error));
+		return res.status(httpStatus.OK).send({
+			name: httpStatus[httpStatus.OK],
+			code: httpStatus.OK
+		});
 	}).catch(error => ErrorHandler(req, res, error));
 });
 

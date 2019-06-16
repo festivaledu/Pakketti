@@ -83,7 +83,7 @@ router.put("/me", async (req, res) => {
 /**
  * DELETE /account/me
  */
-router.delete("/me", (req, res) => {
+router.delete("/me", async (req, res) => {
 	const { account } = req;
 	const { Package, LogItem } = req.models;
 
@@ -93,33 +93,33 @@ router.delete("/me", (req, res) => {
 		message: "Invalid authorization token"
 	});
 
-	Package.findOne({
+	let packageObj = await Package.findOne({
 		where: {
 			accountId: account.id
 		}
-	}).then(packageObj => {
-		if (packageObj) return res.status(httpStatus.FORBIDDEN).send({
-			name: httpStatus[httpStatus.FORBIDDEN],
-			code: httpStatus.FORBIDDEN,
-			message: "One or more packages are associated to your account. You may request your deletion in the User Control Panel."
+	});
+	
+	if (packageObj) return res.status(httpStatus.FORBIDDEN).send({
+		name: httpStatus[httpStatus.FORBIDDEN],
+		code: httpStatus.FORBIDDEN,
+		message: "One or more packages are associated to your account. You may request your deletion in the User Control Panel."
+	});
+
+	account.destroy().then(() => {
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.USER_DELETED,
+			accountId: account.id,
+			affectedAccountId: accountObj.id,
+			detailText: `User ${accountObj.username} <${accountObj.email}> has been deleted`,
+			status: 2
 		});
 
-		account.destroy().then(() => {
-			LogItem.create({
-				id: String.prototype.concat(new Date().getTime, Math.random()),
-				type: LogItemType.USER_DELETED,
-				accountId: account.id,
-				affectedAccountId: accountObj.id,
-				detailText: `User ${accountObj.username} <${accountObj.email}> has been deleted`,
-				status: 2
-			});
-
-			return res.status(httpStatus.OK).send({
-				name: httpStatus[httpStatus.OK],
-				code: httpStatus.OK
-			});
-		}).catch(error => ErrorHandler(req, res, error));
-	});
+		return res.status(httpStatus.OK).send({
+			name: httpStatus[httpStatus.OK],
+			code: httpStatus.OK
+		});
+	}).catch(error => ErrorHandler(req, res, error));
 });
 
 
@@ -127,7 +127,7 @@ router.delete("/me", (req, res) => {
 /**
  * GET /account/me/avatar
  */
-router.get("/me/avatar", (req, res) => {
+router.get("/me/avatar", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
@@ -138,28 +138,28 @@ router.get("/me/avatar", (req, res) => {
 
 	const { Account } = req.models;
 
-	Account.findOne({
+	let accountObj = await Account.findOne({
 		where: {
 			id: account.id
 		},
 		attributes: ["profileImage", "profileImageMime"]
-	}).then(accountObj => {
-		if (!accountObj.profileImage) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: "User does not have any profile image"
-		});
+	});
+	
+	if (!accountObj.profileImage) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: "User does not have any profile image"
+	});
 
-		res.header("Content-Type", accountObj.profileImageMime);
-		res.write(accountObj.profileImage, "binary");
-		return res.end(undefined, "binary");
-	}).catch(error => ErrorHandler(req, res, error));
+	res.header("Content-Type", accountObj.profileImageMime);
+	res.write(accountObj.profileImage, "binary");
+	return res.end(undefined, "binary");
 });
 
 /**
  * PUT /account/me/avatar
  */
-router.put("/me/avatar", (req, res) => {
+router.put("/me/avatar", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
@@ -177,36 +177,36 @@ router.put("/me/avatar", (req, res) => {
 	});
 	let avatarFile = req.files.file;
 
-	Account.findOne({
+	let accountObj = await Account.findOne({
 		where: {
 			id: account.id
 		},
-	}).then(accountObj => {
-		accountObj.update({
-			profileImage: avatarFile.data,
-			profileImageMime: avatarFile.mimetype
-		}).then(() => {
-			LogItem.create({
-				id: String.prototype.concat(new Date().getTime, Math.random()),
-				type: LogItemType.USER_EDITED,
-				accountId: account.id,
-				affectedAccountId: accountObj.id,
-				detailText: `User ${accountObj.username} <${accountObj.email}> has received a new avatar`,
-				status: 2
-			});
+	});
+	
+	accountObj.update({
+		profileImage: avatarFile.data,
+		profileImageMime: avatarFile.mimetype
+	}).then(() => {
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.USER_EDITED,
+			accountId: account.id,
+			affectedAccountId: accountObj.id,
+			detailText: `User ${accountObj.username} <${accountObj.email}> has received a new avatar`,
+			status: 2
+		});
 
-			return res.status(httpStatus.OK).send({
-				name: "OK",
-				code: httpStatus.OK
-			});
-		}).catch(error => ErrorHandler(req, res, error));
+		return res.status(httpStatus.OK).send({
+			name: "OK",
+			code: httpStatus.OK
+		});
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
 /**
  * DELETE /account/me/avatar
  */
-router.delete("/me/avatar", (req, res) => {
+router.delete("/me/avatar", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
@@ -217,29 +217,29 @@ router.delete("/me/avatar", (req, res) => {
 
 	const { Account } = req.models;
 
-	Account.findOne({
+	let accountObj = await Account.findOne({
 		where: {
 			id: account.id
 		},
-	}).then(accountObj => {
-		accountObj.update({
-			profileImage: null,
-			profileImageMime: null
-		}).then(() => {
-			LogItem.create({
-				id: String.prototype.concat(new Date().getTime, Math.random()),
-				type: LogItemType.USER_EDITED,
-				accountId: account.id,
-				affectedAccountId: accountObj.id,
-				detailText: `User ${accountObj.username} <${accountObj.email}> has deleted their avatar`,
-				status: 2
-			});
+	});
+	
+	accountObj.update({
+		profileImage: null,
+		profileImageMime: null
+	}).then(() => {
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.USER_EDITED,
+			accountId: account.id,
+			affectedAccountId: accountObj.id,
+			detailText: `User ${accountObj.username} <${accountObj.email}> has deleted their avatar`,
+			status: 2
+		});
 
-			return res.status(httpStatus.OK).send({
-				name: "OK",
-				code: httpStatus.OK
-			});
-		}).catch(error => ErrorHandler(req, res, error));
+		return res.status(httpStatus.OK).send({
+			name: "OK",
+			code: httpStatus.OK
+		});
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
@@ -248,29 +248,29 @@ router.delete("/me/avatar", (req, res) => {
 /**
  * GET /account/:userId
  */
-router.get("/:userId", (req, res) => {
+router.get("/:userId", async (req, res) => {
 	const { Account } = req.models;
 
-	Account.findOne({
+	let accountObj = await Account.findOne({
 		where: {
 			id: req.params.userId
 		},
 		attributes: ["id", "username", [Sequelize.fn("COUNT", Sequelize.col('profileImage')), "profileImage"], "role", "createdAt"]
-	}).then(accountObj => {
-		if (!accountObj || !accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: "User not found"
-		});
+	});
+	
+	if (!accountObj || !accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: "User not found"
+	});
 
-		return res.status(httpStatus.OK).send(accountObj);
-	}).catch(error => ErrorHandler(req, res, error));
+	return res.status(httpStatus.OK).send(accountObj);
 });
 
 /**
  * DELETE /account/:userId
  */
-router.delete("/:userId", (req, res) => {
+router.delete("/:userId", async (req, res) => {
 	const { account } = req;
 	const { Account } = req.models;
 
@@ -292,38 +292,38 @@ router.delete("/:userId", (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	Account.findOne({
+	let accountObj = await Account.findOne({
 		where: {
 			id: req.params.userId
 		}
-	}).then(accountObj => {
-		if (!accountObj || !accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: "User not found"
+	});
+	
+	if (!accountObj || !accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: "User not found"
+	});
+
+	if (accountObj.role >= account.role || accountObj.role == 1) return res.status(httpStatus.FORBIDDEN).send({
+		name: httpStatus[httpStatus.FORBIDDEN],
+		code: httpStatus.FORBIDDEN,
+		message: "You are not allowed to perform this action"
+	});
+
+	accountObj.destroy().then(() => {
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.USER_DELETED,
+			accountId: account.id,
+			affectedAccountId: accountObj.id,
+			detailText: `User ${accountObj.username} <${accountObj.email}> was deleted by ${account.username}`,
+			status: 2
 		});
 
-		if (accountObj.role >= account.role || accountObj.role == 1) return res.status(httpStatus.FORBIDDEN).send({
-			name: httpStatus[httpStatus.FORBIDDEN],
-			code: httpStatus.FORBIDDEN,
-			message: "You are not allowed to perform this action"
+		return res.status(httpStatus.OK).send({
+			name: httpStatus[httpStatus.OK],
+			code: httpStatus.OK
 		});
-
-		accountObj.destroy().then(() => {
-			LogItem.create({
-				id: String.prototype.concat(new Date().getTime, Math.random()),
-				type: LogItemType.USER_DELETED,
-				accountId: account.id,
-				affectedAccountId: accountObj.id,
-				detailText: `User ${accountObj.username} <${accountObj.email}> was deleted by ${account.username}`,
-				status: 2
-			});
-
-			return res.status(httpStatus.OK).send({
-				name: httpStatus[httpStatus.OK],
-				code: httpStatus.OK
-			});
-		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
@@ -332,31 +332,31 @@ router.delete("/:userId", (req, res) => {
 /**
  * GET /account/:userId/avatar
  */
-router.get("/:userId/avatar", (req, res) => {
+router.get("/:userId/avatar", async (req, res) => {
 	const { Account } = req.models;
 
-	Account.findOne({
+	let accountObj = await Account.findOne({
 		where: {
 			id: req.params.userId
 		},
 		attributes: ["profileImage", "profileImageMime"]
-	}).then(accountObj => {
-		if (!accountObj || accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: "User not found"
-		});
+	});
+	
+	if (!accountObj || accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: "User not found"
+	});
 
-		if (!accountObj.profileImage) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: "User does not have any profile image"
-		});
+	if (!accountObj.profileImage) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: "User does not have any profile image"
+	});
 
-		res.header("Content-Type", accountObj.profileImageMime);
-		res.write(accountObj.profileImage, "binary");
-		return res.end(undefined, "binary");
-	}).catch(error => ErrorHandler(req, res, error));
+	res.header("Content-Type", accountObj.profileImageMime);
+	res.write(accountObj.profileImage, "binary");
+	return res.end(undefined, "binary");
 });
 
 module.exports = router;

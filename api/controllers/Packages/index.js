@@ -17,10 +17,10 @@ Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ 
 /**
  * GET /packages
  */
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
 	const { Package, PackageVersion, PackageScreenshot } = req.models;
 
-	Package.findAll({
+	let packageList = await Package.findAll({
 		where: { visible: true },
 		attributes: { exclude: ["icon"] },
 		order: [["createdAt", "DESC"]],
@@ -38,29 +38,29 @@ router.get("/", (req, res) => {
 			attributes: { exclude: ["fileData"] },
 			order: [["createdAt", "ASC"]]
 		}]
-	}).then(packageList => {
-		if (!packageList || !packageList.length) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: "No packages found"
-		});
+	});
+	
+	if (!packageList || !packageList.length) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: "No packages found"
+	});
 
-		packageList.forEach(packageObj => {
-			if (packageObj.dataValues.versions.length) {
-				packageObj.dataValues.latestVersion = packageObj.dataValues.versions[0];
-			}
-			packageObj.dataValues.versions = undefined;
+	packageList.forEach(packageObj => {
+		if (packageObj.dataValues.versions.length) {
+			packageObj.dataValues.latestVersion = packageObj.dataValues.versions[0];
+		}
+		packageObj.dataValues.versions = undefined;
 
-			if (packageObj.dataValues.screenshots.length) {
-				packageObj.dataValues.screenshots = packageObj.dataValues.screenshots.reduce((obj, item) => ({
-					...obj,
-					[item["screenClass"]]: (obj[item["screenClass"]] || []).concat(item)
-				}), {});
-			}
-		});
+		if (packageObj.dataValues.screenshots.length) {
+			packageObj.dataValues.screenshots = packageObj.dataValues.screenshots.reduce((obj, item) => ({
+				...obj,
+				[item["screenClass"]]: (obj[item["screenClass"]] || []).concat(item)
+			}), {});
+		}
+	});
 
-		return res.status(httpStatus.OK).send(packageList);
-	}).catch(error => ErrorHandler(req, res, error));
+	return res.status(httpStatus.OK).send(packageList);
 });
 
 /**
