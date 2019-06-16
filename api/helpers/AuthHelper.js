@@ -25,7 +25,7 @@ module.exports = (req, res, next) => {
 			},
 			attributes: ["id", "username", "email", "role", [Sequelize.fn("COUNT", Sequelize.col("profileImage")), "profileImage"], "lastLogin", "createdAt"]
 		}).then(accountObj => {
-			if (accountObj) {
+			if (accountObj.id) {
 				req.account = accountObj;
 			}
 			
