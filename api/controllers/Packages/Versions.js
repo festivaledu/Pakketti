@@ -8,7 +8,7 @@ const ErrorHandler = require("../../helpers/ErrorHandler");
 const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 const ArchiveParser = require("../../helpers/ArchiveParser");
 
-Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({[k]: v}) ));
+Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ [k]: v })));
 
 /**
  * GET /packages/:packageId/versions
@@ -29,7 +29,7 @@ router.get("/:packageId/versions", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		return PackageVersion.findAll({
 			where: {
 				packageId: packageObj.id,
@@ -44,7 +44,7 @@ router.get("/:packageId/versions", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: "Package does not have any versions"
 		});
-		
+
 		return res.status(httpStatus.OK).send(packageVersionList);
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -68,7 +68,7 @@ router.get("/:packageId/versions/latest", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		return PackageVersion.findOne({
 			where: {
 				packageId: packageObj.id,
@@ -83,7 +83,7 @@ router.get("/:packageId/versions/latest", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `Package ${req.params.packageId} does not have any versions`
 		});
-		
+
 		return res.status(httpStatus.OK).send(packageVersionObj);
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -143,9 +143,9 @@ router.post("/:packageId/versions/new", async (req, res) => {
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
-	
+
 	const { Package, PackageVersion, LogItem } = req.models;
-	
+
 	let packageObj = await Package.findOne({
 		where: {
 			[Sequelize.Op.or]: {
@@ -159,35 +159,35 @@ router.post("/:packageId/versions/new", async (req, res) => {
 		code: httpStatus.NOT_FOUND,
 		message: `No package with identifier ${req.params.packageId} found`
 	});
-	
+
 	if (packageObj.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
-	
+
 	if (!req.files || !req.files.file) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No package file specified"
 	});
-	
+
 	let packageFile = req.files.file;
 	let versionData = req.body;
-	
+
 	let archiveData = await ArchiveParser.parseArchive(packageFile, packageObj.identifier, packageObj.name, packageObj.architecture);
-	
+
 	if (!archiveData) return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
 		name: httpStatus[httpStatus.INTERNAL_SERVER_ERROR],
 		code: httpStatus.INTERNAL_SERVER_ERROR,
 		message: "Failed to parse archive data"
 	});
-	
+
 	// Parsing the archive data resulted in an error, so we send that error as a response
 	if (archiveData.code) {
 		return res.status(archiveData.code).send(archiveData);
 	}
-	
+
 	PackageVersion.findOne({
 		where: {
 			packageId: packageObj.id,
@@ -199,7 +199,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 			code: httpStatus.CONFLICT,
 			message: `Package ${req.params.packageId} already has a version ${archiveData.version || versionData.version}`
 		});
-		
+
 		PackageVersion.create(Object.assign(archiveData, {
 			id: String.prototype.concat(packageObj.id, account.id, new Date().getTime()),
 			packageId: packageObj.id,
@@ -208,6 +208,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 			visible: versionData.visible,
 			depends: (() => {
 				if (!archiveData || !archiveData.depends) return {};
+
 				return archiveData.depends.split(", ").map(item => {
 					let match = item.match(/(^\S*)(?:.\((.+)\))?/);
 					return { [match[1]]: match[2] };
@@ -215,6 +216,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 			})(),
 			conflicts: (() => {
 				if (!archiveData || !archiveData.conflicts) return {};
+
 				return archiveData.conflicts.split(", ").map(item => {
 					let match = item.match(/(^\S*)(?:.\((.+)\))?/);
 					return { [match[1]]: match[2] };
@@ -230,7 +232,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 			installedSize: controlData.installedSize || -1
 		})).then(packageVersionObj => {
 			delete packageVersionObj.dataValues.fileData;
-			
+
 			LogItem.create({
 				id: String.prototype.concat(new Date().getTime, Math.random()),
 				type: LogItemType.VERSION_CREATED,
@@ -239,7 +241,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 				detailText: `User ${account.username} <${account.email}> created version ${packageVersionObj.version} <${packageVersionObj.id}> for package ${packageObj.identifier} <${packageObj.id}>`,
 				status: 2
 			});
-			
+
 			return res.status(httpStatus.OK).send(packageVersionObj);
 		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));
@@ -266,7 +268,7 @@ router.get("/:packageId/versions/:versionId", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		return PackageVersion.findOne({
 			where: {
 				packageId: packageObj.id,
@@ -284,7 +286,7 @@ router.get("/:packageId/versions/:versionId", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 		});
-		
+
 		return res.status(httpStatus.OK).send(packageVersionObj);
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -337,21 +339,21 @@ router.get("/:packageId/versions/:versionId/file", (req, res) => {
  */
 router.put("/:packageId/versions/:versionId", (req, res) => {
 	const { account } = req;
-	
+
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
-	
+
 	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
-	
+
 	const { Package, PackageVersion, LogItem } = req.models;
-	
+
 	Package.findOne({
 		where: {
 			[Sequelize.Op.or]: {
@@ -365,13 +367,13 @@ router.put("/:packageId/versions/:versionId", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		if (packageObj.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,
 			message: "You are not allowed to perform this action"
 		});
-		
+
 		return PackageVersion.findOne({
 			where: {
 				packageId: packageObj.id,
@@ -389,7 +391,7 @@ router.put("/:packageId/versions/:versionId", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 		});
-		
+
 		packageVersionObj.update(Object.assign(req.body, {
 			id: packageVersionObj.id,
 			packageId: packageVersionObj.packageId,
@@ -410,7 +412,7 @@ router.put("/:packageId/versions/:versionId", (req, res) => {
 			updatedAt: packageVersionObj.updatedAt
 		})).then(packageVersionObj => {
 			delete packageVersionObj.fileData;
-			
+
 			LogItem.create({
 				id: String.prototype.concat(new Date().getTime, Math.random()),
 				type: LogItemType.VERSION_EDITED,
@@ -419,7 +421,7 @@ router.put("/:packageId/versions/:versionId", (req, res) => {
 				detailText: `User ${account.username} <${account.email}> edited version ${packageVersionObj.version} <${packageVersionObj.id}> of package ${packageObj.identifier} <${packageObj.id}>`,
 				status: 2
 			});
-			
+
 			return res.status(httpStatus.OK).send(packageVersionObj);
 		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));
@@ -562,13 +564,13 @@ router.put("/:packageId/versions/:versionId/file", async (req, res) => {
  */
 router.delete("/:packageId/versions/:versionId", (req, res) => {
 	const { account } = req;
-	
+
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
-	
+
 	if (account.role < UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
@@ -590,7 +592,7 @@ router.delete("/:packageId/versions/:versionId", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		if (((account.role & UserRole.DEVELOPER) == UserRole.DEVELOPER &&
 			(account.role & UserRole.ADMINISTRATOR) == 0) &&
 			packageObj.accountId != account.id) {
@@ -600,7 +602,7 @@ router.delete("/:packageId/versions/:versionId", (req, res) => {
 				message: "You are not allowed to perform this action"
 			});
 		}
-		
+
 		return PackageVersion.findOne({
 			where: {
 				packageId: packageObj.id,
@@ -618,7 +620,7 @@ router.delete("/:packageId/versions/:versionId", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 		});
-		
+
 		packageVersionObj.destroy().then(() => {
 			LogItem.create({
 				id: String.prototype.concat(new Date().getTime, Math.random()),
@@ -628,7 +630,7 @@ router.delete("/:packageId/versions/:versionId", (req, res) => {
 				detailText: `User ${account.username} <${account.email}> deleted version ${packageVersionObj.version} <${packageVersionObj.id}> of package ${packageObj.identifier} <${packageObj.id}>`,
 				status: 2
 			});
-			
+
 			return res.status(httpStatus.OK).send({
 				name: httpStatus[httpStatus.OK],
 				code: httpStatus.OK

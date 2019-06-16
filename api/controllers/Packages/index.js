@@ -12,14 +12,14 @@ const ErrorHandler = require("../../helpers/ErrorHandler");
 const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 const ArchiveParser = require("../../helpers/ArchiveParser");
 
-Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({[k]: v}) ));
+Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ [k]: v })));
 
 /**
  * GET /packages
  */
 router.get("/", (req, res) => {
 	const { Package, PackageVersion, PackageScreenshot } = req.models;
-	
+
 	Package.findAll({
 		where: { visible: true },
 		attributes: { exclude: ["icon"] },
@@ -44,13 +44,13 @@ router.get("/", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: "No packages found"
 		});
-		
+
 		packageList.forEach(packageObj => {
 			if (packageObj.dataValues.versions.length) {
 				packageObj.dataValues.latestVersion = packageObj.dataValues.versions[0];
 			}
 			packageObj.dataValues.versions = undefined;
-			
+
 			if (packageObj.dataValues.screenshots.length) {
 				packageObj.dataValues.screenshots = packageObj.dataValues.screenshots.reduce((obj, item) => ({
 					...obj,
@@ -58,7 +58,7 @@ router.get("/", (req, res) => {
 				}), {});
 			}
 		});
-		
+
 		return res.status(httpStatus.OK).send(packageList);
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -68,38 +68,41 @@ router.get("/", (req, res) => {
  */
 router.post("/new", async (req, res) => {
 	const { account } = req;
+
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
+
 	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
-	
+
 	const { Package, PackageVersion, LogItem } = req.models;
 	let packageData = req.body;
-	
+
 	let packageObj = await Package.findOne({
 		where: { identifier: packageData.identifier }
 	});
+
 	if (packageObj) return res.status(httpStatus.CONFLICT).send({
 		name: httpStatus[httpStatus.CONFLICT],
 		code: httpStatus.CONFLICT,
 		message: `Package with identifier ${packageData.identifier} already exists`
 	});
-	
+
 	if (!req.files || !req.files.file) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No package file specified"
 	});
-	
+
 	let packageFile = req.files.file;
 	let iconFile = req.files.icon;
-	
+
 	let archiveData = await ArchiveParser.parseArchive(packageFile, req.body.identifier, req.body.name, req.body.architecture);
 
 	if (!archiveData) return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -107,7 +110,7 @@ router.post("/new", async (req, res) => {
 		code: httpStatus.INTERNAL_SERVER_ERROR,
 		message: "Failed to parse archive data"
 	});
-	
+
 	// Parsing the archive data resulted in an error, so we send that error as a response
 	if (archiveData.code) {
 		return res.status(archiveData.code).send(archiveData);
@@ -127,6 +130,7 @@ router.post("/new", async (req, res) => {
 			visible: true,
 			depends: (() => {
 				if (!archiveData || !archiveData.depends) return {};
+
 				return archiveData.depends.split(", ").map(item => {
 					let match = item.match(/(^\S*)(?:.\((.+)\))?/);
 					return { [match[1]]: match[2] };
@@ -134,6 +138,7 @@ router.post("/new", async (req, res) => {
 			})(),
 			conflicts: (() => {
 				if (!archiveData || !archiveData.conflicts) return {};
+
 				return archiveData.conflicts.split(", ").map(item => {
 					let match = item.match(/(^\S*)(?:.\((.+)\))?/);
 					return { [match[1]]: match[2] };
@@ -149,7 +154,7 @@ router.post("/new", async (req, res) => {
 		})).then(packageVersionObj => {
 			delete packageObj.dataValues.icon;
 			delete packageVersionObj.dataValues.fileData;
-			
+
 			LogItem.create({
 				id: String.prototype.concat(new Date().getTime, Math.random()),
 				type: LogItemType.PACKAGE_CREATED,
@@ -158,7 +163,7 @@ router.post("/new", async (req, res) => {
 				detailText: `Package ${packageObj.identifier} <${packageObj.id}> was created by ${account.username} <${account.email}>`,
 				status: 2
 			});
-			
+
 			return res.status(httpStatus.OK).send({
 				package: packageObj,
 				packageVersion: packageVersionObj

@@ -13,7 +13,7 @@ const keys = ["API_STARTUP", "USER_REGISTRATION", "USER_LOGIN", "PACKAGE_CREATED
  */
 router.get("/", async (req, res) => {
 	const { LogItem } = req.models;
-	
+
 	let statisticsList = await LogItem.findAll({
 		where: {
 			createdAt: {
@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
 		raw: true,
 		attributes: ["type"]
 	});
-	
+
 	return res.status(200).send(keys.reduce((obj, key) => ({
 		...obj,
 		[key]: statisticsList.filter(item => LogItemType[key] === item.type).length
@@ -35,7 +35,7 @@ router.get("/", async (req, res) => {
  */
 router.get("/day", async (req, res) => {
 	const { LogItem } = req.models;
-	
+
 	let statisticsList = await LogItem.findAll({
 		where: {
 			createdAt: {
@@ -45,7 +45,7 @@ router.get("/day", async (req, res) => {
 		raw: true,
 		attributes: ["type"]
 	});
-	
+
 	return res.status(200).send(keys.reduce((obj, key) => ({
 		...obj,
 		[key]: statisticsList.filter(item => LogItemType[key] === item.type).length
@@ -57,7 +57,7 @@ router.get("/day", async (req, res) => {
  */
 router.get("/week", async (req, res) => {
 	const { LogItem } = req.models;
-	
+
 	let statisticsList = await LogItem.findAll({
 		where: {
 			createdAt: {
@@ -67,7 +67,7 @@ router.get("/week", async (req, res) => {
 		raw: true,
 		attributes: ["type"]
 	});
-	
+
 	return res.status(200).send(keys.reduce((obj, key) => ({
 		...obj,
 		[key]: statisticsList.filter(item => LogItemType[key] === item.type).length
@@ -79,7 +79,7 @@ router.get("/week", async (req, res) => {
  */
 router.get("/monthly", async (req, res) => {
 	const { LogItem } = req.models;
-	
+
 	let statisticsList = await LogItem.findAll({
 		where: {
 			createdAt: {
@@ -89,7 +89,7 @@ router.get("/monthly", async (req, res) => {
 		raw: true,
 		attributes: ["type"]
 	});
-	
+
 	return res.status(200).send(keys.reduce((obj, key) => ({
 		...obj,
 		[key]: statisticsList.filter(item => LogItemType[key] === item.type).length
@@ -102,7 +102,7 @@ router.get("/monthly", async (req, res) => {
  */
 router.get("/yearly", async (req, res) => {
 	const { LogItem } = req.models;
-	
+
 	let statisticsList = await LogItem.findAll({
 		where: {
 			createdAt: {
@@ -112,7 +112,7 @@ router.get("/yearly", async (req, res) => {
 		raw: true,
 		attributes: ["type"]
 	});
-	
+
 	return res.status(200).send(keys.reduce((obj, key) => ({
 		...obj,
 		[key]: statisticsList.filter(item => LogItemType[key] === item.type).length

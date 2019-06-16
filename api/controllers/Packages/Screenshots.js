@@ -6,12 +6,6 @@ const Sequelize = require("sequelize");
 const ErrorHandler = require("../../helpers/ErrorHandler");
 const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 
-let asyncForEach = async (array, callback) => {
-	for (let index = 0; index < array.length; index++) {
-		await callback(array[index], index)
-	}
-}
-
 /**
  * GET /packages/:packageId/screenshots
  */
@@ -26,13 +20,13 @@ router.get("/:packageId/screenshots", async (req, res) => {
 			}
 		}
 	});
-	
+
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.NOT_FOUND],
 		code: httpStatus.NOT_FOUND,
 		message: `No package with identifier ${req.params.packageId} found`
 	});
-	
+
 	let packageScreenshotList = await PackageScreenshot.findAll({
 		where: { packageId: packageObj.id },
 		attributes: { exclude: ["fileData"] },
@@ -44,7 +38,7 @@ router.get("/:packageId/screenshots", async (req, res) => {
 		code: httpStatus.NOT_FOUND,
 		message: `Package ${req.params.packageId} does not have any screenshots`
 	});
-	
+
 	return res.status(httpStatus.OK).send(packageScreenshotList.reduce((obj, item) => ({
 		...obj,
 		[item["screenClass"]]: (obj[item["screenClass"]] || []).concat(item)
@@ -56,29 +50,28 @@ router.get("/:packageId/screenshots", async (req, res) => {
  */
 router.post("/:packageId/screenshots", async (req, res) => {
 	const { account } = req;
-	
+
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
-	
+
 	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
-	
+
 	const { Package, PackageScreenshot, LogItem } = req.models;
-	
 	const screenshotData = req.body;
-	
+
 	if (!req.body || !req.body.length) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "Screenshot data missing"
 	});
-	
+
 	let packageObj = await Package.findOne({
 		where: {
 			[Sequelize.Op.or]: {
@@ -87,13 +80,13 @@ router.post("/:packageId/screenshots", async (req, res) => {
 			}
 		}
 	});
-	
+
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.NOT_FOUND],
 		code: httpStatus.NOT_FOUND,
 		message: `No package with identifier ${req.params.packageId} found`
 	});
-	
+
 	if (packageObj.accountId != account.id) {
 		return res.status(httpStatus.FORBIDDEN).send({
 			name: httpStatus[httpStatus.FORBIDDEN],
@@ -101,7 +94,7 @@ router.post("/:packageId/screenshots", async (req, res) => {
 			message: "You are not allowed to perform this action"
 		});
 	}
-	
+
 	PackageScreenshot.bulkCreate(screenshotData.map(screenshotObj => Object.assign(screenshotObj, {
 		id: String.prototype.concat(packageObj.id, new Date().getTime(), Math.random()),
 		packageId: packageObj.id
@@ -122,7 +115,7 @@ router.post("/:packageId/screenshots", async (req, res) => {
 			detailText: `User ${account.username} <${account.email}> added ${screenshotList.length} screenshot(s) to package ${packageObj.identifier} <${packageObj.id}>`,
 			status: 2
 		});
-		
+
 		return res.status(httpStatus.OK).send(screenshotList);
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -141,13 +134,13 @@ router.get("/:packageId/screenshots/:screenshotId", async (req, res) => {
 			}
 		}
 	});
-	
+
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.NOT_FOUND],
 		code: httpStatus.NOT_FOUND,
 		message: `No package with identifier ${req.params.packageId} found`
 	});
-	
+
 	let packageScreenshotObj = await PackageScreenshot.findOne({
 		where: {
 			id: req.params.screenshotId,
@@ -170,21 +163,21 @@ router.get("/:packageId/screenshots/:screenshotId", async (req, res) => {
  */
 router.delete("/:packageId/screenshots/:screenshotId", async (req, res) => {
 	const { account } = req;
-	
+
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
-	
+
 	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
-	
+
 	const { Package, PackageScreenshot, LogItem } = req.models;
-	
+
 	let packageObj = await Package.findOne({
 		where: {
 			[Sequelize.Op.or]: {
@@ -193,13 +186,13 @@ router.delete("/:packageId/screenshots/:screenshotId", async (req, res) => {
 			}
 		}
 	});
-	
+
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.NOT_FOUND],
 		code: httpStatus.NOT_FOUND,
 		message: `No package with identifier ${req.params.packageId} found`
 	});
-	
+
 	if (packageObj.accountId != account.id) {
 		return res.status(httpStatus.FORBIDDEN).send({
 			name: httpStatus[httpStatus.FORBIDDEN],
@@ -207,7 +200,7 @@ router.delete("/:packageId/screenshots/:screenshotId", async (req, res) => {
 			message: "You are not allowed to perform this action"
 		});
 	}
-	
+
 	let packageScreenshotObj = await PackageScreenshot.findOne({
 		where: {
 			id: req.params.screenshotId,
@@ -230,7 +223,7 @@ router.delete("/:packageId/screenshots/:screenshotId", async (req, res) => {
 			detailText: `User ${account.username} <${account.email}> deleted screenshot ${packageScreenshotObj.id} from package ${packageObj.identifier} <${packageObj.id}>`,
 			status: 2
 		});
-		
+
 		return res.status(httpStatus.OK).send({
 			name: httpStatus[httpStatus.OK],
 			code: httpStatus.OK

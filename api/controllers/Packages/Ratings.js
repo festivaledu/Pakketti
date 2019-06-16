@@ -6,7 +6,7 @@ const Sequelize = require("sequelize");
 const ErrorHandler = require("../../helpers/ErrorHandler");
 const { LogItemType } = require("../../helpers/Enumerations");
 
-const emptyRatingsObject =() => {
+const emptyRatingsObject = () => {
 	let _ratings = {
 		ratings: (() => {
 			let _ratingContainer = [];
@@ -21,7 +21,7 @@ const emptyRatingsObject =() => {
 		average: 0,
 		total: 0
 	}
-	
+
 	return _ratings;
 }
 
@@ -35,11 +35,11 @@ const getRatings = (_ratings, ratings) => {
 	_ratings.ratings.forEach(rating => {
 		_ratings.average += (rating.stars * rating.count);
 	});
-	
+
 	if (_ratings.total >= 1) {
 		_ratings.average = _ratings.average / _ratings.total;
 	}
-	
+
 	return _ratings;
 }
 
@@ -48,7 +48,7 @@ const getRatings = (_ratings, ratings) => {
  */
 router.get("/:packageId/ratings", (req, res) => {
 	const { Package, PackageVersion, PackageRating } = req.models;
-	
+
 	Package.findOne({
 		where: {
 			[Sequelize.Op.or]: {
@@ -75,18 +75,18 @@ router.get("/:packageId/ratings", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		if (!packageObj.versions.length) return res.status(httpStatus.NOT_FOUND).send({
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,
 			message: `Package ${req.params.packageId} does not have any versions`
 		});
-		
+
 		let ratings = emptyRatingsObject();
 		packageObj.versions.forEach(version => {
 			ratings = getRatings(ratings, version.ratings);
 		});
-		
+
 		return res.status(httpStatus.OK).send(ratings);
 	});
 });
@@ -110,7 +110,7 @@ router.get("/:packageId/versions/latest/ratings", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		return PackageVersion.findOne({
 			where: {
 				packageId: packageObj.id,
@@ -129,9 +129,9 @@ router.get("/:packageId/versions/latest/ratings", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `Package ${req.params.packageId} does not have any versions`
 		});
-		
+
 		let ratings = getRatings(emptyRatingsObject(), packageVersionObj.ratings);
-		
+
 		return res.status(httpStatus.OK).send(ratings);
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -157,7 +157,7 @@ router.get("/:packageId/versions/:versionId/ratings", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		return PackageVersion.findOne({
 			where: {
 				packageId: packageObj.id,
@@ -180,9 +180,9 @@ router.get("/:packageId/versions/:versionId/ratings", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 		});
-		
+
 		let ratings = getRatings(emptyRatingsObject(), packageVersionObj.ratings);
-		
+
 		return res.status(httpStatus.OK).send(ratings);
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -208,7 +208,7 @@ router.get("/:packageId/reviews/:reviewId/rating", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		return PackageReview.findOne({
 			where: {
 				id: req.params.reviewId,
@@ -225,7 +225,7 @@ router.get("/:packageId/reviews/:reviewId/rating", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `Package ${req.params.packageId} does not have any review with id ${req.params.reviewId}`
 		});
-		
+
 		return res.status(httpStatus.OK).send(packageReviewObj.rating);
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -235,15 +235,16 @@ router.get("/:packageId/reviews/:reviewId/rating", (req, res) => {
  */
 router.put("/:packageId/reviews/:reviewId/rating", (req, res) => {
 	const { account } = req;
-	
+
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
-	
+
 	const { Package, PackageReview, PackageRating, LogItem } = req.models;
 	const ratingData = req.body;
+
 	if (!ratingData || isNaN(ratingData.value)) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
@@ -263,7 +264,7 @@ router.put("/:packageId/reviews/:reviewId/rating", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		return PackageReview.findOne({
 			where: {
 				id: req.params.reviewId,
@@ -280,7 +281,7 @@ router.put("/:packageId/reviews/:reviewId/rating", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `Package ${req.params.packageId} does not have any review with id ${req.params.reviewId}`
 		});
-		
+
 		if (packageReviewObj.accountId != account.id) {
 			return res.status(httpStatus.FORBIDDEN).send({
 				name: httpStatus[httpStatus.FORBIDDEN],
@@ -288,7 +289,7 @@ router.put("/:packageId/reviews/:reviewId/rating", (req, res) => {
 				message: "You are not allowed to perform this action"
 			});
 		}
-		
+
 		packageReviewObj.rating.update({
 			value: ratingData.value
 		}).then(packageRatingObj => {
@@ -301,7 +302,7 @@ router.put("/:packageId/reviews/:reviewId/rating", (req, res) => {
 				detailText: `User ${account.username} <${account.email}> edited rating value of review ${packageReviewObj.id} to ${ratingData.value}`,
 				status: 2
 			});
-			
+
 			return res.status(httpStatus.OK).send(packageRatingObj);
 		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));

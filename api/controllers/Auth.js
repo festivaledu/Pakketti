@@ -15,13 +15,13 @@ const bcrypt = require("bcryptjs");
  */
 router.post("/register", (req, res) => {
 	const { Account, LogItem } = req.models;
-	
+
 	if (!req.body.username || !req.body.password) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No username, email or password provided"
 	});
-	
+
 	Account.findOne({
 		where: {
 			[Sequelize.Op.or]: {
@@ -35,10 +35,10 @@ router.post("/register", (req, res) => {
 			code: httpStatus.CONFLICT,
 			message: "Username or E-Mail address already in use"
 		});
-		
+
 		const salt = bcrypt.genSaltSync(10);
 		const hashedPassword = bcrypt.hashSync(req.body.password, salt);
-		
+
 		Account.create({
 			id: String.prototype.concat(req.body.username, req.body.email, hashedPassword, new Date().getTime()),
 			username: req.body.username,
@@ -55,7 +55,7 @@ router.post("/register", (req, res) => {
 			}, JWT_SECRET, {
 				expiresIn: process.env.NODE_ENV === "production" ? 7200 : 86400
 			});
-			
+
 			LogItem.create({
 				id: String.prototype.concat(new Date().getTime, Math.random()),
 				type: LogItemType.USER_REGISTRATION,
@@ -63,7 +63,7 @@ router.post("/register", (req, res) => {
 				detailText: `User ${accountObj.username} <${accountObj.email}> registered`,
 				status: 2
 			});
-			
+
 			return res
 				.status(httpStatus.OK)
 				.cookie("authToken", token, {
@@ -84,13 +84,13 @@ router.post("/register", (req, res) => {
  */
 router.post("/login", (req, res) => {
 	const { Account, LogItem } = req.models;
-	
+
 	if (!req.body.username || !req.body.password) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No username, email or password provided"
 	});
-	
+
 	Account.findOne({
 		where: {
 			[Sequelize.Op.or]: {
@@ -104,17 +104,17 @@ router.post("/login", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: "User not found"
 		});
-		
+
 		if (!accountObj.passwordValid(req.body.password)) return res.status(httpStatus.UNAUTHORIZED).send({
 			name: httpStatus[httpStatus.UNAUTHORIZED],
 			code: httpStatus.UNAUTHORIZED,
 			message: "Incorrect password"
 		});
-		
+
 		accountObj.update({
 			lastLogin: new Date().toUTCString()
 		}).catch(error => ErrorHandler(req, res, error));
-		
+
 		let token = jwt.sign({
 			userId: accountObj.id,
 			email: accountObj.email,
@@ -122,7 +122,7 @@ router.post("/login", (req, res) => {
 		}, JWT_SECRET, {
 			expiresIn: process.env.NODE_ENV === "production" ? 7200 : 86400
 		});
-		
+
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.USER_LOGIN,
@@ -130,7 +130,7 @@ router.post("/login", (req, res) => {
 			detailText: `User ${accountObj.username} <${accountObj.email}> successfully logged in`,
 			status: 2
 		});
-		
+
 		return res
 			.status(httpStatus.OK)
 			.cookie("authToken", token, {
@@ -154,7 +154,7 @@ router.get("/verify", (req, res) => {
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid or no authorization token provided"
 	});
-	
+
 	let token = jwt.sign({
 		userId: req.account.id,
 		email: req.account.email,
@@ -162,7 +162,7 @@ router.get("/verify", (req, res) => {
 	}, JWT_SECRET, {
 		expiresIn: process.env.NODE_ENV === "production" ? 7200 : 86400
 	});
-	
+
 	return res
 		.status(httpStatus.OK)
 		.cookie("authToken", token, {

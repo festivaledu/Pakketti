@@ -46,6 +46,7 @@ router.get("/:packageId", (req, res) => {
 		if (packageObj.dataValues.versions.length) {
 			packageObj.dataValues.latestVersion = packageObj.dataValues.versions[0];
 		}
+
 		packageObj.dataValues.versions = undefined;
 
 		if (packageObj.dataValues.screenshots.length) {
@@ -64,13 +65,13 @@ router.get("/:packageId", (req, res) => {
  */
 router.put("/:packageId", (req, res) => {
 	const { account } = req;
-	
+
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
-	
+
 	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
@@ -78,8 +79,9 @@ router.put("/:packageId", (req, res) => {
 	});
 
 	const { Package, LogItem } = req.models;
-	
+
 	const packageData = req.body;
+
 	if (!packageData) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
@@ -100,7 +102,7 @@ router.put("/:packageId", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		if (packageObj.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,
@@ -123,7 +125,7 @@ router.put("/:packageId", (req, res) => {
 				detailText: `Package ${packageObj.identifier} <${packageObj.id}> was edited by ${account.username} <${account.email}>`,
 				status: 2
 			});
-			
+
 			return res.status(httpStatus.OK).send(packageObj);
 		}).catch(error => ErrorHandler(req, res, error));
 	}).catch(error => ErrorHandler(req, res, error));
@@ -134,13 +136,13 @@ router.put("/:packageId", (req, res) => {
  */
 router.delete("/:packageId", (req, res) => {
 	const { account } = req;
-	
+
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
-	
+
 	if (account.role < UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
@@ -162,7 +164,7 @@ router.delete("/:packageId", (req, res) => {
 			code: httpStatus.NOT_FOUND,
 			message: `No package with identifier ${req.params.packageId} found`
 		});
-		
+
 		if (((account.role & UserRole.DEVELOPER) == UserRole.DEVELOPER &&
 			(account.role & UserRole.ADMINISTRATOR) == 0) &&
 			packageObj.accountId != account.id) {
@@ -182,7 +184,7 @@ router.delete("/:packageId", (req, res) => {
 				detailText: `Package ${packageObj.identifier} <${packageObj.id}> was deleted by ${account.username} <${account.email}>`,
 				status: 2
 			});
-			
+
 			return res.status(httpStatus.OK).send({
 				name: httpStatus[httpStatus.OK],
 				code: httpStatus.OK
