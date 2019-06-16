@@ -63,7 +63,7 @@ router.post("/:packageId/screenshots", async (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	if (account.role < UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
@@ -177,7 +177,7 @@ router.delete("/:packageId/screenshots/:screenshotId", async (req, res) => {
 		message: "Invalid authorization token"
 	});
 	
-	if (account.role < UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"

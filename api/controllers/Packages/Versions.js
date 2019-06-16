@@ -592,7 +592,6 @@ router.delete("/:packageId/versions/:versionId", (req, res) => {
 		});
 		
 		if (((account.role & UserRole.DEVELOPER) == UserRole.DEVELOPER &&
-			(account.role & UserRole.MODERATOR) == 0 &&
 			(account.role & UserRole.ADMINISTRATOR) == 0) &&
 			packageObj.accountId != account.id) {
 			return res.status(httpStatus.FORBIDDEN).send({
