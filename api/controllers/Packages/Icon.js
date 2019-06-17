@@ -33,6 +33,7 @@ router.get("/:packageId/icon", async (req, res) => {
 		message: `Package ${req.params.packageId} does not contain any icon`
 	});
 
+	res.header("Content-Type", packageObj.iconMime);
 	res.write(packageObj.icon, "binary");
 	return res.end(undefined, "binary");
 });
