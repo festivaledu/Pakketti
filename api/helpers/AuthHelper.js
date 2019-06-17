@@ -15,21 +15,20 @@ module.exports = (req, res, next) => {
 	
 	if (!authToken) return next();
 	
-	
-	jwt.verify(authToken, JWT_SECRET, (error, decoded) => {
+	jwt.verify(authToken, JWT_SECRET, async (error, decoded) => {
 		if (error) return next();
 		
-		Account.findOne({
+		let accountObj = await Account.findOne({
 			where: {
 				id: String(decoded.userId)
 			},
 			attributes: ["id", "username", "email", "role", [Sequelize.fn("COUNT", Sequelize.col("profileImage")), "profileImage"], "lastLogin", "createdAt"]
-		}).then(accountObj => {
-			if (accountObj.id) {
-				req.account = accountObj;
-			}
-			
-			return next();
 		});
+		
+		if (accountObj && accountObj.id) {
+			req.account = accountObj;
+		}
+		
+		return next();
 	});
 }
