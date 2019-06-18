@@ -13,22 +13,25 @@ module.exports = (req, res, next) => {
 		authToken = req.cookies["authToken"];
 	}
 	
-	if (!authToken) return next();
+	if (!authToken) resolve(next());
 	
-	jwt.verify(authToken, JWT_SECRET, async (error, decoded) => {
-		if (error) return next();
-		
-		let accountObj = await Account.findOne({
-			where: {
-				id: String(decoded.userId)
-			},
-			attributes: ["id", "username", "email", "role", [Sequelize.fn("COUNT", Sequelize.col("profileImage")), "profileImage"], "lastLogin", "createdAt"]
+	let promise = new Promise((resolve, reject) => {
+		jwt.verify(authToken, JWT_SECRET, async (error, decoded) => {
+			if (error|| !decoded) return resolve(next());
+			
+			let accountObj = await Account.findOne({
+				where: {
+					id: String(decoded.userId)
+				},
+				attributes: ["id", "username", "email", "role", [Sequelize.fn("COUNT", Sequelize.col("profileImage")), "profileImage"], "lastLogin", "createdAt"]
+			});
+			
+			if (accountObj && accountObj.id) {
+				req.account = accountObj;
+			}
+			
+			return resolve(next());
 		});
-		
-		if (accountObj && accountObj.id) {
-			req.account = accountObj;
-		}
-		
-		return next();
 	});
+	return promise;
 }
