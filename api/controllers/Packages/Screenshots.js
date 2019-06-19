@@ -115,6 +115,8 @@ router.post("/:packageId/screenshots", async (req, res) => {
 			detailText: `User ${account.username} <${account.email}> added ${screenshotList.length} screenshot(s) to package ${packageObj.identifier} <${packageObj.id}>`,
 			status: 2
 		});
+		
+		/// TODO: Move files to media folder
 
 		return res.status(httpStatus.OK).send(screenshotList);
 	}).catch(error => ErrorHandler(req, res, error));
