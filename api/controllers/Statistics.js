@@ -81,6 +81,30 @@ router.get("/week", async (req, res) => {
 });
 
 /**
+ * GET /statistics/year
+ * 
+ * Gets the Statistics values for the current year
+ */
+router.get("/year", async (req, res) => {
+	const { LogItem } = req.models;
+
+	let statisticsList = await LogItem.findAll({
+		where: {
+			createdAt: {
+				[Sequelize.Op.gte]: moment().utc().startOf("year").toDate()
+			}
+		},
+		raw: true,
+		attributes: ["type"]
+	});
+
+	return res.status(200).send(keys.reduce((obj, key) => ({
+		...obj,
+		[key]: statisticsList.filter(item => LogItemType[key] === item.type).length
+	}), {}));
+});
+
+/**
  * GET /statistics/monthly
  * 
  * Gets the Statistics values starting from the current day 2 months ago
