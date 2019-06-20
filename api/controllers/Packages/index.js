@@ -16,6 +16,8 @@ Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ 
 
 /**
  * GET /packages
+ * 
+ * Gets a list of available (visible) packages, including the latest version and screenshot metadata
  */
 router.get("/", async (req, res) => {
 	const { Package, PackageVersion, PackageScreenshot } = req.models;
@@ -65,6 +67,9 @@ router.get("/", async (req, res) => {
 
 /**
  * POST /packages/new
+ * 
+ * Creates a new Package and a Package Version by parsing file contents
+ * Supported package files are .deb (DPKG packages), .zip and (.tar).gz
  */
 router.post("/new", async (req, res) => {
 	const { account } = req;

@@ -8,6 +8,8 @@ const { UserRole, LogItemType } = require("../helpers/Enumerations");
 
 /**
  * GET /account/me
+ * 
+ * Gets information about the currently signed in User
  */
 router.get("/me", (req, res) => {
 	const { account } = req;
@@ -23,6 +25,8 @@ router.get("/me", (req, res) => {
 
 /**
  * PUT /account/me
+ * 
+ * Updates information for the currently signed in User
  */
 router.put("/me", async (req, res) => {
 
@@ -82,6 +86,8 @@ router.put("/me", async (req, res) => {
 
 /**
  * DELETE /account/me
+ * 
+ * Deletes the currently signed in User, if no packages are associated
  */
 router.delete("/me", async (req, res) => {
 	const { account } = req;
@@ -126,6 +132,8 @@ router.delete("/me", async (req, res) => {
 
 /**
  * GET /account/me/avatar
+ * 
+ * Gets the binary file for the Avatar of the currently signed in User
  */
 router.get("/me/avatar", async (req, res) => {
 	const { account } = req;
@@ -158,6 +166,8 @@ router.get("/me/avatar", async (req, res) => {
 
 /**
  * PUT /account/me/avatar
+ * 
+ * Updates the Avatar of the currently signed in User
  */
 router.put("/me/avatar", async (req, res) => {
 	const { account } = req;
@@ -205,6 +215,8 @@ router.put("/me/avatar", async (req, res) => {
 
 /**
  * DELETE /account/me/avatar
+ * 
+ * Deletes the Avatar of the currently signed in User
  */
 router.delete("/me/avatar", async (req, res) => {
 	const { account } = req;
@@ -247,6 +259,8 @@ router.delete("/me/avatar", async (req, res) => {
 
 /**
  * GET /account/:userId
+ * 
+ * Gets public information about a specified User
  */
 router.get("/:userId", async (req, res) => {
 	const { Account } = req.models;
@@ -269,6 +283,9 @@ router.get("/:userId", async (req, res) => {
 
 /**
  * DELETE /account/:userId
+ * 
+ * Deletes a specified User
+ * Users can only be deleted by Users with a Moderator role or higher
  */
 router.delete("/:userId", async (req, res) => {
 	const { account } = req;
@@ -331,6 +348,8 @@ router.delete("/:userId", async (req, res) => {
 
 /**
  * GET /account/:userId/avatar
+ * 
+ * Gets the binary file for the Avatar of a specified User
  */
 router.get("/:userId/avatar", async (req, res) => {
 	const { Account } = req.models;

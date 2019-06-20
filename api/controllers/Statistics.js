@@ -10,6 +10,8 @@ const keys = ["API_STARTUP", "USER_REGISTRATION", "USER_LOGIN", "PACKAGE_CREATED
 
 /**
  * GET /statistics
+ * 
+ * Gets the Statistics values starting the first day of the current month
  */
 router.get("/", async (req, res) => {
 	const { LogItem } = req.models;
@@ -32,6 +34,8 @@ router.get("/", async (req, res) => {
 
 /**
  * GET /statistics/day
+ * 
+ * Gets the Statistics values for the current day
  */
 router.get("/day", async (req, res) => {
 	const { LogItem } = req.models;
@@ -54,6 +58,8 @@ router.get("/day", async (req, res) => {
 
 /**
  * GET /statistics/week
+ * 
+ * Gets the Statistics values for the current week
  */
 router.get("/week", async (req, res) => {
 	const { LogItem } = req.models;
@@ -76,6 +82,8 @@ router.get("/week", async (req, res) => {
 
 /**
  * GET /statistics/monthly
+ * 
+ * Gets the Statistics values starting from the current day 2 months ago
  */
 router.get("/monthly", async (req, res) => {
 	const { LogItem } = req.models;
@@ -99,6 +107,8 @@ router.get("/monthly", async (req, res) => {
 
 /**
  * GET /statistics/yearly
+ * 
+ * Gets the Statistics values starting fron the current day 2 years ago
  */
 router.get("/yearly", async (req, res) => {
 	const { LogItem } = req.models;

@@ -38,7 +38,7 @@ module.exports = (Sequelize, DataTypes) => {
 		},
 		
 		/**
-		 * The OS version (build number) a device was running at the time of linking, which can be edited later on.
+		 * The OS version (build number) a device was running at the time of enrollment, which can be edited later on.
 		 */
 		version: {
 			type: DataTypes.STRING,

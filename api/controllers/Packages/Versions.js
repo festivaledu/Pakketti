@@ -12,6 +12,8 @@ Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ 
 
 /**
  * GET /packages/:packageId/versions
+ * 
+ * Gets a list of available (visible) Versions of a specified Package
  */
 router.get("/:packageId/versions", async (req, res) => {
 	const { Package, PackageVersion } = req.models;
@@ -51,6 +53,8 @@ router.get("/:packageId/versions", async (req, res) => {
 
 /**
  * GET /packages/:packageId/versions/latest
+ * 
+ * Gets the metadata for the latest Version of a specified Package
  */
 router.get("/:packageId/versions/latest", async (req, res) => {
 	const { Package, PackageVersion } = req.models;
@@ -90,6 +94,8 @@ router.get("/:packageId/versions/latest", async (req, res) => {
 
 /**
  * GET /packages/:packageId/versions/latest/file
+ * 
+ * Gets the binary file for the latest Version of a specified Package
  */
 router.get("/:packageId/versions/latest/file", (req, res) => {
 	/*const { Package, PackageVersion } = req.models;
@@ -130,6 +136,9 @@ router.get("/:packageId/versions/latest/file", (req, res) => {
 
 /**
  * POST /packages/:packageId/versions/new
+ * 
+ * Creates a new Package Version by parsing file contents
+ * Supported package files are .deb (DPKG packages), .zip and (.tar).gz
  */
 router.post("/:packageId/versions/new", async (req, res) => {
 	const { account } = req;
@@ -254,6 +263,8 @@ router.post("/:packageId/versions/new", async (req, res) => {
 
 /**
  * GET /packages/:packageId/version/:versionId
+ * 
+ * Gets the metadata for a specific Version of a specified Package
  */
 router.get("/:packageId/versions/:versionId", async (req, res) => {
 	const { Package, PackageVersion } = req.models;
@@ -296,6 +307,8 @@ router.get("/:packageId/versions/:versionId", async (req, res) => {
 
 /**
  * GET /packages/:packageId/version/:versionId/file
+ * 
+ * Gets the binary file for a specific Version of a specified Package
  */
 router.get("/:packageId/versions/:versionId/file", (req, res) => {
 	/*const { Package, PackageVersion } = req.models;
@@ -339,6 +352,8 @@ router.get("/:packageId/versions/:versionId/file", (req, res) => {
 
 /**
  * PUT /packages/:packageId/versions/:versionId
+ * 
+ * Updates the metadata for a specific Version of a specified Package
  */
 router.put("/:packageId/versions/:versionId", async (req, res) => {
 	const { account } = req;
@@ -432,6 +447,8 @@ router.put("/:packageId/versions/:versionId", async (req, res) => {
 
 /**
  * PUT /packages/:packageId/versions/:versionId/file
+ * 
+ * Updates the binary file for a specific Version of a specified Package
  */
 router.put("/:packageId/versions/:versionId/file", async (req, res) => {
 	/*const { account } = req;
@@ -564,6 +581,8 @@ router.put("/:packageId/versions/:versionId/file", async (req, res) => {
 
 /**
  * DELETE /packages/:packageId/versions/:versionId
+ * 
+ * Deletes a sepecific Version of a specified Package
  */
 router.delete("/:packageId/versions/:versionId", async (req, res) => {
 	const { account } = req;

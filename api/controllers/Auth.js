@@ -12,6 +12,8 @@ const bcrypt = require("bcryptjs");
 
 /**
  * POST /auth/register
+ * 
+ * Creates a new Account for a User
  */
 router.post("/register", async (req, res) => {
 	const { Account, LogItem } = req.models;
@@ -81,6 +83,8 @@ router.post("/register", async (req, res) => {
 
 /**
  * POST /auth/login
+ * 
+ * Verifies submitted data and creates a JSON Web Token if valid
  */
 router.post("/login", async (req, res) => {
 	const { Account, LogItem } = req.models;
@@ -147,6 +151,8 @@ router.post("/login", async (req, res) => {
 
 /**
  * GET /auth/verify
+ * 
+ * Validates JWTs and extends them
  */
 router.get("/verify", (req, res) => {
 	if (!req.account) return res.status(httpStatus.UNAUTHORIZED).send({

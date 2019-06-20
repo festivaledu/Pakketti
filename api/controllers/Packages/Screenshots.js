@@ -8,6 +8,8 @@ const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 
 /**
  * GET /packages/:packageId/screenshots
+ * 
+ * Gets a list of Screenshot metadata objects associated to a specified Package
  */
 router.get("/:packageId/screenshots", async (req, res) => {
 	const { Package, PackageScreenshot } = req.models;
@@ -47,6 +49,8 @@ router.get("/:packageId/screenshots", async (req, res) => {
 
 /**
  * POST /packages/:packageId/screenshots
+ * 
+ * Creates a bunch of Screenshot metadata objects and associates them to a specified Package
  */
 router.post("/:packageId/screenshots", async (req, res) => {
 	const { account } = req;
@@ -124,6 +128,8 @@ router.post("/:packageId/screenshots", async (req, res) => {
 
 /**
  * GET /packages/:packageId/screenshots/:screenshotId
+ * 
+ * Gets the metadata of a specific Screenshot associated to a specified Package
  */
 router.get("/:packageId/screenshots/:screenshotId", async (req, res) => {
 	const { Package, PackageScreenshot } = req.models;
@@ -162,6 +168,8 @@ router.get("/:packageId/screenshots/:screenshotId", async (req, res) => {
 
 /**
  * DELETE /packages/:packageId/screenshots/:screenshotId
+ * 
+ * Deletes the metadata of a specific Screenshot associated to a specified Package
  */
 router.delete("/:packageId/screenshots/:screenshotId", async (req, res) => {
 	const { account } = req;

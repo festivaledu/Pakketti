@@ -5,8 +5,14 @@ const express = require("express");
 const router = express.Router();
 const httpStatus = require("http-status");
 
+/**
+ * Make every route use the AuthHelper before reaching their logic to inject a User's account into the Request object
+ */
 router.use("/", require("../helpers/AuthHelper"));
 
+/**
+ * Additional Routes
+ */
 fs
 	.readdirSync(__dirname)
 	.filter(file => {

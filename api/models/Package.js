@@ -89,7 +89,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
-		 * The package creator's Account ID
+		 * The Package creator's Account ID
 		 */
 		accountId: {
 			type: DataTypes.STRING(32),
@@ -97,7 +97,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
-		 * The visibility (downloadability) of this package
+		 * The visibility (downloadability) of this Package
 		 */
 		visible: {
 			type: DataTypes.BOOLEAN,
@@ -105,7 +105,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
-		 * The binary data of a package's icon
+		 * The binary data of a pPackage's icon
 		 */
 		icon: {
 			type: DataTypes.BLOB,
@@ -113,8 +113,8 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
-		 * The MIME type of a package's icon.
-		 * The MIME type is used when requesting a packages's icon and is then added to the Content-Type response header.
+		 * The MIME type of a Package's icon.
+		 * The MIME type is used when requesting a Packages's icon and is then added to the Content-Type response header.
 		 */
 		iconMime: {
 			type: DataTypes.STRING

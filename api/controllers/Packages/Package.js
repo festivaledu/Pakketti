@@ -8,6 +8,8 @@ const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 
 /**
  * GET /packages/:packageId
+ * 
+ * Gets the metadata of a specifed Package
  */
 router.get("/:packageId", async (req, res) => {
 	const { Package, PackageVersion, PackageScreenshot } = req.models;
@@ -62,6 +64,8 @@ router.get("/:packageId", async (req, res) => {
 
 /**
  * PUT /packages/:packageId
+ * 
+ * Updates the metadata of a specified Package
  */
 router.put("/:packageId", async (req, res) => {
 	const { account } = req;
@@ -133,6 +137,8 @@ router.put("/:packageId", async (req, res) => {
 
 /**
  * DELETE /packages/:packageId
+ * 
+ * Deletes a Package and associated Versions, Reviews and Ratings
  */
 router.delete("/:packageId", async (req, res) => {
 	const { account } = req;

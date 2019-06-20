@@ -8,6 +8,9 @@ const { UserRole, LogItemType } = require("../helpers/Enumerations");
 
 /**
  * GET /requests/
+ * 
+ * Gets a list of Requests stored in the Database
+ * List items are filtered according to the role of the currently signed in User
  */
 router.get("/", async (req, res) => {
 	const { account } = req;
@@ -46,6 +49,9 @@ router.get("/", async (req, res) => {
 
 /**
  * POST /requests/new
+ * 
+ * Create a new Request
+ * Users can only create Refunds, User Reports and Developer/Moderator applications
  */
 router.post("/new", async (req, res) => {
 	const { account } = req;
@@ -81,6 +87,9 @@ router.post("/new", async (req, res) => {
 
 /**
  * PUT /requests/:requestId
+ * 
+ * Updates the details of a specified Request
+ * Can only be used by the Request creator or Users with a Moderator role or higher
  */
 router.put("/:requestId", async (req, res) => {
 	const { account } = req;
@@ -130,6 +139,9 @@ router.put("/:requestId", async (req, res) => {
 
 /**
  * DELETE /requests/:requestId
+ * 
+ * Deletes a specified Request
+ * Can only be used by Users with a Moderator role or higher
  */
 router.delete("/:requestId", async (req, res) => {
 	const { account } = req;

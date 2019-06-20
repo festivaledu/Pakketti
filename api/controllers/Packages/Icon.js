@@ -8,6 +8,8 @@ const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 
 /**
  * GET /packages/:packageId/icon
+ * 
+ * Gets the icon file of a specified Package
  */
 router.get("/:packageId/icon", async (req, res) => {
 	const { Package } = req.models;
@@ -40,6 +42,8 @@ router.get("/:packageId/icon", async (req, res) => {
 
 /**
  * PUT /packages/:packageId/icon
+ * 
+ * Updates the icon of a specified Package
  */
 router.put("/:packageId/icon", async (req, res) => {
 	const { account } = req;
@@ -108,6 +112,8 @@ router.put("/:packageId/icon", async (req, res) => {
 
 /**
  * DELETE /packages/:packageId/icon
+ * 
+ * Deletes the icon associated to a Package
  */
 router.delete("/:packageId/icon", async (req, res) => {
 	const { account } = req;

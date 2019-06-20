@@ -8,6 +8,8 @@ const { UserRole, LogItemType } = require("../../helpers/Enumerations");
 
 /**
  * GET /packages/reviews
+ * 
+ * Gets a list of all Package Reviews, limited to own Reviews (User), Reviews of owned Packages (Developer) or all Reviews (>= Moderator)
  */
 router.get("/reviews", async (req, res) => {
 	const { account } = req;
@@ -77,6 +79,8 @@ router.get("/reviews", async (req, res) => {
 
 /**
  * GET /packages/:packageId/reviews
+ * 
+ * Gets a list of every Review associated to a specified Package
  */
 router.get("/:packageId/reviews", async (req, res) => {
 	const { Package, PackageReview, PackageReviewMessage, PackageRating, Device } = req.models;
@@ -133,6 +137,8 @@ router.get("/:packageId/reviews", async (req, res) => {
 
 /**
  * POST /packages/:packageId/reviews/new
+ * 
+ * Creates a new Review and associates it to a specified Package
  */
 router.post("/:packageId/reviews/new", async (req, res) => {
 	const { account } = req;
@@ -241,6 +247,8 @@ router.post("/:packageId/reviews/new", async (req, res) => {
 
 /**
  * GET /packages/:packageId/reviews/:reviewId
+ * 
+ * Gets a specific Review of a specified Package
  */
 router.get("/:packageId/reviews/:reviewId", async (req, res) => {
 	const { Package, PackageReview, PackageReviewMessage, PackageRating, Device } = req.models;
@@ -298,6 +306,9 @@ router.get("/:packageId/reviews/:reviewId", async (req, res) => {
 
 /**
  * DELETE /packages/:packageId/reviews/:reviewId
+ * 
+ * Deletes a specific Review associated to a specified Package
+ * Reviews can only be deleted by their creator, the Package Developer or a User with a Moderator role or higher
  */
 router.delete("/:packageId/reviews/:reviewId", async (req, res) => {
 	const { account } = req;
@@ -365,6 +376,9 @@ router.delete("/:packageId/reviews/:reviewId", async (req, res) => {
 
 /**
  * POST /packages/:packageId/reviews/:reviewId/message
+ * 
+ * Adds a new Message to a specific Review associated to a specified Package
+ * Messages can only be added by the Review creator or the Package Developer
  */
 router.post("/:packageId/reviews/:reviewId/message", async (req, res) => {
 	const { account } = req;
@@ -447,6 +461,9 @@ router.post("/:packageId/reviews/:reviewId/message", async (req, res) => {
 
 /**
  * PUT /packages/:packageId/reviews/:reviewId/:messageId
+ * 
+ * Updates a Message of a specific Review associated to a specified Package
+ * Messages can only be updated by their creator
  */
 router.put("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
 	const { account } = req;
@@ -534,6 +551,9 @@ router.put("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
 
 /**
  * DELETE /packages/:packageId/reviews/:reviewId/:messageId
+ * 
+ * Deletes a Message of a specific Review associated to a specified Package
+ * Messages can only be deleted by their creator, the Package Developer or a User with a Moderator role or higher
  */
 router.delete("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
 	const { account } = req;
@@ -628,6 +648,8 @@ router.delete("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
 
 /**
  * GET /packages/:packageId/versions/latest/reviews
+ * 
+ * Gets a list of every Review associated to the latest Version of a specified Package
  */
 router.get("/:packageId/versions/latest/reviews", async (req, res) => {
 	const { Package, PackageVersion, PackageReview, PackageReviewMessage, PackageRating, Device } = req.models;
@@ -700,6 +722,8 @@ router.get("/:packageId/versions/latest/reviews", async (req, res) => {
 
 /**
  * GET /packages/:packageId/versions/:versionId/reviews
+ * 
+ * Gets a list of every Review associated to a specific Version of a specified Package
  */
 router.get("/:packageId/versions/:versionId/reviews", async (req, res) => {
 	const { Package, PackageVersion, PackageReview, PackageReviewMessage, PackageRating, Device } = req.models;

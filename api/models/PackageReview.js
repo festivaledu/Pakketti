@@ -1,5 +1,5 @@
 /**
- * The PackageReview model defines the internal structure of package reviews.
+ * The PackageReview model defines the internal structure of Package reviews.
  * 
  * @class		PackageReview
  * @file 		This file defines the PackageReview model.

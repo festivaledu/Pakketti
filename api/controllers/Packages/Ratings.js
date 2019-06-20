@@ -45,6 +45,8 @@ const getRatings = (_ratings, ratings) => {
 
 /**
  * GET /packages/:packageId/ratings
+ * 
+ * Gets the Rating values of a specified Package
  */
 router.get("/:packageId/ratings", async (req, res) => {
 	const { Package, PackageVersion, PackageRating } = req.models;
@@ -93,6 +95,8 @@ router.get("/:packageId/ratings", async (req, res) => {
 
 /**
  * GET /packages/:packageId/versions/latest/ratings
+ * 
+ * Gets the Rating values from the latest Version of a specified Package
  */
 router.get("/:packageId/versions/latest/ratings", async (req, res) => {
 	const { Package, PackageVersion, PackageRating } = req.models;
@@ -140,6 +144,8 @@ router.get("/:packageId/versions/latest/ratings", async (req, res) => {
 
 /**
  * GET /packages/:packageId/versions/:versionId/ratings
+ * 
+ * Gets the Rating values from a specific Version of a specified Package
  */
 router.get("/:packageId/versions/:versionId/ratings", async (req, res) => {
 	const { Package, PackageVersion, PackageRating } = req.models;
@@ -191,6 +197,8 @@ router.get("/:packageId/versions/:versionId/ratings", async (req, res) => {
 
 /**
  * GET /packages/:packageId/reviews/:reviewId/rating
+ * 
+ * Gets the Rating value of a specified Review
  */
 router.get("/:packageId/reviews/:reviewId/rating", async (req, res) => {
 	const { Package, PackageReview, PackageRating } = req.models;
@@ -232,6 +240,8 @@ router.get("/:packageId/reviews/:reviewId/rating", async (req, res) => {
 
 /**
  * PUT /packages/:packageId/reviews/:reviewId/rating
+ * 
+ * Updates the Rating value of a specified Review 
  */
 router.put("/:packageId/reviews/:reviewId/rating", async (req, res) => {
 	const { account } = req;

@@ -1,5 +1,5 @@
 /**
- * The PackageReviewMessage model defines the internal structure of messages associated to package reviews.
+ * The PackageReviewMessage model defines the internal structure of messages associated to Package reviews.
  * 
  * @class		PackageReviewMessage
  * @file 		This file defines the PackageReviewMessage model.

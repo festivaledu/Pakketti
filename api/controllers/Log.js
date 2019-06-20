@@ -8,6 +8,9 @@ const { UserRole, LogItemType } = require("../helpers/Enumerations");
 
 /**
  * GET /log/
+ * 
+ * Gets a list of Moderation Log items
+ * Can only be used by Users with a Moderator role or higher
  */
 router.get("/", async (req, res) => {
 	const { account } = req;
@@ -40,6 +43,9 @@ router.get("/", async (req, res) => {
 
 /**
  * GET /log/:logItemId
+ * 
+ * Gets the details of a specific Moderation Log item
+ * Can only be used by Users with a Moderator role or higher
  */
 router.get("/:logItemId", async (req, res) => {
 	const { account } = req;
@@ -79,6 +85,9 @@ router.get("/:logItemId", async (req, res) => {
 
 /**
  * PUT /log/:logItemId
+ * 
+ * Updates the details of a specific Moderation Log item
+ * Can only be used by Users with a Moderator role or higher
  */
 router.put("/:logItemId", async (req, res) => {
 	const { account } = req;
@@ -130,6 +139,9 @@ router.put("/:logItemId", async (req, res) => {
 
 /**
  * DELETE /log/:logItemId
+ * 
+ * Deletes a specific Moderation Log item
+ * Can only be used by Users with a Moderator role or higher
  */
 router.delete("/:logItemId", async (req, res) => {
 	const { account } = req;
