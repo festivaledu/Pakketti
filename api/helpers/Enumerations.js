@@ -127,6 +127,26 @@ const LogItemType = {
 	 */
 	REVIEW_MESSAGE_DELETED: 18,
 	
+	/**
+	 * This type is used when a User manually creates a device
+	 */
+	DEVICE_CREATED: 19,
+	
+	/**
+	 * This type is used when a User enrolls an iOS device using a Configuration Profile
+	 */
+	DEVICE_LINKED: 20,
+	
+	/**
+	 * This type is used when a User updates a device
+	 */
+	DEVICE_UPDATED: 21,
+	
+	/**
+	 * This type is used when a User deletes a device
+	 */
+	DEVICE_DELETED: 22,
+	
 	
 	
 	/**

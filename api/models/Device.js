@@ -24,6 +24,13 @@ module.exports = (Sequelize, DataTypes) => {
 		},
 		
 		/**
+		 * The device's assigned name, if available
+		 */
+		name: {
+			type: DataTypes.STRING
+		},
+		
+		/**
 		 * The device's product identifier (eg. in case of Apple devices: iPhone8,1) or a device's marketing name, if available
 		 */
 		product: {

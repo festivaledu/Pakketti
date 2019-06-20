@@ -62,6 +62,13 @@ module.exports = (Sequelize, DataTypes) => {
 		},
 		
 		/**
+		 * The Device that is affected by this Log Item, if any
+		 */
+		affectedDeviceId: {
+			type: DataTypes.STRING(32)
+		},
+		
+		/**
 		 * The Detail Text is used to further explain the purpose of this Log Item
 		 */
 		detailText: {
