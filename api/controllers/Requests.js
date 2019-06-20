@@ -65,7 +65,7 @@ router.post("/new", async (req, res) => {
 	const { LogItem } = req.models;
 	let requestData = req.body;
 
-	if (!requestData || isNaN(requestData.type) || !requestData.detailText.length) return res.status(httpStatus.NOT_FOUND).send({
+	if (!requestData || isNaN(requestData.type) || !requestData.detailText.length) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "Missing request information"
@@ -104,7 +104,7 @@ router.put("/:requestId", async (req, res) => {
 	const { LogItem } = req.models;
 	let requestData = req.body;
 
-	if (!requestData) return res.status(httpStatus.NOT_FOUND).send({
+	if (!requestData) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "Missing request information"

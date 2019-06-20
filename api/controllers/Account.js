@@ -180,7 +180,7 @@ router.put("/me/avatar", async (req, res) => {
 
 	const { Account, LogItem } = req.models;
 
-	if (!req.files || !req.files.file) return res.status(httpStatus.NOT_FOUND).send({
+	if (!req.files || !req.files.file) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No avatar file specified"

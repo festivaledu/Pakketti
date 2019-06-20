@@ -93,7 +93,7 @@ router.put("/:packageId", async (req, res) => {
 
 	const packageData = req.body;
 
-	if (!packageData) return res.status(httpStatus.NOT_FOUND).send({
+	if (!packageData) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No package data specified"

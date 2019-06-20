@@ -194,7 +194,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	if (!req.files || !req.files.file) return res.status(httpStatus.NOT_FOUND).send({
+	if (!req.files || !req.files.file) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No package file specified"

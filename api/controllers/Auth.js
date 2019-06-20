@@ -104,7 +104,7 @@ router.post("/login", async (req, res) => {
 		}
 	});
 	
-	if (!accountObj || (!accountObj.usernameValid(req.body.username) && !accountObj.emailValid(req.body.username))) return res.status(httpStatus.NOT_FOUND).send({
+	if (!accountObj || (!accountObj.usernameValid(req.body.username) && !accountObj.emailValid(req.body.username))) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.NOT_FOUND],
 		code: httpStatus.NOT_FOUND,
 		message: "User not found"

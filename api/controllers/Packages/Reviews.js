@@ -392,7 +392,7 @@ router.post("/:packageId/reviews/:reviewId/message", async (req, res) => {
 	const { Package, PackageReview, PackageReviewMessage, LogItem } = req.models;
 	const reviewData = req.body;
 
-	if (!reviewData || !reviewData.text || !reviewData.text.length) return res.status(httpStatus.NOT_FOUND).send({
+	if (!reviewData || !reviewData.text || !reviewData.text.length) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No review message specified"
@@ -477,7 +477,7 @@ router.put("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
 	const { Package, PackageReview, PackageReviewMessage } = req.models;
 	const reviewData = req.body;
 
-	if (!reviewData || !reviewData.text) return res.status(httpStatus.NOT_FOUND).send({
+	if (!reviewData || !reviewData.text) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No review message specified"
@@ -567,7 +567,7 @@ router.delete("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
 	const { Package, PackageReview, PackageReviewMessage, LogItem } = req.models;
 	const reviewData = req.body;
 
-	if (!reviewData || !reviewData.text) return res.status(httpStatus.NOT_FOUND).send({
+	if (!reviewData || !reviewData.text) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No review message specified"

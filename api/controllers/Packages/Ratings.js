@@ -255,7 +255,7 @@ router.put("/:packageId/reviews/:reviewId/rating", async (req, res) => {
 	const { Package, PackageReview, PackageRating, LogItem } = req.models;
 	const ratingData = req.body;
 
-	if (!ratingData || isNaN(ratingData.value)) return res.status(httpStatus.NOT_FOUND).send({
+	if (!ratingData || isNaN(ratingData.value)) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "Invalid or no rating data specified"

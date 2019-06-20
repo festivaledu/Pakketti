@@ -107,7 +107,7 @@ router.put("/:logItemId", async (req, res) => {
 	const { LogItem } = req.models;
 	let logItemData = req.body;
 
-	if (!logItemData) return res.status(httpStatus.NOT_FOUND).send({
+	if (!logItemData) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "Missing log item information"
