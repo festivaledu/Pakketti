@@ -23,6 +23,14 @@ router.get("/:packageId/versions", async (req, res) => {
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
 				identifier: req.params.packageId
+			},
+			[Sequelize.Op.and]: {
+				[Sequelize.Op.or]: (() => {
+					return JSON.parse(JSON.stringify({
+						visible: true,
+						accountId: req.developer !== undefined ? req.developer.id : undefined
+					}));
+				})()
 			}
 		}
 	});
@@ -36,7 +44,7 @@ router.get("/:packageId/versions", async (req, res) => {
 	let packageVersionList = await PackageVersion.findAll({
 		where: {
 			packageId: packageObj.id,
-			visible: true
+			visible: { [Sequelize.Op.gte]: req.developer === undefined },
 		},
 		attributes: { exclude: ["fileData"] },
 		order: [["createdAt", "DESC"]]
@@ -64,6 +72,14 @@ router.get("/:packageId/versions/latest", async (req, res) => {
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
 				identifier: req.params.packageId
+			},
+			[Sequelize.Op.and]: {
+				[Sequelize.Op.or]: (() => {
+					return JSON.parse(JSON.stringify({
+						visible: true,
+						accountId: req.developer !== undefined ? req.developer.id : undefined
+					}));
+				})()
 			}
 		}
 	});
@@ -274,6 +290,14 @@ router.get("/:packageId/versions/:versionId", async (req, res) => {
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
 				identifier: req.params.packageId
+			},
+			[Sequelize.Op.and]: {
+				[Sequelize.Op.or]: (() => {
+					return JSON.parse(JSON.stringify({
+						visible: true,
+						accountId: req.developer !== undefined ? req.developer.id : undefined
+					}));
+				})()
 			}
 		}
 	});
@@ -291,7 +315,7 @@ router.get("/:packageId/versions/:versionId", async (req, res) => {
 				id: req.params.versionId,
 				version: req.params.versionId
 			},
-			visible: true
+			visible: { [Sequelize.Op.gte]: req.developer === undefined }
 		},
 		attributes: { exclude: ["fileData"] }
 	});

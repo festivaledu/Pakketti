@@ -23,7 +23,14 @@ router.get("/", async (req, res) => {
 	const { Package, PackageVersion, PackageScreenshot } = req.models;
 
 	let packageList = await Package.findAll({
-		where: { visible: true },
+		where: {
+			[Sequelize.Op.or]: (() => {
+				return JSON.parse(JSON.stringify({
+					visible: true,
+					accountId: req.developer !== undefined ? req.developer.id : undefined
+				}));
+			})()
+		},
 		attributes: { exclude: ["icon"] },
 		order: [["createdAt", "DESC"]],
 		include: [{
@@ -31,7 +38,7 @@ router.get("/", async (req, res) => {
 			as: "versions",
 			separate: true,
 			attributes: { exclude: ["fileData"] },
-			where: { visible: true },
+			visible: { [Sequelize.Op.gte]: req.developer === undefined },
 			order: [["createdAt", "DESC"]],
 			limit: 1
 		}, {

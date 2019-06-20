@@ -16,10 +16,17 @@ router.get("/:packageId", async (req, res) => {
 
 	let packageObj = await Package.findOne({
 		where: {
-			visible: true,
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
 				identifier: req.params.packageId
+			},
+			[Sequelize.Op.and]: {
+				[Sequelize.Op.or]: (() => {
+					return JSON.parse(JSON.stringify({
+						visible: true,
+						accountId: req.developer !== undefined ? req.developer.id : undefined
+					}));
+				})()
 			}
 		},
 		attributes: { exclude: ["icon"] },
@@ -29,7 +36,7 @@ router.get("/:packageId", async (req, res) => {
 			as: "versions",
 			separate: true,
 			attributes: { exclude: ["fileData"] },
-			where: { visible: true },
+			where: { visible: { [Sequelize.Op.gte]: req.developer === undefined }},
 			order: [["createdAt", "DESC"]],
 			limit: 1
 		}, {
