@@ -71,7 +71,8 @@ router.post("/new", async (req, res) => {
 		message: "Missing request information"
 	});
 
-	if (requestData.type >= LogItemType.ROLE_DOWNGRADE && account.role < UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+	if ((requestData.type < LogItemType.REFUND) ||
+		(requestData.type >= LogItemType.ROLE_DOWNGRADE && account.role < UserRole.DEVELOPER)) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"

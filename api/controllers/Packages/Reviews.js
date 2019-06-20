@@ -346,7 +346,7 @@ router.delete("/:packageId/reviews/:reviewId", async (req, res) => {
 		
 	if (account.id != packageObj.accountId &&	// Developer
 		account.id != packageReviewObj.accountId &&	// Review Author
-		(account.role & UserRole.MODERATOR) != UserRole.MODERATOR) {
+		account.role < UserRole.MODERATOR) {
 		return res.status(httpStatus.FORBIDDEN).send({
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,
@@ -429,7 +429,7 @@ router.post("/:packageId/reviews/:reviewId/message", async (req, res) => {
 
 	if (account.id != packageObj.accountId &&	// Developer
 		account.id != packageReviewObj.accountId &&	// Review Author
-		(account.role & UserRole.MODERATOR) != UserRole.MODERATOR) {
+		account.role < UserRole.MODERATOR) {
 		return res.status(httpStatus.FORBIDDEN).send({
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,
@@ -604,7 +604,7 @@ router.delete("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
 
 	if (account.id != packageObj.accountId &&	// Developer
 		account.id != packageReviewObj.accountId &&	// Review Author
-		(account.role & UserRole.MODERATOR) != UserRole.MODERATOR) {
+		account.role < UserRole.MODERATOR) {
 		return res.status(httpStatus.FORBIDDEN).send({
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,
