@@ -7,6 +7,8 @@ const tar = require("tar-stream");
 const bufferstream = require("simple-bufferstream");
 const gunzip = require("gunzip-maybe");
 const controlParser = require("debian-control-parser");
+const unzip = require("adm-zip");
+const plist = require("plist");
 
 module.exports = {
 	/**
@@ -14,11 +16,13 @@ module.exports = {
 	 * If not, it returns an error object describing the parse error.
 	 */
 	parseArchive: async (archiveData, identifier, name, architecture) => {
+		let controlData;
+		
 		switch (archiveData.mimetype) {
 			case "application/x-deb":
 			case "application/x-debian-package":
 				// Debian package (APT)
-				let controlData = await new Promise((resolve, reject) => {
+				controlData = await new Promise((resolve, reject) => {
 					let archive = new ar.Archive(archiveData.data);
 					archive.getFiles().forEach(file => {
 						let filename = file.name();
@@ -58,6 +62,37 @@ module.exports = {
 				
 				return controlData;
 			case "application/zip":
+				controlData = await new Promise((resolve, reject) => {
+					let archive = new unzip(archiveData.data);
+					
+					archive.getEntries().forEach(file => {
+						let filename = file.entryName;
+						
+						if (filename.includes("Info.json")) {
+							let controlFile = JSON.parse(file.getData().toString("utf-8"));
+							return resolve(Object.fromEntries(Object.entries(controlFile).map(([k, v]) => [camelcase(k), v])));
+						} else if (filename.includes("Info.plist")) {
+							let controlFile = plist.parse(file.getData().toString("utf-8"));
+							return resolve(Object.fromEntries(Object.entries(controlFile).map(([k, v]) => [camelcase(k), v])));
+						}
+					});
+				});
+				
+				if (!controlData) return {
+					name: httpStatus[httpStatus.BAD_REQUEST],
+					code: httpStatus.BAD_REQUEST,
+					message: "Package file does not contain an Info.plist or Info.json file"
+				};
+				
+				if (controlData["package"] !== identifier ||
+					controlData["name"] !== name ||
+					controlData["architecture"] !== architecture) return {
+					name: httpStatus[httpStatus.CONFLICT],
+					code: httpStatus.CONFLICT,
+					message: "Package file information does not match package data"
+				};
+				
+				return controlData;
 			case "application/gzip":
 					return {
 						name: httpStatus[httpStatus.NOT_IMPLEMENTED],
