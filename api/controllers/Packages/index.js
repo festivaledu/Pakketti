@@ -175,6 +175,8 @@ router.post("/new", async (req, res) => {
 				detailText: `Package ${packageObj.identifier} <${packageObj.id}> was created by ${account.username} <${account.email}>`,
 				status: 2
 			});
+			
+			packageFile.mv(path.join(path.dirname(require.main.filename), "../", "files", packageFile.name));
 
 			return res.status(httpStatus.OK).send({
 				package: packageObj,

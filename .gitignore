@@ -108,3 +108,7 @@ typings/
 
 # Pakketti specific files
 *.sqlite3
+files/*
+!files/.gitkeep
+media/*
+!media/.gitkeep

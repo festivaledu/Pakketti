@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const express = require("express");
 const router = express.Router();
 const httpStatus = require("http-status");
@@ -162,7 +165,7 @@ router.delete("/:packageId", async (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	const { Package, LogItem } = req.models;
+	const { Package, PackageVersion, LogItem } = req.models;
 
 	let packageObj = await Package.findOne({
 		where: {
@@ -170,7 +173,13 @@ router.delete("/:packageId", async (req, res) => {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			}
-		}
+		},
+		include: [{
+			model: PackageVersion,
+			as: "versions",
+			separate: true,
+			attributes: ["filename"]
+		}]
 	});
 	
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
@@ -197,6 +206,12 @@ router.delete("/:packageId", async (req, res) => {
 			affectedPackageId: packageObj.id,
 			detailText: `Package ${packageObj.identifier} <${packageObj.id}> was deleted by ${account.username} <${account.email}>`,
 			status: 2
+		});
+		
+		packageObj.versions.forEach(packageVersionObj => {
+			if (fs.existsSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename))) {
+				fs.unlinkSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename))
+			}
 		});
 
 		return res.status(httpStatus.OK).send({

@@ -51,12 +51,18 @@ module.exports = (sequelize, DataTypes) => {
 		height: DataTypes.INTEGER,
 		
 		/**
+		 * The binary data of a Screenshot
+		 */
+		fileData: {
+			type: DataTypes.BLOB
+		},
+		
+		/**
 		 * The MIME type of a Screenshot
 		 * The MIME type is used when requesting a Screenshot and is then added to the Content-Type response header
 		 */
 		fileMime: {
-			type: DataTypes.STRING,
-			allowNull: false
+			type: DataTypes.STRING
 		},
 		
 		/**

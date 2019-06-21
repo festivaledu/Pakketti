@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const express = require("express");
 const router = express.Router();
 const httpStatus = require("http-status");
@@ -114,7 +117,7 @@ router.get("/:packageId/versions/latest", async (req, res) => {
  * Gets the binary file for the latest Version of a specified Package
  */
 router.get("/:packageId/versions/latest/file", (req, res) => {
-	/*const { Package, PackageVersion } = req.models;
+	const { Package, PackageVersion } = req.models;
 
 	Package.findOne({
 		where: {
@@ -144,10 +147,20 @@ router.get("/:packageId/versions/latest/file", (req, res) => {
 			message: `Package ${req.params.packageId} does not have any versions`
 		});
 		
+		if (!fs.existsSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename))) {
+			return res.status(httpStatus.NOT_FOUND).send({
+				name: httpStatus[httpStatus.NOT_FOUND],
+				code: httpStatus.NOT_FOUND,
+				message: `Package file not found`
+			});
+		}
+		
+		let fileData = fs.readFileSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename));
+		
 		res.header("Content-Type", packageVersionObj.fileMime);
-		res.write(packageVersionObj.fileData, "binary");
+		res.write(fileData, "binary");
 		return res.end(undefined, "binary");
-	}).catch(error => ErrorHandler(req, res, error));*/
+	}).catch(error => ErrorHandler(req, res, error));
 });
 
 /**
@@ -219,7 +232,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 	let packageVersionObj = await PackageVersion.findOne({
 		where: {
 			packageId: packageObj.id,
-			version: controlData.version
+			version: archiveData.version
 		}
 	});
 	
@@ -258,7 +271,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 		sha1: cryptoBuiltin.createHash("sha1").update(packageFile.data).digest("hex"),
 		sha256: cryptoBuiltin.createHash("sha256").update(packageFile.data).digest("hex"),
 		size: packageFile.size,
-		installedSize: controlData.installedSize || -1
+		installedSize: archiveData.installedSize || -1
 	})).then(packageVersionObj => {
 		delete packageVersionObj.dataValues.fileData;
 
@@ -270,6 +283,8 @@ router.post("/:packageId/versions/new", async (req, res) => {
 			detailText: `User ${account.username} <${account.email}> created version ${packageVersionObj.version} <${packageVersionObj.id}> for package ${packageObj.identifier} <${packageObj.id}>`,
 			status: 2
 		});
+		
+		packageFile.mv(path.join(path.dirname(require.main.filename), "../", "files", packageFile.name));
 
 		return res.status(httpStatus.OK).send(packageVersionObj);
 	}).catch(error => ErrorHandler(req, res, error));
@@ -335,7 +350,7 @@ router.get("/:packageId/versions/:versionId", async (req, res) => {
  * Gets the binary file for a specific Version of a specified Package
  */
 router.get("/:packageId/versions/:versionId/file", (req, res) => {
-	/*const { Package, PackageVersion } = req.models;
+	const { Package, PackageVersion } = req.models;
 
 	Package.findOne({
 		where: {
@@ -368,10 +383,20 @@ router.get("/:packageId/versions/:versionId/file", (req, res) => {
 			message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 		});
 		
+		if (!fs.existsSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename))) {
+			return res.status(httpStatus.NOT_FOUND).send({
+				name: httpStatus[httpStatus.NOT_FOUND],
+				code: httpStatus.NOT_FOUND,
+				message: `Package file not found`
+			});
+		}
+		
+		let fileData = fs.readFileSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename));
+		
 		res.header("Content-Type", packageVersionObj.fileMime);
-		res.write(packageVersionObj.fileData, "binary");
+		res.write(fileData, "binary");
 		return res.end(undefined, "binary");
-	}).catch(error => ErrorHandler(req, res, error));*/
+	}).catch(error => ErrorHandler(req, res, error));
 });
 
 /**
@@ -475,19 +500,21 @@ router.put("/:packageId/versions/:versionId", async (req, res) => {
  * Updates the binary file for a specific Version of a specified Package
  */
 router.put("/:packageId/versions/:versionId/file", async (req, res) => {
-	/*const { account } = req;
+	const { account } = req;
+	
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
 	});
+	
 	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
 	});
 	
-	const { Package, PackageVersion } = req.models;
+	const { Package, PackageVersion, LogItem } = req.models;
 	
 	let packageObj = await Package.findOne({
 		where: {
@@ -497,6 +524,7 @@ router.put("/:packageId/versions/:versionId/file", async (req, res) => {
 			}
 		}
 	});
+	
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
 		name: httpStatus[httpStatus.NOT_FOUND],
 		code: httpStatus.NOT_FOUND,
@@ -517,90 +545,83 @@ router.put("/:packageId/versions/:versionId/file", async (req, res) => {
 	
 	let packageFile = req.files.file;
 	let versionData = req.body;
-	let controlData = {};
-	
-	switch (packageFile.mimetype) {
-		case "application/x-debian-package":
-			// Debian package (APT)
-			controlData = await new Promise((resolve, reject) => {
-				let archive = new ar.Archive(packageFile.data);
-				archive.getFiles().forEach(file => {
-					let filename = file.name();
 
-					if (filename.includes("control.tar.gz")) {
-						let extractor = tar.extract();
+	let archiveData = await ArchiveParser.parseArchive(packageFile, packageObj.identifier, packageObj.name, packageObj.architecture);
 
-						extractor.on("entry", (header, stream, next) => {
-							if (header.name.indexOf("control") !== -1) {
-								let controlFile = controlParser(stream);
-								controlFile.on("stanza", parsedControl => {
-									return resolve(Object.fromEntries(Object.entries(parsedControl).map(([k, v]) => [camelcase(k), v])));
-								});
-							} else {
-								next();
-							}
-						});
+	if (!archiveData) return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+		name: httpStatus[httpStatus.INTERNAL_SERVER_ERROR],
+		code: httpStatus.INTERNAL_SERVER_ERROR,
+		message: "Failed to parse archive data"
+	});
 
-						bufferstream(file.fileData()).pipe(gunzip()).pipe(extractor);
-					}
-				});
-			});
-			
-			if (!controlData) return res.status(httpStatus.NOT_FOUND).send({
-				name: httpStatus[httpStatus.BAD_REQUEST],
-				code: httpStatus.BAD_REQUEST,
-				message: "Package file does not contain any control file"
-			});
-			
-			if (controlData["package"] !== packageObj.identifier ||
-				controlData["name"] !== packageObj.name ||
-				controlData["architecture"] !== packageObj.architecture) return res.status(httpStatus.CONFLICT).send({
-				name: httpStatus[httpStatus.CONFLICT],
-				code: httpStatus.CONFLICT,
-				message: "Package file information does not match package data"
-			});
-			break;
-		case "application/zip":
-			// Zip package (packed applications)
-		case "application/gzip":
-			// GNU Zip package (source code))
-			break;
-		default: return res.status(httpStatus.BAD_REQUEST).send({
-			name: httpStatus[httpStatus.BAD_REQUEST],
-			code: httpStatus.BAD_REQUEST,
-			message: "Package file does not have any known format"
-		});
+	// Parsing the archive data resulted in an error, so we send that error as a response
+	if (archiveData.code) {
+		return res.status(archiveData.code).send(archiveData);
 	}
 	
-	PackageVersion.findOne({
+	let packageVersionObj = await PackageVersion.findOne({
 		where: {
 			packageId: packageObj.id,
-			version: controlData.version
+			version: archiveData.version
 		}
-	}).then(packageVersionObj => {
-		if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: `Package ${req.params.packageId} does not have a version ${controlData.version || versionData.version}`
+	});
+	
+	if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
+		name: httpStatus[httpStatus.NOT_FOUND],
+		code: httpStatus.NOT_FOUND,
+		message: `Package ${req.params.packageId} does not have a version ${archiveData.version || versionData.version}`
+	});
+	
+	if (fs.existsSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename))) {
+		fs.unlinkSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename))
+	}
+	
+	packageVersionObj.update(Object.assign(archiveData, {
+		id: packageVersionObj.id,
+		packageId: packageVersionObj.packageId,
+		version: archiveData["version"] || versionData.version,
+		changeText: versionData.changeText,
+		visible: versionData.visible,
+		depends: (() => {
+			if (!archiveData || !archiveData.depends) return {};
+
+			return archiveData.depends.split(", ").map(item => {
+				let match = item.match(/(^\S*)(?:.\((.+)\))?/);
+				return { [match[1]]: match[2] };
+			}).reduce((obj, item) => (obj[Object.keys(item)[0]] = item[Object.keys(item)[0]] || true, obj), {});
+		})(),
+		conflicts: (() => {
+			if (!archiveData || !archiveData.conflicts) return {};
+
+			return archiveData.conflicts.split(", ").map(item => {
+				let match = item.match(/(^\S*)(?:.\((.+)\))?/);
+				return { [match[1]]: match[2] };
+			}).reduce((obj, item) => (obj[Object.keys(item)[0]] = item[Object.keys(item)[0]] || true, obj), {});
+		})(),
+		filename: `/files/${packageFile.name}`,
+		//fileData: packageFile.data,
+		fileMime: packageFile.mimetype,
+		md5sum: cryptoBuiltin.createHash("md5").update(packageFile.data).digest("hex"),
+		sha1: cryptoBuiltin.createHash("sha1").update(packageFile.data).digest("hex"),
+		sha256: cryptoBuiltin.createHash("sha256").update(packageFile.data).digest("hex"),
+		size: packageFile.size,
+		installedSize: archiveData.installedSize || -1
+	})).then(packageVersionObj => {
+		delete packageVersionObj.dataValues.fileData;
+		
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.VERSION_EDITED,
+			accountId: account.id,
+			affectedPackageId: packageObj.id,
+			detailText: `User ${account.username} <${account.email}> updated package file for version ${packageVersionObj.version} <${packageVersionObj.id}> of package ${packageObj.identifier} <${packageObj.id}>`,
+			status: 2
 		});
 		
-		packageVersionObj.update({
-			depends: [],
-			conflicts: [],
-			filename: `/files/${packageFile.name}`,
-			fileData: packageFile.data,
-			fileMime: packageFile.mimetype,
-			md5sum: cryptoBuiltin.createHash("md5").update(packageFile.data).digest("hex"),
-			sha1: cryptoBuiltin.createHash("sha1").update(packageFile.data).digest("hex"),
-			sha256: cryptoBuiltin.createHash("sha256").update(packageFile.data).digest("hex"),
-			size: packageFile.size,
-			installedSize: controlData.installedSize || -1
-		}).then(packageVersionObj => {
-			delete packageVersionObj.dataValues.fileData;
-			
-			return res.status(httpStatus.OK).send(packageVersionObj);
-		}).catch(error => ErrorHandler(req, res, error));
-	}).catch(error => ErrorHandler(req, res, error));*/
+		packageFile.mv(path.join(path.dirname(require.main.filename), "../", "files", packageFile.name));
+		
+		return res.status(httpStatus.OK).send(packageVersionObj);
+	}).catch(error => ErrorHandler(req, res, error));
 });
 
 /**
@@ -677,6 +698,10 @@ router.delete("/:packageId/versions/:versionId", async (req, res) => {
 			detailText: `User ${account.username} <${account.email}> deleted version ${packageVersionObj.version} <${packageVersionObj.id}> of package ${packageObj.identifier} <${packageObj.id}>`,
 			status: 2
 		});
+		
+		if (fs.existsSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename))) {
+			fs.unlinkSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename))
+		}
 
 		return res.status(httpStatus.OK).send({
 			name: httpStatus[httpStatus.OK],
