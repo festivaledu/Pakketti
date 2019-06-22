@@ -73,7 +73,7 @@ router.post("/register", async (req, res) => {
 				expiresIn: new Date().getTime() + (7200 * 1000),
 				//httpOnly: true
 			})
-			.json({
+			.send({
 				auth: true,
 				token: token,
 				role: accountObj.role
@@ -142,7 +142,7 @@ router.post("/login", async (req, res) => {
 			expiresIn: new Date().getTime() + (7200 * 1000),
 			//httpOnly: true
 		})
-		.json({
+		.send({
 			auth: true,
 			token: token,
 			role: accountObj.role
@@ -175,7 +175,7 @@ router.get("/verify", (req, res) => {
 			expiresIn: new Date().getTime() + (7200 * 1000),
 			//httpOnly: true
 		})
-		.json({
+		.send({
 			auth: true,
 			token: token,
 			role: req.account.role

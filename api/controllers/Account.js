@@ -73,7 +73,7 @@ router.put("/me", async (req, res) => {
 			detailText: `User ${accountObj.username} <${accountObj.email}> has been edited`,
 			status: 2
 		});
-		return res.status(httpStatus.OK).json({
+		return res.status(httpStatus.OK).send({
 			id: accountObj.id,
 			username: accountObj.username,
 			email: accountObj.email,
