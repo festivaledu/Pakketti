@@ -1,56 +1,8 @@
 const ws = require("ws");
+const HttpRequestWrapper = require("./HttpRequestWrapper");
 
 const controllers = require("../controllers");
 const authHelper = require("./AuthHelper");
-
-class RequestWrapper {
-	constructor(models, options) {
-		this.options = Object.assign({
-			headers: {},
-			body: null,
-			method: "GET",
-			path: ""
-		}, options);
-		
-		this.account = null;
-		this.models = models;
-	}
-	
-	async init() {
-		await authHelper(this, null, () => {});
-	}
-	
-	get headers() {
-		return this.options.headers;
-	}
-	
-	get body() {
-		return this.options.body;
-	}
-	
-	get method() {
-		return this.options.method;
-	}
-	
-	get path() {
-		return this.options.path;
-	}
-}
-
-class ResponseWrapper {
-	constructor() {
-		this._status = -1;
-	}
-	
-	status(statusCode) {
-		this._status = statusCode;
-		return this;
-	}
-	
-	send(content) {
-		return content;
-	}
-}
 
 module.exports = (models, port = 62486) => {
 	let mappedMethods = {};
@@ -90,15 +42,23 @@ module.exports = (models, port = 62486) => {
 	socket.on("connection", (ws) => {
 		ws.on('message', (data) => {
 			(async () => {
-				let rq = new RequestWrapper(models, JSON.parse(data));
-				await rq.init();
+				const _data = JSON.parse(data);
+				
+				let rq = new HttpRequestWrapper.Request.createRequest(Object.assign(_data, {
+					models: models
+				}));
+				await authHelper(rq, null, () => {});
+				
+				let rs = new HttpRequestWrapper.Response.createResponse({
+					req: rq
+				});
 
-				let rs = new ResponseWrapper();
+				await mappedMethods[rq.method.toLowerCase()][rq.path](rq, rs);
 
-				const response = await mappedMethods[rq.method.toLowerCase()][rq.path](rq, rs);
 				ws.send(JSON.stringify({
+					_rqid: _data._rqid,
 					status: rs._status,
-					data: response
+					body: rs._getData()
 				}));
 			})();
 		});
