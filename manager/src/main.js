@@ -3,6 +3,9 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
+import metroUI from "metroui-vue";
+Vue.use(metroUI);
+
 Vue.config.productionTip = false
 
 new Vue({
