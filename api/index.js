@@ -94,3 +94,8 @@ httpServer.use("/api", controllers);
 httpServer.listen(process.env.SERVER_PORT, () => {
 	console.log(`\x1b[34m[INFO]\x1b[0m Server is up on port ${process.env.SERVER_PORT}`);
 });
+
+//#region WebSocket Testing Area
+const WebSocketServer = require("./helpers/WebSocketServer");
+const socketServer = WebSocketServer(db.models);
+//#endregion
