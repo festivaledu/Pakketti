@@ -6,6 +6,12 @@ import store from './store'
 import metroUI from "metroui-vue";
 Vue.use(metroUI);
 
+import Vuelidate from 'vuelidate'
+Vue.use(Vuelidate)
+
+import vueHeadful from 'vue-headful'
+Vue.component("vue-headful", vueHeadful);
+
 Vue.config.productionTip = false
 
 new Vue({

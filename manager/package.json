@@ -8,9 +8,12 @@
   },
   "dependencies": {
     "core-js": "^2.6.5",
+    "crypto-js": "^3.1.9-1",
     "metroui-vue": "file:metroui-vue",
     "vue": "^2.6.10",
+    "vue-headful": "^2.0.1",
     "vue-router": "^3.0.3",
+    "vuelidate": "^0.7.4",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
