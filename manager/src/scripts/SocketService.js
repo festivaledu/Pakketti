@@ -4,6 +4,7 @@ import crypto from "crypto";
 export const SocketService = new Vue({
 	data: {
 		socket: null,
+		connectionPromiseResolve: null,
 		queue: {}
 	},
 	methods: {
@@ -13,9 +14,15 @@ export const SocketService = new Vue({
 			this.socket.onclose = this.onClose;
 			this.socket.onerror = this.onError;
 			this.socket.onmessage = this.onMessage;
+			
+			return new Promise((resolve) => {
+				this.connectionPromiseResolve = resolve;
+			});
 		},
 		onOpen(event) {
 			console.info("[WebSocket] WebSocket opened");
+			
+			this.connectionPromiseResolve(this.socket);
 			this.$emit("open", event);
 		},
 		onClose(event) {

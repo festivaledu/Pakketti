@@ -17,15 +17,3 @@
 		-webkit-backdrop-filter: none;
 	}
 </style>
-
-
-<script>
-import { SocketService } from "@/scripts/SocketService";
-
-export default {
-	name: "app",
-	created() {
-		SocketService.connect(`ws://${window.location.hostname}:62486`);
-	}
-}
-</script>
