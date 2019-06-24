@@ -42,7 +42,7 @@ router.post("/register", async (req, res) => {
 	const salt = bcrypt.genSaltSync(10);
 	const hashedPassword = bcrypt.hashSync(req.body.password, salt);
 
-	Account.create({
+	return Account.create({
 		id: String.prototype.concat(req.body.username, req.body.email, hashedPassword, new Date().getTime()),
 		username: req.body.username,
 		email: req.body.email,

@@ -301,7 +301,7 @@ router.put("/:packageId/reviews/:reviewId/rating", async (req, res) => {
 		});
 	}
 
-	packageReviewObj.rating.update({
+	return packageReviewObj.rating.update({
 		value: ratingData.value
 	}).then(packageRatingObj => {
 		LogItem.create({

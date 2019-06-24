@@ -78,12 +78,12 @@ router.post("/new", async (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	let logItemObj = await LogItem.create(Object.assign(requestData, {
+	return LogItem.create(Object.assign(requestData, {
 		id: String.prototype.concat(account.id, new Date().getTime(), Math.random()),
 		accountId: account.id
-	})).catch(error => ErrorHandler(req, res, error));
-
-	return res.status(httpStatus.OK).send(logItemObj);
+	})).then(logItemObj => {
+		return res.status(httpStatus.OK).send(logItemObj);
+	}).catch(error => ErrorHandler(req, res, error));
 });
 
 /**
@@ -129,7 +129,7 @@ router.put("/:requestId", async (req, res) => {
 			message: "You are not allowed to perform this action"
 		});
 
-	logItemObj.update(Object.assign(requestData, {
+	return logItemObj.update(Object.assign(requestData, {
 		id: logItemObj.id,
 		type: logItemObj.type,
 		accountId: logItemObj.accountId
@@ -180,7 +180,7 @@ router.delete("/:requestId", async (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	logItemObj.destroy().then(() => {
+	return logItemObj.destroy().then(() => {
 		return res.status(httpStatus.OK).send({
 			name: httpStatus[httpStatus.OK],
 			code: httpStatus.OK

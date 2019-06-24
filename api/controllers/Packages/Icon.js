@@ -91,7 +91,7 @@ router.put("/:packageId/icon", async (req, res) => {
 		message: "No icon file specified"
 	});
 
-	packageObj.update({
+	return packageObj.update({
 		icon: iconFile.data
 	}).then(() => {
 		LogItem.create({
@@ -153,7 +153,7 @@ router.delete("/:packageId/icon", async (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	packageObj.update({
+	return packageObj.update({
 		icon: null
 	}).then(() => {
 		LogItem.create({

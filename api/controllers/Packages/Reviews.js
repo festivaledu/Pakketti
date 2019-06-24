@@ -208,7 +208,7 @@ router.post("/:packageId/reviews/new", async (req, res) => {
 		message: "User did already review this package"
 	});
 
-	PackageReview.create(Object.assign(reviewData, {
+	return PackageReview.create(Object.assign(reviewData, {
 		id: String.prototype.concat(packageVersionObj.packageId, packageVersionObj.id, new Date().getTime()),
 		packageId: packageVersionObj.packageId,
 		packageVersionId: packageVersionObj.id,
@@ -354,7 +354,7 @@ router.delete("/:packageId/reviews/:reviewId", async (req, res) => {
 		});
 	}
 
-	packageReviewObj.destroy().then(() => {
+	return packageReviewObj.destroy().then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.REVIEW_DELETED,
@@ -437,7 +437,7 @@ router.post("/:packageId/reviews/:reviewId/message", async (req, res) => {
 		});
 	}
 
-	PackageReviewMessage.create(Object.assign(reviewData, {
+	return PackageReviewMessage.create(Object.assign(reviewData, {
 		id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.versionId, packageReviewObj.id, new Date().getTime()),
 		packageId: packageReviewObj.packageId,
 		packageVersionId: packageReviewObj.packageVersionId,
@@ -532,7 +532,7 @@ router.put("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
 		message: `Review ${req.params.reviewId} does not have any review with identifier ${req.params.messageId}`
 	});
 
-	reviewMessageObj.update({
+	return reviewMessageObj.update({
 		text: reviewData.text
 	}).then(packageReviewObj => {
 		LogItem.create({
@@ -626,7 +626,7 @@ router.delete("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
 		message: `Review ${req.params.reviewId} does not have any review with identifier ${req.params.messageOd}`
 	});
 
-	reviewMessageObj.destroy().then(() => {
+	return reviewMessageObj.destroy().then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.REVIEW_MESSAGE_DELETED,

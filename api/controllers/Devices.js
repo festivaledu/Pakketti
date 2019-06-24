@@ -65,7 +65,7 @@ router.post("/new", async (req, res) => {
 		message: `Device with Serial/UDID ${deviceObj.udid} already exists`
 	});
 	
-	Device.create(Object.assign(deviceData, {
+	return Device.create(Object.assign(deviceData, {
 		id: String.prototype.concat(deviceData.udid, new Date().getTime(), Math.random()),
 		accountId: account.id
 	})).then(deviceObj => {
@@ -157,7 +157,7 @@ router.put("/:deviceId", async (req, res) => {
 		message: `No device with identifier or Serial/UDID ${req.params.deviceId} found`
 	});
 	
-	deviceObj.update(Object.assign(deviceData, {
+	return deviceObj.update(Object.assign(deviceData, {
 		id: deviceObj.id,
 		product: deviceObj.product,
 		udid: deviceObj.udid,
@@ -208,7 +208,7 @@ router.delete("/:deviceId", async (req, res) => {
 		message: `No device with identifier or Serial/UDID ${req.params.deviceId} found`
 	});
 	
-	deviceObj.destroy().then(() => {
+	return deviceObj.destroy().then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.DEVICE_DELETED,

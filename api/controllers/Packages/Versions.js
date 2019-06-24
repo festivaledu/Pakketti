@@ -242,7 +242,7 @@ router.post("/:packageId/versions/new", async (req, res) => {
 		message: `Package ${req.params.packageId} already has a version ${archiveData.version || versionData.version}`
 	});
 
-	PackageVersion.create(Object.assign(archiveData, {
+	return PackageVersion.create(Object.assign(archiveData, {
 		id: String.prototype.concat(packageObj.id, account.id, new Date().getTime()),
 		packageId: packageObj.id,
 		version: archiveData["version"] || versionData.version,
@@ -460,7 +460,7 @@ router.put("/:packageId/versions/:versionId", async (req, res) => {
 		message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 	});
 
-	packageVersionObj.update(Object.assign(req.body, {
+	return packageVersionObj.update(Object.assign(req.body, {
 		id: packageVersionObj.id,
 		packageId: packageVersionObj.packageId,
 		version: packageVersionObj.version,
@@ -576,7 +576,7 @@ router.put("/:packageId/versions/:versionId/file", async (req, res) => {
 		fs.unlinkSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename))
 	}
 	
-	packageVersionObj.update(Object.assign(archiveData, {
+	return packageVersionObj.update(Object.assign(archiveData, {
 		id: packageVersionObj.id,
 		packageId: packageVersionObj.packageId,
 		version: archiveData["version"] || versionData.version,
@@ -689,7 +689,7 @@ router.delete("/:packageId/versions/:versionId", async (req, res) => {
 		message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
 	});
 
-	packageVersionObj.destroy().then(() => {
+	return packageVersionObj.destroy().then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.VERSION_DELETED,

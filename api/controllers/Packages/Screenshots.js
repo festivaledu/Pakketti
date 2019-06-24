@@ -111,7 +111,7 @@ router.post("/:packageId/screenshots", async (req, res) => {
 		});
 	}
 
-	PackageScreenshot.bulkCreate(screenshotData.map(screenshotObj => Object.assign(screenshotObj, {
+	return PackageScreenshot.bulkCreate(screenshotData.map(screenshotObj => Object.assign(screenshotObj, {
 		id: String.prototype.concat(packageObj.id, new Date().getTime(), Math.random()),
 		packageId: packageObj.id
 	}))).then(() => {
@@ -131,8 +131,6 @@ router.post("/:packageId/screenshots", async (req, res) => {
 			detailText: `User ${account.username} <${account.email}> added ${screenshotList.length} screenshot(s) to package ${packageObj.identifier} <${packageObj.id}>`,
 			status: 2
 		});
-		
-		/// TODO: Move files to media folder
 
 		return res.status(httpStatus.OK).send(screenshotList);
 	}).catch(error => ErrorHandler(req, res, error));
@@ -204,6 +202,11 @@ router.post("/:packageId/screenshots/files", async (req, res) => {
 				fileMime: screenshotFiles[fileId].mimetype
 			});
 		}
+	});
+	
+	return res.status(httpStatus.OK).send({
+		name: httpStatus[httpStatus.OK],
+		code: httpStatus.OK
 	});
 });
 
@@ -315,7 +318,7 @@ router.put("/:packageId/screenshots/:screenshotId", async (req, res) => {
 		message: `Package ${req.params.packageId} does not have any screenshot with identifier ${req.params.screenshotId}`
 	});
 	
-	packageScreenshotObj.update(Object.assign(screenshotData, {
+	return packageScreenshotObj.update(Object.assign(screenshotData, {
 		id: packageScreenshotObj.id,
 		packageId: packageScreenshotObj.packageId,
 		fileData: screenshotData.file ? screenshotData.file.data : packageScreenshotObj.fileData,
@@ -396,7 +399,7 @@ router.delete("/:packageId/screenshots/:screenshotId", async (req, res) => {
 		message: `Package ${req.params.packageId} does not have any screenshot with identifier ${req.params.screenshotId}`
 	});
 
-	packageScreenshotObj.destroy().then(() => {
+	return packageScreenshotObj.destroy().then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.PACKAGE_EDITED,

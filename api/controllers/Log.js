@@ -128,7 +128,7 @@ router.put("/:logItemId", async (req, res) => {
 		message: `No log item with identifier ${req.params.logItemId} found`
 	});
 	
-	logItemObj.update(Object.assign(logItemData, {
+	return logItemObj.update(Object.assign(logItemData, {
 		id: logItemObj.id,
 		type: logItemObj.type,
 		accountId: logItemObj.accountId
@@ -175,7 +175,7 @@ router.delete("/:logItemId", async (req, res) => {
 		message: `No log item with identifier ${req.params.logItemId} found`
 	});
 	
-	logItemObj.destroy().then(() => {
+	return logItemObj.destroy().then(() => {
 		return res.status(httpStatus.OK).send({
 			name: httpStatus[httpStatus.OK],
 			code: httpStatus.OK

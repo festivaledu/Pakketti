@@ -56,7 +56,7 @@ router.put("/me", async (req, res) => {
 		message: "Username or E-Mail address already in use"
 	});
 
-	account.update(Object.assign(req.body, {
+	return account.update(Object.assign(req.body, {
 		id: account.id,
 		role: account.role,
 		profileImage: account.profileImage,
@@ -111,7 +111,7 @@ router.delete("/me", async (req, res) => {
 		message: "One or more packages are associated to your account. You may request your deletion in the User Control Panel."
 	});
 
-	account.destroy().then(() => {
+	return account.destroy().then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.USER_DELETED,
@@ -193,7 +193,7 @@ router.put("/me/avatar", async (req, res) => {
 		},
 	});
 	
-	accountObj.update({
+	return accountObj.update({
 		profileImage: avatarFile.data,
 		profileImageMime: avatarFile.mimetype
 	}).then(() => {
@@ -235,7 +235,7 @@ router.delete("/me/avatar", async (req, res) => {
 		},
 	});
 	
-	accountObj.update({
+	return accountObj.update({
 		profileImage: null,
 		profileImageMime: null
 	}).then(() => {
@@ -327,7 +327,7 @@ router.delete("/:userId", async (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	accountObj.destroy().then(() => {
+	return accountObj.destroy().then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.USER_DELETED,

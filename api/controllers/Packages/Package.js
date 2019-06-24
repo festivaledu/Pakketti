@@ -124,7 +124,7 @@ router.put("/:packageId", async (req, res) => {
 		message: "You are not allowed to perform this action"
 	});
 
-	packageObj.update(Object.assign(packageData, {
+	return packageObj.update(Object.assign(packageData, {
 		id: packageObj.id,
 		identifier: packageObj.identifier,
 		icon: undefined,
@@ -198,7 +198,7 @@ router.delete("/:packageId", async (req, res) => {
 		});
 	}
 
-	packageObj.destroy().then(() => {
+	return packageObj.destroy().then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.PACKAGE_DELETED,

@@ -128,7 +128,7 @@ router.post("/new", async (req, res) => {
 		return res.status(archiveData.code).send(archiveData);
 	}
 
-	Package.create(Object.assign(packageData, {
+	return Package.create(Object.assign(packageData, {
 		id: String.prototype.concat(packageData.name, packageData.identifier, new Date().getTime()),
 		accountId: account.id,
 		icon: iconFile ? iconFile.data : null,
