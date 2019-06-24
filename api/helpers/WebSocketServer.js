@@ -53,13 +53,20 @@ module.exports = (models, port = 62486) => {
 					req: rq
 				});
 
-				await mappedMethods[rq.method.toLowerCase()][rq.path](rq, rs);
+				if (mappedMethods[rq.method.toLowerCase()][rq.path]) {
+					await mappedMethods[rq.method.toLowerCase()][rq.path](rq, rs);
+				} else {
+					return ws.send(JSON.stringify({
+						_rqid: _data._rqid,
+						statusCode: 404,
+						body: `Cannot ${rq.method} /api/${rq.path}'`
+					}));
+				}
 
-				ws.send(JSON.stringify({
+				ws.send(JSON.stringify(Object.assign(rs, {
 					_rqid: _data._rqid,
-					status: rs._status,
 					body: rs._getData()
-				}));
+				})));
 			})();
 		});
 
