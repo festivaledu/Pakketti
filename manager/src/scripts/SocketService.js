@@ -37,6 +37,13 @@ export const SocketService = new Vue({
 		},
 		onMessage(event) {
 			const data = JSON.parse(event.data);
+			
+			if (data.cookies && Object.keys(data.cookies).length) {
+				Object.keys(data.cookies).forEach(cookie => {
+					window.$cookies.set(cookie, data.cookies[cookie].value, data.cookies[cookie].options.expiresIn)
+				});
+			}
+			
 			if (data._rqid && this.queue[data._rqid]) {
 				this.queue[data._rqid].resolve(data.body);
 				delete this.queue[data._rqid];
