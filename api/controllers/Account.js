@@ -267,7 +267,11 @@ router.get("/:userId", async (req, res) => {
 
 	let accountObj = await Account.findOne({
 		where: {
-			id: req.params.userId
+			[Sequelize.Op.or]: {
+				id: req.params.userId,
+				username: req.params.userId,
+				email: req.params.userId
+			}
 		},
 		attributes: ["id", "username", [Sequelize.fn("COUNT", Sequelize.col('profileImage')), "profileImage"], "role", "createdAt"]
 	});
@@ -311,8 +315,12 @@ router.delete("/:userId", async (req, res) => {
 
 	let accountObj = await Account.findOne({
 		where: {
-			id: req.params.userId
-		}
+			[Sequelize.Op.or]: {
+				id: req.params.userId,
+				username: req.params.userId,
+				email: req.params.userId
+			}
+		},
 	});
 	
 	if (!accountObj || !accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
@@ -356,7 +364,11 @@ router.get("/:userId/avatar", async (req, res) => {
 
 	let accountObj = await Account.findOne({
 		where: {
-			id: req.params.userId
+			[Sequelize.Op.or]: {
+				id: req.params.userId,
+				username: req.params.userId,
+				email: req.params.userId
+			}
 		},
 		attributes: ["profileImage", "profileImageMime"]
 	});
