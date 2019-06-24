@@ -53,7 +53,7 @@
 
 <style lang="less">
 	.container {
-		min-height: 100vh;
+		min-height: 100%;
 		display: flex;
 		align-items: center;
 		& > .row {
@@ -141,11 +141,11 @@ export default {
 					password: CryptoJS.SHA512(texts[2]).toString(CryptoJS.enc.Hex)
 				}).then(async authData => {
 					this.isWorking = false;
-				
-					if (authData.code) {
+
+					if (!authData.auth) {
 						new metroUI.ContentDialog({
 							title: "There was an error signing you in",
-							content: `<p>The server responded with the following message:<br><span style="font-style: italic">${authData.code}: ${authData.message}</span></p>`,
+							content: `<p>The server responded with the following message:<br><span style="font-style: italic">${typeof authData === 'string' ? authData : `${authData.code}: ${authData.message}`}</span></p>`,
 							commands: [{ text: "Ok", primary: true }]
 						}).show();
 						return;

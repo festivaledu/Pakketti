@@ -19,4 +19,14 @@ export class AuthAPI {
 			body: data
 		});
 	}
+	
+	static async verify() {
+		return await SocketService.send({
+			method: "GET",
+			path: "auth/verify",
+			headers: {
+				"authorization": window.$cookies.get("authToken") ? `Bearer ${window.$cookies.get("authToken")}` : undefined
+			}
+		});
+	}
 }
