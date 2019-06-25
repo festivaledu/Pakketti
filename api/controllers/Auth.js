@@ -76,6 +76,7 @@ router.post("/register", async (req, res) => {
 			.send({
 				auth: true,
 				token: token,
+				accountId: accountObj.id,
 				role: accountObj.role
 			});
 	}).catch(error => ErrorHandler(req, res, error));
@@ -147,6 +148,7 @@ router.post("/login", async (req, res) => {
 		.send({
 			auth: true,
 			token: token,
+			accountId: accountObj.id,
 			role: accountObj.role
 		});
 });
@@ -180,6 +182,7 @@ router.get("/verify", (req, res) => {
 		.send({
 			auth: true,
 			token: token,
+			accountId: req.account.id,
 			role: req.account.role
 		});
 });

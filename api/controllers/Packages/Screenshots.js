@@ -213,7 +213,7 @@ router.post("/:packageId/screenshots/files", async (req, res) => {
 /**
  * GET /packages/:packageId/screenshots/:screenshotId
  * 
- * Gets the metadata of a specific Screenshot associated to a specified Package
+ * Gets the binary data of a specific Screenshot associated to a specified Package
  */
 router.get("/:packageId/screenshots/:screenshotId", async (req, res) => {
 	const { Package, PackageScreenshot } = req.models;

@@ -76,14 +76,7 @@ router.get("/:packageId/versions/latest", async (req, res) => {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			},
-			[Sequelize.Op.and]: {
-				[Sequelize.Op.or]: (() => {
-					return JSON.parse(JSON.stringify({
-						visible: true,
-						accountId: req.developer !== undefined ? req.developer.id : undefined
-					}));
-				})()
-			}
+			visible: true
 		}
 	});
 	
@@ -357,7 +350,8 @@ router.get("/:packageId/versions/:versionId/file", (req, res) => {
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
 				identifier: req.params.packageId
-			}
+			},
+			visible: true
 		}
 	}).then(packageObj => {
 		if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({

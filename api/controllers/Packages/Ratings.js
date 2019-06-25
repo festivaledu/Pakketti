@@ -105,8 +105,9 @@ router.get("/:packageId/versions/latest/ratings", async (req, res) => {
 		where: {
 			[Sequelize.Op.or]: {
 				id: req.params.packageId,
-				identifier: req.params.packageId
-			}
+				identifier: req.params.packageId,
+			},
+			visible: true
 		}
 	});
 	
