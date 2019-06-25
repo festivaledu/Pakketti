@@ -67,6 +67,33 @@ export const SocketService = new Vue({
 			
 			this.socket.send(JSON.stringify(data));
 			return promise;
+		},
+		
+		get(path, options = {}) {
+			return this.send(Object.assign(options, {
+				method: "GET",
+				path: path
+			}));
+		},
+		post(path, data = {}, options = {}) {
+			return this.send(Object.assign(options, {
+				method: "POST",
+				path: path,
+				body: data
+			}));
+		},
+		put(path, data = {}, options = {}) {
+			return this.send(Object.assign(options, {
+				method: "PUT",
+				path: path,
+				body: data
+			}));
+		},
+		delete(path, options = {}) {
+			return this.send(Object.assign(options, {
+				method: "DELETE",
+				path: path,
+			}));
 		}
 	}
 });

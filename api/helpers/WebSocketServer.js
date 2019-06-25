@@ -16,7 +16,7 @@ module.exports = (models, port = 62486) => {
 			if (!mappedMethods[layer.method]) mappedMethods[layer.method] = {};
 			
 			const route = path.concat(split(layer.regexp)).filter(Boolean).join('/');
-			mappedMethods[layer.method][route] = layer.handle;
+			mappedMethods[layer.method]["/" + route] = layer.handle;
 		}
 	}
 	const split = (path) => {
