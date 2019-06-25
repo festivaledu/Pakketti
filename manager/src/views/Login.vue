@@ -105,6 +105,9 @@ export default {
 					return;
 				}
 				
+				this.$store.commit("setAccountId", authData.accountId);
+				this.$store.commit("setRole", authData.role);
+				
 				this.$router.replace("/");
 			});
 		},
