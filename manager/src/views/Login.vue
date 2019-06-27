@@ -99,7 +99,7 @@ export default {
 				if (authData.code) {
 					new metroUI.ContentDialog({
 						title: "There was an error signing you in",
-						content: `<p>The server responded with the following message:<br><span style="font-style: italic">${authData.code}: ${authData.message}</span></p>`,
+						content: `<p>The server responded with the following message:<br><span style="font-style: italic">${typeof authData === 'string' ? authData : `${authData.code}: ${authData.message}`}</span></p>`,
 						commands: [{ text: "Ok", primary: true }]
 					}).show();
 					return;
