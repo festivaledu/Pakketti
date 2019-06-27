@@ -23,13 +23,12 @@ router.get("/:packageId", async (req, res) => {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			},
-			[Sequelize.Op.and]: {
-				[Sequelize.Op.or]: (() => {
-					return JSON.parse(JSON.stringify({
+			[Sequelize.Op.and]: req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
+				[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
 						visible: true,
 						accountId: req.developer !== undefined ? req.developer.id : undefined
-					}));
-				})()
+					}))
+				)()
 			}
 		},
 		attributes: { exclude: ["icon"] },

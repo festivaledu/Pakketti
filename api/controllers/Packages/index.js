@@ -23,13 +23,12 @@ router.get("/", async (req, res) => {
 	const { Package, PackageVersion, PackageScreenshot } = req.models;
 
 	let packageList = await Package.findAll({
-		where: {
-			[Sequelize.Op.or]: (() => {
-				return JSON.parse(JSON.stringify({
+		where: req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
+			[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
 					visible: true,
 					accountId: req.developer !== undefined ? req.developer.id : undefined
-				}));
-			})()
+				}))
+			)()
 		},
 		attributes: { exclude: ["icon"] },
 		order: [["createdAt", "DESC"]],
