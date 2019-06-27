@@ -39,7 +39,7 @@ router.get("/", async (req, res) => {
 			attributes: { exclude: ["fileData"] },
 			visible: { [Sequelize.Op.gte]: req.developer === undefined },
 			order: [["createdAt", "DESC"]],
-			limit: 1
+			// limit: 1
 		}, {
 			model: PackageScreenshot,
 			as: "screenshots",
@@ -55,13 +55,15 @@ router.get("/", async (req, res) => {
 	});
 
 	packageList.forEach(packageObj => {
-		if (packageObj.dataValues.versions.length) {
-			packageObj.dataValues.latestVersion = packageObj.dataValues.versions[0];
+		if (packageObj.versions.length) {
+			packageObj.dataValues.latestVersion = packageObj.versions[0];
+			
+			packageObj.dataValues.downloadCount = packageObj.versions.map(item => item.dataValues.downloadCount).reduce((a, b) => a + b);
 		}
-		packageObj.dataValues.versions = undefined;
+		delete packageObj.versions;
 
-		if (packageObj.dataValues.screenshots.length) {
-			packageObj.dataValues.screenshots = packageObj.dataValues.screenshots.reduce((obj, item) => ({
+		if (packageObj.screenshots.length) {
+			packageObj.screenshots = packageObj.screenshots.reduce((obj, item) => ({
 				...obj,
 				[item["screenClass"]]: (obj[item["screenClass"]] || []).concat(item)
 			}), {});
