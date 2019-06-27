@@ -1,0 +1,1 @@
+/Users/janikschmidt/Sites/Pakketti-git/api/helpers/Enumerations.js

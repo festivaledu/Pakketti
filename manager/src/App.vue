@@ -16,4 +16,36 @@
 		backdrop-filter: none;
 		-webkit-backdrop-filter: none;
 	}
+	
+	.data-grid .toggle-switch {
+		margin-bottom: 0;
+	}
+	
+	body[data-theme="light"] {
+		.acrylic:not(.notification) {
+			&.acrylic-80 {
+				background-color: darken(#FFF, 5%) !important;
+			}
+			&.acrylic-70 {
+				background-color: darken(#FFF, 10%) !important;
+			}
+			&.acrylic-60 {
+				background-color: darken(#FFF, 15%) !important;
+			}
+		}
+	}
+
+	body[data-theme="dark"] {
+		.acrylic:not(.notification) {
+			&.acrylic-80 {
+				background-color: lighten(#000, 5%) !important;
+			}
+			&.acrylic-70 {
+				background-color: lighten(#000, 10%) !important;
+			}
+			&.acrylic-60 {
+				background-color: lighten(#000, 15%) !important;
+			}
+		}
+	}
 </style>
