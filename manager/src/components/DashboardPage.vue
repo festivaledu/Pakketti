@@ -1,7 +1,13 @@
 <template>
 	<div class="page" data-page-id="dashboard" data-page-title="Dashboard" @pageShow="onPageShow">
 		<h4>Overview</h4>
-
+		
+		<div class="row">
+			<div class="col-md-3 p-0 px-md-3 mb-md-4">
+				<Statcard name="Downloads" :dataset="[543, 1337, 857]" />
+			</div>
+		</div>
+		
 		<table class="data-grid" v-if="isDeveloper && packageData">
 			<thead>
 				<tr>
@@ -48,8 +54,13 @@
 import { PackageAPI } from "@/scripts/ApiUtil"
 import { UserRole } from "@/scripts/Enumerations"
 
+import Statcard from "@/components/StatcardComponent"
+
 export default {
 	name: "DashboardPage",
+	components: {
+		Statcard
+	},
 	data: () => ({
 		packageData: null
 	}),
