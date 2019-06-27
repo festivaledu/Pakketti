@@ -33,7 +33,7 @@ module.exports = (req, res, next) => {
 			authToken = req.cookies["authToken"];
 		}
 		
-		if (!authToken) resolve(next());
+		if (!authToken) return resolve(next());
 	
 	
 		jwt.verify(authToken, JWT_SECRET, async (error, decoded) => {
