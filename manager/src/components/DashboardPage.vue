@@ -30,7 +30,7 @@
 					<td>{{ packageObj.latestVersion.version }}</td>
 					<td>{{ packageObj.downloadCount | number }}</td>
 					<td>
-						<metro-toggle-switch :value="true" />
+						<metro-toggle-switch :value="packageObj.visible" onContent="Yes" offContent="No" :readonly="true" />
 					</td>
 					<td>{{ packageObj.updatedAt | date }}</td>
 					<td class="align-right">

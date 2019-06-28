@@ -2144,11 +2144,12 @@ var Slider = {
  * @param {Any} value Represents the bound v-model
  * @param {String} onContent The text to show next to the ToggleSwitch in it 'on' state (default: "On")
  * @param {String} offContent The text to show next to the ToggleSwitch in it 'off' state (default: "Off")
+ * @param {Boolean} readonly Defines the ToggleSwitch as read-only
  * @fires input Fired if the ToggleSwitch state changed to update the model
  */
 var ToggleSwitch = {
 	name: "metro-toggle-switch",
-	props: ["value", "itemHeader", "onContent", "offContent"],
+	props: ["value", "itemHeader", "onContent", "offContent", "readonly"],
 	data() {
 		return {
 			id: crypto.randomBytes(20).toString("hex"),
@@ -2163,8 +2164,8 @@ var ToggleSwitch = {
 				{this.$props.itemHeader &&
 					<p class="item-header">{this.$props.itemHeader}</p>
 				}
-				<input type="checkbox" checked={this.$data._checked} id={this.$data.id} onChange={this._onChange} ref="input"></input>
-				<label for={this.$data.id}>
+				<input type="checkbox" checked={this.$data._checked} id={this.$data.id} onChange={this._onChange} readonly={this.$props.readonly} ref="input"></input>
+				<label for={this.$data.id} class={{"readonly": this.$props.readonly}}>
 					<p class="item-label" ref="itemLabel"></p>
 				</label>
 			</div>
