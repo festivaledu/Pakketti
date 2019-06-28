@@ -27,7 +27,7 @@ router.get("/:packageId/versions", async (req, res) => {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			},
-			[Sequelize.Op.and]: req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
+			[Sequelize.Op.and]: req.account && req.account.role >= UserRole.MODERATOR ? {} : {
 				[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
 						visible: true,
 						accountId: req.developer !== undefined ? req.developer.id : undefined
@@ -298,7 +298,7 @@ router.get("/:packageId/versions/:versionId", async (req, res) => {
 				id: req.params.packageId,
 				identifier: req.params.packageId
 			},
-			[Sequelize.Op.and]: req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
+			[Sequelize.Op.and]: req.account && req.account.role >= UserRole.MODERATOR ? {} : {
 				[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
 						visible: true,
 						accountId: req.developer !== undefined ? req.developer.id : undefined

@@ -21,9 +21,8 @@ Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ 
  */
 router.get("/", async (req, res) => {
 	const { Package, PackageVersion, PackageScreenshot } = req.models;
-
 	let packageList = await Package.findAll({
-		where: req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
+		where: req.account && req.account.role >= UserRole.MODERATOR ? {} : {
 			[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
 					visible: true,
 					accountId: req.developer !== undefined ? req.developer.id : undefined
