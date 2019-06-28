@@ -38,8 +38,17 @@
 </template>
 
 <style lang="less">
-	.navigation-view.fixed-width > .frame {
-		width: calc(~"100% - 48px");
+	@media all and (max-width: 640px) {
+		.row {
+			margin-left: 0;
+			margin-right: 0;
+		}
+	}
+	@media all and (min-width: 641px) {
+		.navigation-view.fixed-width > .frame {
+			width: calc(~"100% - 48px");
+		}
+		
 	}
 </style>
 

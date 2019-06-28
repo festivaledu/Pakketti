@@ -38,7 +38,7 @@
 										<button class="btn btn-primary d-inline-block colored" @click="login()" :disabled="!socket || $v.user.$invalid || isWorking">Sign In</button>
 									</div>
 
-									<div class="col text-left" v-show="!isWorking">
+									<div class="col align-right" v-show="!isWorking">
 										<a href="#" class="d-inline-block mt-2 p-0" @click.prevent="register" :disabled="!socket">No Account?</a>
 									</div>
 								</div>
@@ -56,8 +56,20 @@
 		min-height: 100%;
 		display: flex;
 		align-items: center;
+		
 		& > .row {
 			flex: 1;
+		}
+		
+		input[type="email"],
+		input[type="number"],
+		input[type="password"],
+		input[type="search"],
+		input[type="tel"],
+		input[type="text"],
+		input[type="url"],
+		.list {
+			max-width: initial;
 		}
 	}
 </style>

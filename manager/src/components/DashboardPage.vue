@@ -3,7 +3,7 @@
 		<h4>Overview</h4>
 		
 		<div class="row">
-			<div class="col-md-3 p-0 px-md-3 mb-md-4">
+			<div class="col-12 col-md-3 p-0 px-md-3 mb-3 mb-md-4">
 				<Statcard name="Downloads" :dataset="[543, 1337, 857]" />
 			</div>
 		</div>
