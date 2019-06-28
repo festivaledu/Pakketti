@@ -168,6 +168,7 @@ export class PackageAPI {
 	static async getPackages() {
 		return await SocketService.get("/packages", {
 			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
 				"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
 			}
 		});
@@ -189,6 +190,7 @@ export class PackageAPI {
 	static async getPackage(packageId) {
 		return await SocketService.get(`/packages/${packageId}`, {
 			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
 				"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
 			}
 		});
@@ -364,6 +366,7 @@ export class PackageAPI {
 	
 	static async getPackageVersions(packageId) {
 		return await SocketService.get(`/packages/${packageId}/versions`, {
+			"authorization": `Bearer ${window.$cookies.get("authToken")}`,
 			"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
 		});
 	}
@@ -400,6 +403,7 @@ export class PackageAPI {
 	static async getPackageVersion(packageId, versionId) {
 		return await SocketService.get(`/packages/${packageId}/versions/${versionId}`, {
 			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
 				"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
 			}
 		});
