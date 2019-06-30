@@ -149,6 +149,15 @@ router.get("/:packageId/versions/latest/file", (req, res) => {
 		
 		let fileData = fs.readFileSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename));
 		
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.VERSION_DOWNLOADED,
+			accountId: packageObj.accountId,
+			affectedPackageId: packageObj.id,
+			detailText: `Package ${packageObj.identifier} <${packageObj.id}>, version ${packageVersionObj.version} <${packageVersionObj.id}> has been downloaded`,
+			status: 2
+		});
+		
 		res.header("Content-Type", packageVersionObj.fileMime);
 		res.write(fileData, "binary");
 		return res.end(undefined, "binary");
@@ -384,6 +393,15 @@ router.get("/:packageId/versions/:versionId/file", (req, res) => {
 		}
 		
 		let fileData = fs.readFileSync(path.join(path.dirname(require.main.filename), "../", packageVersionObj.filename));
+		
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.VERSION_DOWNLOADED,
+			accountId: packageObj.accountId,
+			affectedPackageId: packageObj.id,
+			detailText: `Package ${packageObj.identifier} <${packageObj.id}>, version ${packageVersionObj.version} <${packageVersionObj.id}> has been downloaded`,
+			status: 2
+		});
 		
 		res.header("Content-Type", packageVersionObj.fileMime);
 		res.write(fileData, "binary");

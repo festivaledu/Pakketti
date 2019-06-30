@@ -98,54 +98,59 @@ const LogItemType = {
 	VERSION_DELETED: 12,
 	
 	/**
+	 * This type is used when a User downloads a package
+	 */
+	VERSION_DOWNLOADED: 13,
+	
+	/**
 	 * This type is used when a User created a package review
 	 */
-	REVIEW_CREATED: 13,
+	REVIEW_CREATED: 14,
 	
 	/**
 	 * This type is used when a User edited a package review or rating
 	 */
-	REVIEW_EDITED: 14,
+	REVIEW_EDITED: 15,
 	
 	/**
 	 * This type is used when a User, Developer or Moderator deleted a package review
 	 */
-	REVIEW_DELETED: 15,
+	REVIEW_DELETED: 16,
 	
 	/**
 	 * This type is used when a User or Developer adds a message to a review
 	 */
-	REVIEW_MESSAGE_CREATED: 16,
+	REVIEW_MESSAGE_CREATED: 17,
 	
 	/**
 	 * This type is used when a User or Developer edits their review message
 	 */
-	REVIEW_MESSAGE_EDITED: 17,
+	REVIEW_MESSAGE_EDITED: 18,
 	
 	/**
 	 * This type is used when a User or Developer deletes their review message
 	 */
-	REVIEW_MESSAGE_DELETED: 18,
+	REVIEW_MESSAGE_DELETED: 19,
 	
 	/**
 	 * This type is used when a User manually creates a device
 	 */
-	DEVICE_CREATED: 19,
+	DEVICE_CREATED: 20,
 	
 	/**
 	 * This type is used when a User enrolls an iOS device using a Configuration Profile
 	 */
-	DEVICE_LINKED: 20,
+	DEVICE_LINKED: 21,
 	
 	/**
 	 * This type is used when a User updates a device
 	 */
-	DEVICE_UPDATED: 21,
+	DEVICE_UPDATED: 22,
 	
 	/**
 	 * This type is used when a User deletes a device
 	 */
-	DEVICE_DELETED: 22,
+	DEVICE_DELETED: 23,
 	
 	
 	
