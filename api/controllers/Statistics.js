@@ -54,7 +54,7 @@ const groupedStatistics = (statisticsList, format = "week") => {
 			...statisticsList[formatKey][0],
 			type: undefined,
 			createdAt: undefined,
-			[key]: statisticsList[formatKey].filter(item => LogItemType[key] === item.type).length
+			[key.toLowerCase().replace(/_\w/g, (m) => m[1].toUpperCase())]: statisticsList[formatKey].filter(item => LogItemType[key] === item.type).length
 		}), {});
 	});
 }
@@ -62,7 +62,7 @@ const groupedStatistics = (statisticsList, format = "week") => {
 const totalStatistics = (statisticsList) => {
 	return keys.reduce((obj, key) => ({
 		...obj,
-		[key]: statisticsList.filter(item => LogItemType[key] === item.type).length
+		[key.toLowerCase().replace(/_\w/g, (m) => m[1].toUpperCase())]: statisticsList.filter(item => LogItemType[key] === item.type).length
 	}), {})
 }
 
