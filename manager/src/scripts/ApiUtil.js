@@ -480,27 +480,27 @@ export class RequestAPI {
 }
 
 export class StatisticAPI {
-	static async getStatistics() {
-		return await SocketService.get("/statistics");
-	}
-
-	static async getCurrentDay() {
+	static async getDay() {
 		return await SocketService.get("/statistics/day");
 	}
 
-	static async getCurrentWeek() {
+	static async getWeek() {
 		return await SocketService.get("/statistics/week");
 	}
+	
+	static async getMonth() {
+		return await SocketService.get("/statistics/month");
+	}
+	
+	static async get3Month() {
+		return await SocketService.get("/statistics/3month");
+	}
 
-	static async getCurrentYear() {
+	static async getYear() {
 		return await SocketService.get("/statistics/year");
 	}
 
-	static async getMonthly() {
-		return await SocketService.get("/statistics/monthly");
-	}
-
-	static async getYearly() {
-		return await SocketService.get("/statistics/yearly");
+	static async get2Year() {
+		return await SocketService.get("/statistics/2year");
 	}
 }
