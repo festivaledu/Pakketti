@@ -2,9 +2,9 @@
 	<div class="statcard">
 		<div class="px-3 pt-3">
 			<p class="statcard-desc caption">{{name}}</p>
-			<h2 class="statcard-number">
-				<span>1,337</span>
-				<small class="delta-indicator delta-negative">-118</small>
+			<h2 class="statcard-number" v-if="currentValue >= 0">
+				<span>{{ currentValue | number }}</span>
+				<small v-if="!isNaN(deltaValue)" class="delta-indicator" :class="{'delta-neutral': deltaValue == 0 || isNaN(deltaValue), 'delta-positive': deltaValue > 0, 'delta-negative': deltaValue < 0}">{{ Math.abs(deltaValue) }}</small>
 			</h2>
 			<hr class="statcard-hr m-b-0">
 		</div>
@@ -42,6 +42,14 @@
 				content: "\E74B";
 			}
 		}
+		&.delta-neutral {
+			color: #FFFFFF;
+			
+			&:before {
+				font-family: "Segoe UI";
+				content: "\00B1";
+			}
+		}
 		&.delta-positive {
 			color: #1BC98E;
 			
@@ -70,7 +78,7 @@ export default {
 	name: "Statcard",
 	props: ["name", "dataset", "labels"],
 	mounted() {
-		// this.$refs["canvas"]
+		
 		Charts["spark-line"](this.$refs["canvas"])
 	},
 	computed: {
@@ -80,6 +88,19 @@ export default {
 		systemAccentColorLow() {
 			const [r, g, b] = this.systemAccentColor.match(/\w\w/g).map(x => parseInt(x, 16));
 			return `rgba(${r},${g},${b},0.15)`;
+		},
+		
+		currentValue() {
+			return this.dataset[this.dataset.length - 1];
+		},
+		deltaValue() {
+			if (this.dataset.length <= 1) return NaN;
+			return this.dataset[this.dataset.length - 1] - this.dataset[this.dataset.length - 2];
+		}
+	},
+	filters: {
+		number(value) {
+			return new Intl.NumberFormat("en-US").format(value)
 		}
 	}
 }
