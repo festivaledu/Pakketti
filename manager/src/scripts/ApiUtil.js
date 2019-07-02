@@ -495,6 +495,10 @@ export class StatisticAPI {
 	static async get3Month() {
 		return await SocketService.get("/statistics/3month");
 	}
+	
+	static async get6Month() {
+		return await SocketService.get("/statistics/6month");
+	}
 
 	static async getYear() {
 		return await SocketService.get("/statistics/year");
