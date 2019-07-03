@@ -79,7 +79,7 @@ export default {
 	props: ["name", "dataset", "labels"],
 	mounted() {
 		
-		Charts["spark-line"](this.$refs["canvas"])
+		Charts["sparkline"](this.$refs["canvas"])
 	},
 	computed: {
 		systemAccentColor() {
