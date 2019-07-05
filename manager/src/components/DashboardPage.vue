@@ -1,25 +1,27 @@
 <template>
 	<div class="page" data-page-id="dashboard" data-page-title="Dashboard" @pageShow="onPageShow">
-		<h4>Overview</h4>
 		
-		<div class="row" v-if="(isModerator || isAdministrator) && statisticsData">
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard name="Downloads" :dataset="this.statisticsData.items.map(item => item['versionDownloaded'])" />
-			</div>
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard name="Packages Created" :dataset="this.statisticsData.items.map(item => item['packageCreated'])" />
-			</div>
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard name="Packages Updated" :dataset="this.statisticsData.items.map(item => item['versionCreated'])" />
-			</div>
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard name="Reviews" :dataset="this.statisticsData.items.map(item => item['reviewCreated'])" />
-			</div>
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard name="Registrations" :dataset="this.statisticsData.items.map(item => item['userRegistration'])" />
-			</div>
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard name="Logins" :dataset="this.statisticsData.items.map(item => item['userLogin'])" />
+		<div v-if="(isModerator || isAdministrator) && statisticsData">
+			<h4>Overview</h4>
+			<div class="row">
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard name="Downloads" :dataset="this.statisticsData.items.map(item => item['versionDownloaded'])" />
+				</div>
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard name="Packages Created" :dataset="this.statisticsData.items.map(item => item['packageCreated'])" />
+				</div>
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard name="Packages Updated" :dataset="this.statisticsData.items.map(item => item['versionCreated'])" />
+				</div>
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard name="Reviews" :dataset="this.statisticsData.items.map(item => item['reviewCreated'])" />
+				</div>
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard name="Registrations" :dataset="this.statisticsData.items.map(item => item['userRegistration'])" />
+				</div>
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard name="Logins" :dataset="this.statisticsData.items.map(item => item['userLogin'])" />
+				</div>
 			</div>
 		</div>
 		

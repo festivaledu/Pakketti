@@ -1,6 +1,6 @@
 <template>
 	<div class="statcard">
-		<div class="px-3 pt-3">
+		<div class="px-3 pt-3 mb-2">
 			<p class="statcard-desc caption">{{name}}</p>
 			<h2 class="statcard-number" v-if="currentValue >= 0">
 				<span>{{ currentValue | number }}</span>
@@ -8,7 +8,7 @@
 			</h2>
 			<hr class="statcard-hr m-b-0">
 		</div>
-		<canvas width="520" height="175" data-chart="spark-line" :data-dataset="`[[${dataset}]]`" :data-labels="`[${labels || dataset}]`" :data-dataset-options="`[{borderColor: '${systemAccentColor}', backgroundColor:'${systemAccentColorLow}'}]`" class="sparkline" ref="canvas" />
+		<canvas width="520" height="175" data-chart="sparkline" :data-dataset="`[[${dataset}]]`" :data-labels="`[${labels || dataset}]`" :data-dataset-options="`[{borderColor: '${systemAccentColor}', backgroundColor:'transparent'}]`" class="sparkline" ref="canvas" />
 	</div>
 </template>
 
