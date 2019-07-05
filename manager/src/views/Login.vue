@@ -3,14 +3,14 @@
 		<div class="view" data-view-id="main-view">
 			<div class="pages">
 				<div class="page" data-page-id="login">
-					<vue-headful title="Pakketti – Login" />
+					<vue-headful :title="`${$t('app.name')} – Login`" />
 					<div class="container">
 						<div class="row justify-content-around">
 							<div class="col-md-4">
 								<nav class="mb-5">
 									<div class="nav-logo pb-0">
 										<div class="nav-link">
-											<h1 class="text-center">Pakketti</h1>
+											<h1 class="text-center">{{ $t('app.name') }}</h1>
 										</div>
 									</div>
 								</nav>
@@ -24,22 +24,22 @@
 
 								<form novalidate>
 									<div class="form-group">
-										<label>Username or E-Mail Address</label>
-										<input type="text" placeholder="Johnny Appleseed" v-model="user.username" :disabled="!socket" @input="$v.user.username.$touch()" @keyup.13="login">
+										<label>{{ $t("login.login_username") }}</label>
+										<input type="text" :placeholder="$t('login.login_username_placeholder')" v-model="user.username" :disabled="!socket" @input="$v.user.username.$touch()" @keyup.13="login">
 									</div>
 									<div class="form-group">
-										<label for="login-password">Password</label>
-										<input type="password" placeholder="Required" v-model="user.password" :disabled="!socket" @input="$v.user.password.$touch()" @keyup.13="login">
+										<label for="login-password">{{ $t("login.login_password") }}</label>
+										<input type="password" :placeholder="$t('login.login_password_required')" v-model="user.password" :disabled="!socket" @input="$v.user.password.$touch()" @keyup.13="login">
 									</div>
 								</form>
 
 								<div class="row mt-3 d-flex">
 									<div class="col col-6 text-right">
-										<button class="btn btn-primary d-inline-block colored" @click="login()" :disabled="!socket || $v.user.$invalid || isWorking">Sign In</button>
+										<button class="btn btn-primary d-inline-block colored" @click="login()" :disabled="!socket || $v.user.$invalid || isWorking">{{ $t("login.login_button") }}</button>
 									</div>
 
 									<div class="col align-right" v-show="!isWorking">
-										<a href="#" class="d-inline-block mt-2 p-0" @click.prevent="register" :disabled="!socket">No Account?</a>
+										<a href="#" class="d-inline-block mt-2 p-0" @click.prevent="register" :disabled="!socket">{{ $t("login.login_register") }}</a>
 									</div>
 								</div>
 							</div>

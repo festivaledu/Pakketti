@@ -1,0 +1,13 @@
+{
+	"app": {
+		"name": "Team FESTIVAL"
+	},
+	"login": {
+		"login_username": "Username or E-Mail Address",
+		"login_username_placeholder": "Johnny Appleseed",
+		"login_password": "Password",
+		"login_password_required": "Required",
+		"login_button": "Sign In",
+		"login_register": "No Account?"
+	}
+}

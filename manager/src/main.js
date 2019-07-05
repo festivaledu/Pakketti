@@ -15,6 +15,19 @@ Vue.use(Vuelidate)
 import vueHeadful from "vue-headful";
 Vue.component("vue-headful", vueHeadful);
 
+import VueI18n from 'vue-i18n';
+Vue.use(VueI18n);
+const i18n = new VueI18n({
+	locale: navigator.language,
+	fallbackLocale: "en",
+	messages: {
+		en: require("@/locale/en.json"),
+		"en-US": require("@/locale/en.json"),
+		de: require("@/locale/de.json"),
+		"de-DE": require("@/locale/de.json"),
+	}
+});
+
 Vue.config.productionTip = false
 
 import { SocketService } from "@/scripts/SocketService";
@@ -24,6 +37,7 @@ import { SocketService } from "@/scripts/SocketService";
 	new Vue({
 		router,
 		store,
+		i18n,
 		render: h => h(App)
 	}).$mount('#app')
 })()
