@@ -97,6 +97,11 @@ export default {
 			password: { required }
 		}
 	},
+	mounted() {
+		if (window.$cookies.get("authToken")) {
+			this.$router.replace("/");
+		}
+	},
 	methods: {
 		async login() {
 			document.activeElement.blur();
