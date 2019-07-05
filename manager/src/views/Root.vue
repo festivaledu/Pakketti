@@ -11,7 +11,7 @@
 						<!-- Regular navigation items -->
 						<template slot="navigation-items">
 							<metro-navigation-view-menu-item page="dashboard" icon="home" title="Dashboard" />
-							<metro-navigation-view-menu-item page="packages" icon="package" title="Packages" :disabled="true" />
+							<metro-navigation-view-menu-item page="packages" icon="package" title="Packages" />
 							<metro-navigation-view-menu-item page="reviews" icon="chat-bubbles" title="Reviews" :disabled="true" />
 							<metro-navigation-view-menu-item page="devices" icon="cell-phone" title="Devices" :disabled="true" />
 							<metro-navigation-view-menu-item page="users" icon="people" title="Users" :disabled="true" />
@@ -29,6 +29,7 @@
 						<!-- Pages stored in this navigation view -->
 						<template slot="pages">
 							<DashboardPage />
+							<PackagesPage />
 						</template>
 					</metro-navigation-view>
 				</div>
@@ -44,7 +45,7 @@
 			margin-right: 0;
 		}
 	}
-	@media all and (min-width: 641px) {
+	@media all and (min-width: 1008px) {
 		.navigation-view.fixed-width > .frame {
 			width: calc(~"100% - 48px");
 		}
@@ -54,12 +55,13 @@
 
 <script>
 import DashboardPage from '@/components/DashboardPage'
-
+import PackagesPage from '@/components/PackagesPage'
 
 export default {
 	name: "root",
 	components: {
 		DashboardPage,
+		PackagesPage
 	},
 	methods: {
 		signOut() {
