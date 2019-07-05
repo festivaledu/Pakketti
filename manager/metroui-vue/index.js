@@ -157,17 +157,18 @@ metroUI.View = class {
 		let page = view.pages[pageName];
 		if (page) {
 			if (page.isVisible) return;
-			page.show();
 			view._currentPage = page;
 
 			if (options.addHistory) {
 				view._history.push(pageName);
 			}
+			
+			page.show();
 		}
 	}
 
 	/**
-	 * Show the last page stored in the hitory array
+	 * Show the last page stored in the history array
 	 */
 	goBack() {
 		const view = this;
@@ -176,9 +177,8 @@ metroUI.View = class {
 
 			let lastPage = view.pages[view._history[view._history.length - 2]];
 			if (lastPage) {
-				lastPage.show();
-
 				view._history.pop();
+				lastPage.show();
 			}
 		}
 	}
@@ -228,6 +228,8 @@ metroUI.Page = class {
 	constructor(element, params) {
 		let page = this;
 		page.container = element;
+		page.header = element.querySelector(".page-header");
+		page.frame = element.querySelector(".page-frame");
 
 		page.params = {
 			parentView: null,
@@ -241,6 +243,16 @@ metroUI.Page = class {
 
 		if (page.params.isPrimaryPage) {
 			page.container.classList.add("page-active");
+		}
+		
+		page.container.querySelectorAll("a[href='#'][data-page]").forEach((item, index) => {
+			item.addEventListener("click", () => {
+				page.params.parentView.navigate(item.getAttribute("data-page"));
+			});
+		});
+		
+		if (page.header && page.header.querySelector(".back-button")) {
+			page.header.querySelector(".back-button").addEventListener("click", this.goBack.bind(this));
 		}
 
 		page._scrollTop = null;
@@ -269,6 +281,16 @@ metroUI.Page = class {
 				if (item == page.container) {
 					item.classList.add("page-active");
 					item.dispatchEvent(new Event("pageShow"));
+					
+					if (page.header && page.header.querySelector(".back-button")) {
+						if (page.params.parentView._history.length > 1) {
+							console.log("a");
+							page.header.querySelector(".back-button").classList.remove("disabled");
+						} else {
+							page.header.querySelector(".back-button").classList.add("disabled");
+						}
+					}
+					
 				} else if (item.parentNodeOfClass("page") == page.container.parentNodeOfClass("page") && item.classList.contains("page-active")) {
 					item.classList.remove("page-active");
 					item.dispatchEvent(new Event("pageHide"));
@@ -283,6 +305,15 @@ metroUI.Page = class {
 	hide() {
 		this.container.classList.remove("page-active");
 		this.container.dispatchEvent(new Event("pageHide"));
+	}
+	
+	/**
+	 * Triggers the parent view's goBack function
+	 */
+	goBack() {
+		if (this.params.parentView) {
+			this.params.parentView.goBack();
+		}
 	}
 
 	/**
@@ -938,7 +969,7 @@ var AppBarButton = {
 				<div class="app-bar-button-icon">
 					<i class={`icon ${this.$props.icon}`}></i>
 				</div>
-				<p class="app-bar-button-content">{this.$slots.default}</p>
+				<p class="app-bar-button-content">{this.$props.title || this.$slots.default}</p>
 			</div>
 		)
 	}
@@ -1865,7 +1896,7 @@ var NavigationView = {
 			}
 		},
 		/**
-		 * Show the last page stored in the hitory array
+		 * Show the last page stored in the history array
 		 */
 		goBack() {
 			if (this.$data._history.length > 1) {

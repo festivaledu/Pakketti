@@ -1,5 +1,5 @@
 /*
- * metroUI 4.0 (4.0.1177.31_winkit_internal_dev.190628-0822)
+ * metroUI 4.0 (4.0.1178.7_winkit_internal_dev.190705-0809)
  * HTML framework to create UWP-like web applications
  * © 2014-2019 FESTIVAL Development
  */
@@ -21,7 +21,7 @@ body {
   color: var(--base-high);
 }
 .metro-ui-version-string:after {
-  content: "metroUI 4.0\A Build 4.0.1177.31_winkit_internal_dev.190628-0822";
+  content: "metroUI 4.0\A Build 4.0.1178.7_winkit_internal_dev.190705-0809";
   white-space: pre;
 }
 a {
@@ -4262,6 +4262,89 @@ i.icon.folder-select:after {
 .pages .page .no-overflow {
   overflow: hidden;
 }
+.pages .page > .page-header {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  z-index: 50;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+.pages .page > .page-header .title {
+  flex: 1;
+  font-weight: 600;
+  margin: 6px 10px 10px;
+  line-height: 32px;
+}
+.pages .page > .page-header:not(.hidden) + .page-frame .page-frame-content {
+  margin-top: 48px;
+  height: calc(100% - 84px);
+}
+.pages .page > .page-header.hidden {
+  display: none;
+}
+.pages .page > .page-header .back-button {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  flex: 0 0 auto;
+}
+.pages .page > .page-header .back-button.disabled,
+.pages .page > .page-header .back-button[disabled] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.pages .page > .page-header .back-button.disabled:hover,
+.pages .page > .page-header .back-button[disabled]:hover,
+.pages .page > .page-header .back-button.disabled:active,
+.pages .page > .page-header .back-button[disabled]:active {
+  background-color: transparent !important;
+}
+.pages .page > .page-header .back-button:after {
+  content: '\E72B';
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  font-family: "Segoe MDL2 Assets";
+  font-size: 16px;
+  font-weight: 400;
+  text-align: center;
+  padding: 14px;
+}
+.pages .page > .page-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+.pages .page > .page-frame .page-frame-content {
+  height: 100%;
+  padding: 10px 24px;
+}
+.pages .page:not(.no-frame-animation) .page-frame .page-frame-content {
+  animation: pageSlideIn 800ms cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+.pages .page:not(.transparent) .page-header {
+  background-color: var(--chrome-medium);
+}
+.pages .page:not(.transparent) .page-frame {
+  background-color: var(--alt-high);
+}
 .pages > .page {
   padding: 24px;
 }
@@ -5584,6 +5667,7 @@ textarea[disabled]::placeholder {
   }
   .navigation-view .frame-header:not(.hidden) + .frame .frame-content {
     margin-top: 48px;
+    height: calc(100% - 48px);
   }
   .navigation-view .frame-header .navigation-view-back-button,
   .navigation-view .frame-header .toggle-pane-button {

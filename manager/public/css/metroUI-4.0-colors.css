@@ -1,5 +1,5 @@
 /*
- * metroUI 4.0 (4.0.1177.31_winkit_internal_dev.190628-0822)
+ * metroUI 4.0 (4.0.1178.7_winkit_internal_dev.190705-0809)
  * HTML framework to create UWP-like web applications
  * © 2014-2019 FESTIVAL Development
  */
@@ -36,6 +36,9 @@ body[data-theme="light"] .acrylic.acrylic-70 {
 }
 body[data-theme="light"] .acrylic.acrylic-80 {
   background-color: rgba(255, 255, 255, 0.8);
+}
+body[data-theme="light"] .page .page-header .back-button:active {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 body[data-theme="light"] .checkbox input[type="checkbox"]:indeterminate + label:after {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D'0%200%2020%2020'%20version%3D'1.1'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20xmlns%3Axlink%3D'http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink'%3E%3Crect%20x%3D'4'%20y%3D'4'%20width%3D'12'%20height%3D'12'%20fill%3D'%23000000'%2F%3E%3C%2Fsvg%3E");
@@ -79,6 +82,9 @@ body[data-theme="light"] .command-bar .command-bar-inner .more {
 }
 body[data-theme="light"] .command-bar.minimal .more {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D'48px'%20height%3D'24px'%20viewBox%3D'0%200%2048%2024'%20version%3D'1.1'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%3E%3Ccircle%20fill%3D'%23000000'%20cx%3D'16.5'%20cy%3D'12'%20r%3D'1.25'%2F%3E%3Ccircle%20fill%3D'%23000000'%20cx%3D'24'%20cy%3D'12'%20r%3D'1.25'%2F%3E%3Ccircle%20fill%3D'%23000000'%20cx%3D'31.5'%20cy%3D'12'%20r%3D'1.25'%2F%3E%3C%2Fsvg%3E");
+}
+body[data-theme="light"]:not(.touch) .page .page-header .back-button:hover:not(:active) {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 body[data-theme="light"]:not(.touch) button:not(:disabled):hover:not(:active) {
   box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.4);
@@ -185,6 +191,9 @@ body[data-theme="dark"] .acrylic.acrylic-70 {
 body[data-theme="dark"] .acrylic.acrylic-80 {
   background-color: rgba(0, 0, 0, 0.8);
 }
+body[data-theme="dark"] .page .page-header .back-button:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
 body[data-theme="dark"] .checkbox input[type="checkbox"]:indeterminate + label:after {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D'0%200%2020%2020'%20version%3D'1.1'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20xmlns%3Axlink%3D'http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink'%3E%3Crect%20x%3D'4'%20y%3D'4'%20width%3D'12'%20height%3D'12'%20fill%3D'%23ffffff'%2F%3E%3C%2Fsvg%3E");
 }
@@ -227,6 +236,9 @@ body[data-theme="dark"] .command-bar .command-bar-inner .more {
 }
 body[data-theme="dark"] .command-bar.minimal .more {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D'48px'%20height%3D'24px'%20viewBox%3D'0%200%2048%2024'%20version%3D'1.1'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%3E%3Ccircle%20fill%3D'%23ffffff'%20cx%3D'16.5'%20cy%3D'12'%20r%3D'1.25'%2F%3E%3Ccircle%20fill%3D'%23ffffff'%20cx%3D'24'%20cy%3D'12'%20r%3D'1.25'%2F%3E%3Ccircle%20fill%3D'%23ffffff'%20cx%3D'31.5'%20cy%3D'12'%20r%3D'1.25'%2F%3E%3C%2Fsvg%3E");
+}
+body[data-theme="dark"]:not(.touch) .page .page-header .back-button:hover:not(:active) {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 body[data-theme="dark"]:not(.touch) button:not(:disabled):hover:not(:active) {
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.4);
