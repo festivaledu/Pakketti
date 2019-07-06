@@ -1,4 +1,4 @@
-const ws = require("ws");
+const SocketIO = require("socket.io");
 const HttpRequestWrapper = require("./HttpRequestWrapper");
 
 const controllers = require("../controllers");
@@ -37,7 +37,7 @@ module.exports = (models, port = 62486) => {
 	
 	controllers.stack.forEach(map.bind(null, []));
 	
-	let socket = new ws.Server({ port: port });
+	let socket = SocketIO(port);
 	
 	socket.on("connection", (ws) => {
 		ws.on('message', (data) => {

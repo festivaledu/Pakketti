@@ -1,5 +1,6 @@
 import Vue from "vue";
 import crypto from "crypto";
+import SocketIOClient from "socket.io-client";
 
 export const SocketService = new Vue({
 	data: {
@@ -9,11 +10,10 @@ export const SocketService = new Vue({
 	},
 	methods: {
 		connect(url) {
-			this.socket = new WebSocket(url);
-			this.socket.onopen = this.onOpen;
-			this.socket.onclose = this.onClose;
-			this.socket.onerror = this.onError;
-			this.socket.onmessage = this.onMessage;
+			this.socket = SocketIOClient(url);
+			this.socket.on("connect", this.onOpen);
+			this.socket.on("disconnect", this.onClose);
+			this.socket.on("message", data => this.onMessage(data));
 			
 			return new Promise((resolve) => {
 				this.connectionPromiseResolve = resolve;
@@ -29,14 +29,14 @@ export const SocketService = new Vue({
 			console.info("[WebSocket] WebSocket closed");
 			this.$emit("close", event);
 			
-			alert("WebSocket has been closed. Please reload the page.")
-			window.location.reload(true);
+			// alert("WebSocket has been closed. Please reload the page.")
+			// window.location.reload(true);
 		},
 		onError(error) {
 			this.$emit("error", error);
 		},
-		onMessage(event) {
-			const data = JSON.parse(event.data);
+		onMessage(data) {
+			data = JSON.parse(data);
 			
 			if (data.cookies && Object.keys(data.cookies).length) {
 				Object.keys(data.cookies).forEach(cookie => {
@@ -49,7 +49,7 @@ export const SocketService = new Vue({
 				delete this.queue[data._rqid];
 			}
 			
-			this.$emit("message", JSON.parse(event.data));
+			this.$emit("message", data);
 		},
 		send(data) {
 			const rqid = crypto.createHash("sha256").update(String.prototype.concat(new Date().getTime(), Math.random())).digest("hex");

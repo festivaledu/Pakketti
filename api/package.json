@@ -31,8 +31,8 @@
     "plist": "^3.0.1",
     "sequelize": "^5.9.2",
     "simple-bufferstream": "^1.0.0",
-    "tar-stream": "^2.1.0",
-    "ws": "^7.0.1"
+    "socket.io": "^2.2.0",
+    "tar-stream": "^2.1.0"
   },
   "devDependencies": {
     "sqlite3": "^4.0.9"
