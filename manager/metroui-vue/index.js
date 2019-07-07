@@ -640,6 +640,8 @@ metroUI.MenuFlyout = class {
 metroUI.Notification = class {
 	constructor(params) {
 		const notification = this;
+		
+		notification.params = params;
 
 		notification.notificationCenter = document.createElement("div");
 		notification.notificationCenter.className = "notification-center";
@@ -796,6 +798,8 @@ metroUI.Notification = class {
 
 	_resetTimeout() {
 		const notification = this;
+		
+		if (notification.params.reminder === true) return;
 
 		if (notification.container.classList.contains("slide-out") ||
 			notification.container.classList.contains("dismissing") ||
