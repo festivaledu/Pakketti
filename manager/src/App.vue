@@ -12,7 +12,7 @@
 		}
 	}
 		
-	.acrylic {
+	.acrylic:not(.notification) {
 		backdrop-filter: none;
 		-webkit-backdrop-filter: none;
 	}
