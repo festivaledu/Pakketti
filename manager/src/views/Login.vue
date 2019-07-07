@@ -98,11 +98,19 @@ export default {
 		}
 	},
 	mounted() {
-		if (window.$cookies.get("authToken")) {
-			this.$router.replace("/");
-		}
+		this.reconnected();
+		
+		SocketService.$on("open", this.reconnected);
+	},
+	beforeDestroy() {
+		SocketService.$off("open", this.reconnected);
 	},
 	methods: {
+		reconnected() {
+			if (window.$cookies.get("authToken")) {
+				this.$router.replace("/");
+			}
+		},
 		async login() {
 			document.activeElement.blur();
 			this.isWorking = true;
