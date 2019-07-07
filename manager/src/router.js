@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import { AuthAPI } from "@/scripts/ApiUtil";
+import { SocketService } from "@/scripts/SocketService";
 
 Vue.use(Router)
 
@@ -24,6 +25,13 @@ const router = new Router({
 });
 
 router.beforeEach(async (to, from, next) => {
+	if (!SocketService.socket && to.path !== "/login") {
+		return next({
+			path: "/login",
+			replace: true
+		});
+	}
+	
 	if (!to.matched.some(_ => _.meta.noAuth)) {
 		if (!window.$cookies.get("authToken")) {
 			return next({

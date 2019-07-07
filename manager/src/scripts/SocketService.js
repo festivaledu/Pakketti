@@ -4,15 +4,26 @@ import SocketIOClient from "socket.io-client";
 
 export const SocketService = new Vue({
 	data: {
+		url: null,
 		socket: null,
 		connectionPromiseResolve: null,
 		queue: {}
 	},
 	methods: {
 		connect(url) {
-			this.socket = SocketIOClient(url);
+			if (this.socket && this.socket.connected) return;
+			
+			this.url = url;
+			this.socket = SocketIOClient(url, {
+				secure: true,
+				multiplex: false,
+				"force new connection": true,
+				"connect timeout": 5000,
+				reconnection: false
+			});
 			this.socket.on("connect", this.onOpen);
 			this.socket.on("disconnect", this.onClose);
+			this.socket.on("connect_error", this.onError);
 			this.socket.on("message", data => this.onMessage(data));
 			
 			return new Promise((resolve) => {
@@ -22,18 +33,58 @@ export const SocketService = new Vue({
 		onOpen(event) {
 			console.info("[WebSocket] WebSocket opened");
 			
-			this.connectionPromiseResolve(this.socket);
+			if (this.connectionPromiseResolve) {
+				this.connectionPromiseResolve(this.socket);
+			}
+			
 			this.$emit("open", event);
 		},
 		onClose(event) {
 			console.info("[WebSocket] WebSocket closed");
+			this.socket = null;
+			
+			if (this.connectionPromiseResolve) {
+				this.connectionPromiseResolve(null);
+			}
+			
 			this.$emit("close", event);
+			
+			let notification = new metroUI.Notification({
+				payload: {},
+				title: "Connection interrupted",
+				content: "The WebSocket connection has been interrupted. Click here to reconnect.",
+				icon: "ethernet-error",
+				reminder: true,
+				dismissAction: (payload) => {
+					setTimeout(() => this.connect(this.url), 1000);
+				}
+			});
+			notification.show();
 			
 			// alert("WebSocket has been closed. Please reload the page.")
 			// window.location.reload(true);
 		},
 		onError(error) {
+			console.log(error);
+			this.socket = null;
+			
+			if (this.connectionPromiseResolve) {
+				this.connectionPromiseResolve(null);
+			}
+			
 			this.$emit("error", error);
+			
+			let notification = new metroUI.Notification({
+				payload: {},
+				title: "Connection failed",
+				content: "The WebSocket connection could not be established. Click here to try again.",
+				icon: "ethernet-error",
+				reminder: true,
+				dismissAction: (payload) => {
+					setTimeout(() => this.connect(this.url), 1000);
+				}
+			});
+			notification.show();
 		},
 		onMessage(data) {
 			data = JSON.parse(data);
