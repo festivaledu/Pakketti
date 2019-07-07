@@ -1,5 +1,5 @@
 /*
- * metroUI 4.0 (4.0.1179.3_winkit_internal_dev.190705-0953)
+ * metroUI 4.0 (4.0.1179.4_winkit_internal_dev.190707-0824)
  * HTML framework to create UWP-like web applications
  * © 2014-2019 FESTIVAL Development
  */
@@ -21,7 +21,7 @@ body {
   color: var(--base-high);
 }
 .metro-ui-version-string:after {
-  content: "metroUI 4.0\A Build 4.0.1179.3_winkit_internal_dev.190705-0953";
+  content: "metroUI 4.0\A Build 4.0.1179.4_winkit_internal_dev.190707-0824";
   white-space: pre;
 }
 a {
@@ -5842,7 +5842,7 @@ textarea[disabled]::placeholder {
   pointer-events: none;
 }
 .notification-center .notification .content .title-label {
-  font-weight: 700;
+  font-weight: 600;
 }
 .notification-center .notification .notification-inputs {
   margin-top: 16px;
