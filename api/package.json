@@ -29,7 +29,7 @@
     "morgan": "^1.9.1",
     "nodemon": "^1.19.1",
     "plist": "^3.0.1",
-    "sequelize": "^5.9.2",
+    "sequelize": "^5.10.0",
     "simple-bufferstream": "^1.0.0",
     "socket.io": "^2.2.0",
     "tar-stream": "^2.1.0"
