@@ -2071,6 +2071,134 @@ var PersonPicture = {
 };
 
 /**
+ * Presents information from different sources in a tabbed view.
+ * @param {String} title The title displayed in this pivot's header
+ */
+var Pivot = {
+	name: "metro-pivot",
+	props: ["title"],
+	data() {
+		return {
+			_title: this.$props.title,
+			
+			_currentPage: null,
+			_items: {},
+			_itemOrder: [],
+			_pages: {}
+		}
+	},
+	render(h) {
+		return (
+			<div class="pivot">
+				{this.$data._title &&
+					<p class="pivot-title" ref="title">{this.$data._title}</p>
+				}
+				
+				<div class="pivot-header" ref="headerContainer">
+					{this.$slots["header-items"]}
+				</div>
+				
+				<div class="pivot-items" ref="itemContainer">
+					{this.$slots["items"]}
+				</div>
+			</div>
+		)
+	},
+	mounted() {
+		this._itemsRendered();
+	},
+	updated() {
+		this._itemsRendered();
+	},
+	methods: {
+		_itemsRendered() {
+			if (this.$refs["headerContainer"]) {
+				this.$refs["headerContainer"].querySelectorAll(".pivot-header-item").forEach((item, index) => {
+					if (item.hasAttribute("data-pivot-item")) {
+						this.$data._items[item.getAttribute("data-pivot-item")] = item;
+						this.$data._itemOrder.push(item.getAttribute("data-pivot-item"))
+						
+						item.addEventListener("click", () => {
+							this.navigate(item.getAttribute("data-pivot-item"));
+						});
+					}
+				});
+			}
+			
+			if (this.$refs["itemContainer"]) {
+				this.$refs["itemContainer"].querySelectorAll(".pivot-item").forEach((item, index) => {
+					if (item.hasAttribute("data-pivot-item")) {
+						this.$data._pages[item.getAttribute("data-pivot-item")] = item;
+					}
+				});
+			}
+			
+			if (this.$data._itemOrder.length) {
+				this.navigate(this.$data._itemOrder[0]);
+			}
+		},
+		
+		async navigate(pivotItem) {
+			if (!this.$data._items[pivotItem] || !this.$data._pages[pivotItem]) return;
+		
+			if (this.$data._currentPage) {
+				let currentIndex = this.$data._itemOrder.indexOf(this.$data._currentPage.getAttribute("data-pivot-item"));
+				let navigateIndex = this.$data._itemOrder.indexOf(pivotItem);
+
+				if (navigateIndex == currentIndex) return;
+				
+				if (this.$refs["headerContainer"].querySelector(".selected")) {
+					this.$refs["headerContainer"].querySelector(".selected").classList.remove("selected");
+				}
+				this.$data._items[pivotItem].classList.add("selected");
+				
+				if (navigateIndex > currentIndex) {
+					this.$data._currentPage.classList.add("item-out-right-left");
+					
+					await new Promise((resolve) => setTimeout(() => {
+						this.$data._currentPage.classList.remove("item-active");
+						this.$data._currentPage.classList.remove("item-out-right-left");
+						
+						this.$data._pages[pivotItem].classList.add("item-active");
+						this.$data._pages[pivotItem].classList.add("item-in-right-left");
+						resolve();
+					}, 200));
+				} else if (navigateIndex < currentIndex) {
+					this.$data._currentPage.classList.add("item-out-left-right");
+					
+					await new Promise((resolve) => setTimeout(() => {
+						this.$data._currentPage.classList.remove("item-active");
+						this.$data._currentPage.classList.remove("item-out-left-right");
+						
+						this.$data._pages[pivotItem].classList.add("item-active");
+						this.$data._pages[pivotItem].classList.add("item-in-left-right");
+						resolve();
+					}, 200));
+				}
+				
+				this.$data._currentPage = this.$data._pages[pivotItem];
+					
+				setTimeout(() => {
+					this.$data._currentPage.classList.remove("item-in-right-left");
+					this.$data._currentPage.classList.remove("item-in-left-right");
+				}, 400);
+			} else {
+				this.$data._currentPage = this.$data._pages[pivotItem];
+				
+				this.$data._items[pivotItem].classList.add("selected");
+				this.$data._pages[pivotItem].classList.add("item-active");
+				this.$data._pages[pivotItem].classList.add("item-in-right-left");
+				
+				await new Promise((resolve) => setTimeout(() => {
+					this.$data._pages[pivotItem].classList.remove("item-in-right-left");
+					resolve();
+				}, 500));
+			}
+		}
+	}
+}
+
+/**
  * Shows the apps progress on a task, or that the app is performing ongoing work that doesn't block user interaction.
  * @param {Any} value Represents the bound v-model
  * @param {Number} min The minimum value of this ProgressBar
@@ -2250,6 +2378,7 @@ export default {
 				[NavigationViewMenuItem.name]: NavigationViewMenuItem,
 				[NavigationViewMenuSeparator.name]: NavigationViewMenuSeparator,
 				[PersonPicture.name]: PersonPicture,
+				[Pivot.name]: Pivot,
 				[ProgressBar.name]: ProgressBar,
 				[Slider.name]: Slider,
 				[ToggleSwitch.name]: ToggleSwitch
