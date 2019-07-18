@@ -1,5 +1,5 @@
 /*
- * metroUI 4.0 (4.0.1181.26_winkit_internal_dev.190716-1040)
+ * metroUI 4.0 (4.0.1181.39_winkit_internal_dev.190717-2055)
  * HTML framework to create UWP-like web applications
  * © 2014-2019 FESTIVAL Development
  */
@@ -86,8 +86,11 @@ body[data-theme="light"] .command-bar.minimal .more {
 body[data-theme="light"]:not(.touch) .page .page-header .back-button:hover:not(:active) {
   background-color: rgba(0, 0, 0, 0.1);
 }
-body[data-theme="light"]:not(.touch) button:not(:disabled):hover:not(:active) {
+body[data-theme="light"]:not(.touch) button:not(.navigation-back-button):not(:disabled):hover:not(:active) {
   box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.4);
+}
+body[data-theme="light"]:not(.touch) button.navigation-back-button:not(:disabled):hover:not(:active) {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 body[data-theme="light"]:not(.touch) .checkbox label:hover:not(:active):after {
   box-shadow: inset 0 0 0 2px #000000 !important;
@@ -240,8 +243,11 @@ body[data-theme="dark"] .command-bar.minimal .more {
 body[data-theme="dark"]:not(.touch) .page .page-header .back-button:hover:not(:active) {
   background-color: rgba(255, 255, 255, 0.1);
 }
-body[data-theme="dark"]:not(.touch) button:not(:disabled):hover:not(:active) {
+body[data-theme="dark"]:not(.touch) button:not(.navigation-back-button):not(:disabled):hover:not(:active) {
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+body[data-theme="dark"]:not(.touch) button.navigation-back-button:not(:disabled):hover:not(:active) {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 body[data-theme="dark"]:not(.touch) .checkbox label:hover:not(:active):after {
   box-shadow: inset 0 0 0 2px #ffffff !important;
