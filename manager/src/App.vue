@@ -2,6 +2,8 @@
 	<router-view/>
 </template>
 
+<style src="metroui-vue/metroUI-4.0.css"></style>
+<style src="metroui-vue/metroUI-4.0-colors.css"></style>
 <style lang="less">
 	html {
 		background-image: none;
