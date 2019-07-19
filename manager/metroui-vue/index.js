@@ -969,13 +969,18 @@ var AppBarButton = {
 	props: ["disabled", "icon", "title"],
 	render(h) {
 		return (
-			<div class={{ 'app-bar-button': true, 'disabled': this.$props.disabled }}>
+			<div class={{ 'app-bar-button': true, 'disabled': this.$props.disabled }} onClick={this._onClick}>
 				<div class="app-bar-button-icon">
 					<i class={`icon ${this.$props.icon}`}></i>
 				</div>
 				<p class="app-bar-button-content">{this.$props.title || this.$slots.default}</p>
 			</div>
 		)
+	},
+	methods: {
+		_onClick() {
+			this.$emit('click');
+		}
 	}
 };
 
@@ -1742,6 +1747,7 @@ var Messages = {
  * Common vertical layout for top-level areas of your app via a collapsible navigation menu
  * @param {String} title Sets the title of the NavigationView
  * @param {Boolean} history If false, disable the use of history in this NavigationView
+ * @param {Boolean} showBackButton
  * @param {String} menuTitle Sets the title that is displayed next to the Menu Button
  * @param {String} acrylic Sets the acrylic background variant (60%, 70%, 80%)
  * @param {Boolean} startExpanded Expands the navigation view on load (< 768 px)
@@ -1750,7 +1756,7 @@ var Messages = {
  */
 var NavigationView = {
 	name: "metro-navigation-view",
-	props: ["title", "history", "menuTitle", "acrylic", "startExpanded", "startRetracted", "defaultPage"],
+	props: ["title", "history", "showBackButton", "menuTitle", "acrylic", "startExpanded", "startRetracted", "defaultPage"],
 	data() {
 		return {
 			_acrylic: this.$props.acrylic || "acrylic-60",
@@ -1767,13 +1773,13 @@ var NavigationView = {
 		return (
 			<div class="navigation-view">
 				<div class={{ [`navigation-view-menu acrylic ${this.$data._acrylic}`]: true, "expanded": this.$data._startExpanded, "retracted": this.$data._startRetracted }} ref="menu">
+					{this.$props.history != false || this.$props.showBackButton &&
+						<div class="navigation-view-back-button" disabled={this.$data._history.length <= 1} onClick={this.goBack}></div>
+					}
+					
 					<div class={{ "toggle-pane-button": true, "title": this.$data._menuTitle != null }} ref="toggleButton" onClick={this.toggle}>
 						<p>{this.$data._menuTitle}</p>
 					</div>
-
-					{this.$props.history != false &&
-						<div class="navigation-view-back-button" disabled={this.$data._history.length <= 1} onClick={this.goBack}></div>
-					}
 
 					<div class="navigation-view-items">
 						{this.$slots["navigation-items"]}
@@ -1821,7 +1827,9 @@ var NavigationView = {
 					this.$data._items[item.getAttribute("data-page")] = item;
 
 					item.addEventListener("click", () => {
-						this.navigate(item.getAttribute("data-page"));
+						this.navigate(item.getAttribute("data-page"), {
+							addHistory: this.$props.history
+						});
 
 						if (window.innerWidth < 1008) {
 							this.$refs["menu"].classList.remove("expanded");
@@ -1894,8 +1902,10 @@ var NavigationView = {
 				this.$refs["frame"].scrollTo(0, 0);
 				page.container.scrollTo(0, 0);
 
-				if (this.$props.history != false) {
+				if (options.addHistory != false) {
 					this.$data._history.push(pageName);
+				} else {
+					this.$data._history = [pageName];
 				}
 			}
 		},
@@ -1932,9 +1942,7 @@ var NavigationView = {
 						this.$refs["frame"].scrollTo(0, 0);
 					}
 
-					if (this.$props.history != false) {
-						this.$data._history.pop();
-					}
+					this.$data._history.pop();
 				}
 			}
 		},
@@ -2090,9 +2098,11 @@ var Pivot = {
 	render(h) {
 		return (
 			<div class="pivot">
-				{this.$data._title &&
+				{this.$data._title && !this.$slots["title"] &&
 					<p class="pivot-title" ref="title">{this.$data._title}</p>
 				}
+				
+				{this.$slots["title"]}
 				
 				<div class="pivot-header" ref="headerContainer">
 					{this.$slots["header-items"]}

@@ -6,7 +6,7 @@
 				<span>{{ currentValue | number }}</span>
 				<small v-if="!isNaN(deltaValue)" class="delta-indicator" :class="{'delta-neutral': deltaValue == 0 || isNaN(deltaValue), 'delta-positive': deltaValue > 0, 'delta-negative': deltaValue < 0}">{{ Math.abs(deltaValue) }}</small>
 			</h2>
-			<hr class="statcard-hr m-b-0">
+			<hr class="statcard-hr mb-0">
 		</div>
 		<canvas width="520" height="175" data-chart="sparkline" :data-dataset="`[[${dataset}]]`" :data-labels="`[${labels || dataset}]`" :data-dataset-options="`[{borderColor: '${systemAccentColor}', backgroundColor:'transparent'}]`" class="sparkline" ref="canvas" />
 	</div>

@@ -6,7 +6,7 @@
 					<vue-headful title="Pakketti" />
 								
 					<!-- Main navigation view, always visible -->
-					<metro-navigation-view menuTitle="Team FESTIVAL" :history="false" :startRetracted="true" defaultPage="dashboard" acrylic="acrylic-80" class="fixed-width" ref="mainNavView">
+					<metro-navigation-view menuTitle="Team FESTIVAL" :history="false" :showBackButton="true" :startRetracted="true" defaultPage="dashboard" acrylic="acrylic-80" class="fixed-width" ref="mainNavView">
 
 						<!-- Regular navigation items -->
 						<template slot="navigation-items">
