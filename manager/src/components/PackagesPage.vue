@@ -41,7 +41,7 @@
 			
 			<metro-command-bar>
 				<template slot="buttons">
-					<metro-app-bar-button icon="add" title="Add" />
+					<metro-app-bar-button icon="add" title="Add" @click="navigate('package-editor')" />
 				</template>
 			</metro-command-bar>
 		</div>
@@ -96,6 +96,9 @@ export default {
 			if (this.isDeveloper || this.isModerator || this.isAdministrator) {
 				this.packageData = await PackageAPI.getPackages();
 			}
+		},
+		navigate(pageName) {
+			this.$parent.navigate(pageName, { addHistory: true });
 		}
 	},
 	computed: {

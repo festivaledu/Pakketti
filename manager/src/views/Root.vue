@@ -23,13 +23,15 @@
 						<template slot="bottom-items">
 							<metro-navigation-view-menu-item page="profile" icon="contact" title="Profil" :disabled="true" />
 							<metro-navigation-view-menu-item page="settings" icon="settings" title="Einstellungen" :disabled="true" />
-							<button @click="signOut">Test</button>
+							<button class="colored" @click="signOut">Test</button>
 						</template>
 
 						<!-- Pages stored in this navigation view -->
 						<template slot="pages">
 							<DashboardPage />
 							<PackagesPage />
+							
+							<PackageEditorPage />
 						</template>
 					</metro-navigation-view>
 				</div>
@@ -56,12 +58,14 @@
 <script>
 import DashboardPage from '@/components/DashboardPage'
 import PackagesPage from '@/components/PackagesPage'
+import PackageEditorPage from '@/components/PackageEditorPage'
 
 export default {
 	name: "root",
 	components: {
 		DashboardPage,
-		PackagesPage
+		PackagesPage,
+		PackageEditorPage
 	},
 	methods: {
 		signOut() {
