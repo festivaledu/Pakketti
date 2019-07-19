@@ -3,7 +3,7 @@
 		<div class="view" data-view-id="main-view">
 			<div class="pages">
 				<div class="page" data-page-id="login">
-					<vue-headful :title="`${$t('app.name')} – Login`" />
+					<vue-headful :title="$t('login.login_title')" />
 					<div class="container">
 						<div class="row justify-content-around">
 							<div class="col-md-4">
@@ -114,7 +114,7 @@ export default {
 		async login() {
 			document.activeElement.blur();
 			this.isWorking = true;
-			
+
 			AuthAPI.login({
 				username: this.user.username,
 				password: CryptoJS.SHA512(this.user.password).toString(CryptoJS.enc.Hex)
@@ -123,9 +123,9 @@ export default {
 				
 				if (authData.code) {
 					new metroUI.ContentDialog({
-						title: "There was an error signing you in",
-						content: `<p>The server responded with the following message:<br><span style="font-style: italic">${typeof authData === 'string' ? authData : `${authData.code}: ${authData.message}`}</span></p>`,
-						commands: [{ text: "Ok", primary: true }]
+						title: this.$t("login.login_error_title"),
+						content: `<p>${this.$t("login.login_error_message")}<br><span style="font-style: italic">${typeof authData === 'string' ? authData : `${authData.code}: ${authData.message}`}</span></p>`,
+						commands: [{ text: this.$t("app.ok"), primary: true }]
 					}).show();
 					return;
 				}
@@ -138,26 +138,26 @@ export default {
 		},
 		async register() {
 			var registerDialog = new metroUI.ContentDialog({
-				title: "Register with Pakketti",
+				title: this.$t("login.register_title"),
 				content: (() => {
 				return (
 					<div>
-						<input type="text" placeholder="Username" data-required />
-						<input type="email" placeholder="E-Mail Address" data-required />
-						<input type="password" placeholder="Password (min. 8 characters)" data-minlength="8" />
-						<input type="password" placeholder="Confirm Password" data-minlength="8" />
+						<input type="text" placeholder={this.$t("login.register_username")} data-required />
+						<input type="email" placeholder={this.$t("login.register_email")} data-required />
+						<input type="password" placeholder={this.$t("login.register_password")} data-minlength="8" />
+						<input type="password" placeholder={this.$t("login.register_password_confirm")} data-minlength="8" />
 					</div>
 				)
 			})(),
-				commands: [{ text: "Cancel" }, { text: "Ok", primary: true }]
+				commands: [{ text: this.$t("app.cancel") }, { text: this.$t("app.ok"), primary: true }]
 			});
 			if (await registerDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
 				let texts = registerDialog.text;
 				if (texts[2].localeCompare(texts[3]) != 0) {
 					new metroUI.ContentDialog({
-						title: "There was an error creating your account",
-						content: "The passwords you've entered do not match.",
-						commands: [{ text: "Ok", primary: true }]
+						title: this.$t("login.register_password_match_title"),
+						content: this.$t("login.register_password_match_message"),
+						commands: [{ text: this.$t("app.ok"), primary: true }]
 					}).show();
 					return;
 				}
@@ -172,15 +172,15 @@ export default {
 
 					if (!authData.auth) {
 						new metroUI.ContentDialog({
-							title: "There was an error signing you in",
-							content: `<p>The server responded with the following message:<br><span style="font-style: italic">${typeof authData === 'string' ? authData : `${authData.code}: ${authData.message}`}</span></p>`,
+							title: this.$t("login.login_error_title"),
+						content: `<p>${this.$t("login.login_error_message")}<br><span style="font-style: italic">${typeof authData === 'string' ? authData : `${authData.code}: ${authData.message}`}</span></p>`,
 							commands: [{ text: "Ok", primary: true }]
 						}).show();
 						return;
 					} else {
 						await new metroUI.ContentDialog({
-							title: "Registration successful",
-							content: "<p>Your account has been successfully created.<br>You will now be redirected to the Dashboard.<p>",
+							title: this.$t("login.register_success_title"),
+							content: this.$t("login.register_success_message"),
 							commands: [{ text: "Ok", primary: true }]
 						}).showAsync();
 						

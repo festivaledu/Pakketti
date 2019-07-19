@@ -1,13 +1,27 @@
 {
 	"app": {
-		"name": "Team FESTIVAL"
+		"name": "Team FESTIVAL",
+		"ok": "Ok",
+		"cancel": "Cancel"
 	},
 	"login": {
+		"login_title": "@:(app.name) – Login",
 		"login_username": "Username or E-Mail Address",
 		"login_username_placeholder": "Johnny Appleseed",
 		"login_password": "Password",
 		"login_password_required": "Required",
 		"login_button": "Sign In",
-		"login_register": "No Account?"
+		"login_register": "No Account?",
+		"login_error_title": "There was an error signing you in",
+		"login_error_message": "The server responded with the following message:",
+		"register_title": "Register with @:(app.name)",
+		"register_username": "Username",
+		"register_email": "E-Mail Address",
+		"register_password": "Password (min. 8 characters)",
+		"register_password_confirm": "Confirm Password",
+		"register_password_match_title": "There was an error creating your Account",
+		"register_password_match_message": "The passwords you've entered do not match",
+		"register_success_title": "Registration successful",
+		"register_success_message": "<p>Your account has been successfully created.<br>You will now be redirected to the Dashboard.<p>"
 	}
 }

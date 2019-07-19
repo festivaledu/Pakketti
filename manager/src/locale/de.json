@@ -1,5 +1,27 @@
 {
 	"app": {
-		"name": "Team FESTIVAL"
+		"name": "Team FESTIVAL",
+		"ok": "Ok",
+		"cancel": "Abbrechen"
+	},
+	"login": {
+		"login_title": "@:(app.name) – Anmelden",
+		"login_username": "Benutzername oder E-Mail-Adresse",
+		"login_username_placeholder": "Max Mustermann",
+		"login_password": "Passwort",
+		"login_password_required": "Benötigt",
+		"login_button": "Anmelden",
+		"login_register": "Noch kein Account?",
+		"login_error_title": "Es gab ein Problem beim Anmelden",
+		"login_error_message": "Der Server lieferte folgende Fehlermeldung:",
+		"register_title": "Für @:(app.name) registrieren",
+		"register_username": "Benutzername",
+		"register_email": "E-Mail-Adresse",
+		"register_password": "Passwort (min. 8 Zeichen)",
+		"register_password_confirm": "Passwort bestätigen",
+		"register_password_match_title": "Es gab ein Problem beim Erstellen deines Accounts",
+		"register_password_match_message": "Die eingegebenen Passwörter stimmen nicht überein",
+		"register_success_title": "Registrierung erfolgreich",
+		"register_success_message": "<p>Dein Account wurde erfolgreich erstellt.<br>Du wirst jetzt zum Dashboard weitergeleitet.<p>"
 	}
 }
