@@ -215,18 +215,18 @@ router.post("/:packageId/reviews/new", async (req, res) => {
 		accountId: account.id
 	})).then(packageReviewObj => {
 		PackageReviewMessage.create(Object.assign(reviewData, {
-			id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.versionId, packageReviewObj.id, Math.random(), new Date().getTime()),
+			id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.packageVersionId, packageReviewObj.id, Math.random(), new Date().getTime()),
 			packageId: packageReviewObj.packageId,
-			packageVersionId: packageReviewObj.versionId,
+			packageVersionId: packageReviewObj.packageVersionId,
 			packageReviewId: packageReviewObj.id,
 			fromDeveloper: account.id == packageVersionObj.accountId,
 			accountId: account.id
 		}));
 
 		PackageRating.create(Object.assign(reviewData, {
-			id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.versionId, packageReviewObj.id, Math.random(), new Date().getTime()),
+			id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.packageVersionId, packageReviewObj.id, Math.random(), new Date().getTime()),
 			packageId: packageReviewObj.packageId,
-			packageVersionId: packageReviewObj.versionId,
+			packageVersionId: packageReviewObj.packageVersionId,
 			packageReviewId: packageReviewObj.id,
 			accountId: account.id
 		}));
@@ -438,7 +438,7 @@ router.post("/:packageId/reviews/:reviewId/message", async (req, res) => {
 	}
 
 	return PackageReviewMessage.create(Object.assign(reviewData, {
-		id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.versionId, packageReviewObj.id, new Date().getTime()),
+		id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.packageVersionId, packageReviewObj.id, new Date().getTime()),
 		packageId: packageReviewObj.packageId,
 		packageVersionId: packageReviewObj.packageVersionId,
 		packageReviewId: packageReviewObj.id,

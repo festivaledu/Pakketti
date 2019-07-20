@@ -76,11 +76,11 @@
 
 
 <script>
-import { SocketService } from "@/scripts/SocketService";
-import { AuthAPI } from "@/scripts/ApiUtil";
+import { SocketService } from "@/scripts/SocketService"
+import { AuthAPI } from "@/scripts/ApiUtil"
 
-import { required } from "vuelidate/lib/validators";
-import CryptoJS from "crypto-js";
+import { required } from "vuelidate/lib/validators"
+import CryptoJS from "crypto-js"
 
 export default {
 	name: "login",

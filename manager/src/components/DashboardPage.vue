@@ -90,8 +90,8 @@
 							<td>{{ reviewObj.createdAt | date }}</td>
 							<td>
 								<div class="review-rating-view">
-									<div class="rating-star" v-for="i in reviewObj.rating.value" :key="i" />
-									<div class="rating-star outline" v-for="i in (5 - reviewObj.rating.value)" :key="i"  />
+									<div class="rating-star" v-for="i in reviewObj.rating.value" :key="`${reviewObj.id}${i}`" />
+									<div class="rating-star outline" v-for="i in (5 - reviewObj.rating.value)" :key="`${reviewObj.id}${i + reviewObj.rating.value}`" />
 								</div>
 							</td>
 						</tr>
