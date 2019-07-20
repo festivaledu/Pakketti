@@ -13,7 +13,7 @@
 			</template>
 			
 			<template slot="items">
-				<div class="pivot-item" data-pivot-item="info" v-if="true">
+				<div class="pivot-item" data-pivot-item="info">
 					<div class="row">
 						<div class="col-12 col-md-6">
 							<div class="mb-4">
@@ -127,12 +127,15 @@
 				</div>
 				
 				<div class="pivot-item" data-pivot-item="screenshots">
-					<div class="grid-view row">
-						<div class="grid-item col col-2" v-for="(item, index) in Array(20)" :key="index">
+					<div class="grid-view">
+						<!-- <div class="grid-item" v-for="(index) in Array(20)" :key="index">
 							<div class="item-inner">
 								<p class="item-title">GridView Item {{ index + 1 }}</p>
 								<p class="item-subtitle">This is an example description</p>
 							</div>
+						</div> -->
+						<div class="grid-item add-button">
+							<div class="item-inner" />
 						</div>
 					</div>
 				</div>
@@ -251,6 +254,30 @@
 			padding: 0;
 			// height: 240px;
 			
+			@media all and (max-width: 640px) {
+				width: calc(~"(100% - (1 * 4px)) / 2");
+				
+				&:nth-child(2n) {
+					margin-right: 0;
+				}
+			}
+			
+			@media all and (min-width: 641px) and (max-width:1007px) {
+				width: calc(~"(100% - (3 * 4px)) / 4");
+				
+				&:nth-child(4n) {
+					margin-right: 0;
+				}
+			}
+			
+			@media all and (min-width: 1008px) {
+				width: calc(~"(100% - (5 * 4px)) / 6");
+				
+				&:nth-child(6n) {
+					margin-right: 0;
+				}
+			}
+			
 			&::before {
 				content: '';
 				display: block;
@@ -266,6 +293,25 @@
 
 				.item-title {
 					font-weight: 600;
+				}
+			}
+			
+			&.add-button {
+				.item-inner {
+					width: 100%;
+					height: 100%;
+					pointer-events: none;
+					padding: 0;
+					
+					&:after {
+						content: "\E710";
+						font-family: "Segoe MDL2 Assets";
+						font-size: 48px;
+						position: absolute;
+						top: 50%;
+						left: 50%;
+						transform: translate3d(-50%, -50%, 0);
+					}
 				}
 			}
 		}
