@@ -12,7 +12,7 @@
 						<template slot="navigation-items">
 							<metro-navigation-view-menu-item page="dashboard" icon="home" title="Dashboard" />
 							<metro-navigation-view-menu-item page="packages" icon="package" title="Packages" />
-							<metro-navigation-view-menu-item page="reviews" icon="chat-bubbles" title="Reviews" :disabled="true" />
+							<metro-navigation-view-menu-item page="reviews" icon="chat-bubbles" title="Reviews" />
 							<metro-navigation-view-menu-item page="devices" icon="cell-phone" title="Devices" :disabled="true" />
 							<metro-navigation-view-menu-item page="users" icon="people" title="Users" :disabled="true" />
 							<metro-navigation-view-menu-item page="log" icon="clipboard-list" title="Moderation Log" :disabled="true" />
@@ -30,6 +30,7 @@
 						<template slot="pages">
 							<DashboardPage />
 							<PackagesPage />
+							<ReviewThreadsPage />
 							
 							<PackageEditorPage />
 						</template>
@@ -56,15 +57,18 @@
 </style>
 
 <script>
-import DashboardPage from '@/components/DashboardPage'
-import PackagesPage from '@/components/PackagesPage'
-import PackageEditorPage from '@/components/PackageEditorPage'
+import DashboardPage from "@/components/DashboardPage"
+import PackagesPage from "@/components/PackagesPage"
+import ReviewThreadsPage from "@/components/ReviewThreadsPage"
+
+import PackageEditorPage from "@/components/PackageEditorPage"
 
 export default {
 	name: "root",
 	components: {
 		DashboardPage,
 		PackagesPage,
+		ReviewThreadsPage,
 		PackageEditorPage
 	},
 	methods: {

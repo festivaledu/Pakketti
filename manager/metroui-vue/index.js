@@ -1607,8 +1607,6 @@ var Messages = {
 				</div>
 
 				<div class="messages-input">
-					<button class="emoji-selector" onClick={this._showEmojiSelector} disabled={this.$data._inputDisabled}><i class="icon emoji2"></i></button>
-					
 					{this.$data._useTextarea && 
 						<textarea placeholder={this.$data._placeholder} value={this.$data.messageText} onInput={this._onInput} onKeydown={this._onKeyDown} disabled={this.$data._inputDisabled} ref="input" />
 					}
