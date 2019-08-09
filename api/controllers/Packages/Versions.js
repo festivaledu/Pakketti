@@ -52,11 +52,11 @@ router.get("/:packageId/versions", async (req, res) => {
 		order: [["createdAt", "DESC"]]
 	});
 
-	if (!packageVersionList || !packageVersionList.length) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: "Package does not have any versions"
-	});
+	// if (!packageVersionList || !packageVersionList.length) return res.status(httpStatus.NOT_FOUND).send({
+	// 	name: httpStatus[httpStatus.NOT_FOUND],
+	// 	code: httpStatus.NOT_FOUND,
+	// 	message: "Package does not have any versions"
+	// });
 
 	return res.status(httpStatus.OK).send(packageVersionList);
 });

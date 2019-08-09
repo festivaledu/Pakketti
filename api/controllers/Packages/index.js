@@ -47,11 +47,11 @@ router.get("/", async (req, res) => {
 		}]
 	});
 	
-	if (!packageList || !packageList.length) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: "No packages found"
-	});
+	// if (!packageList || !packageList.length) return res.status(httpStatus.NOT_FOUND).send({
+	// 	name: httpStatus[httpStatus.NOT_FOUND],
+	// 	code: httpStatus.NOT_FOUND,
+	// 	message: "No packages found"
+	// });
 
 	packageList.forEach(packageObj => {
 		if (packageObj.versions.length) {

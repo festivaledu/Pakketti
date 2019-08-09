@@ -47,11 +47,11 @@ router.get("/:packageId/screenshots", async (req, res) => {
 		order: [["createdAt", "ASC"]]
 	})
 
-	if (!packageScreenshotList || !packageScreenshotList.length) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any screenshots`
-	});
+	// if (!packageScreenshotList || !packageScreenshotList.length) return res.status(httpStatus.NOT_FOUND).send({
+	// 	name: httpStatus[httpStatus.NOT_FOUND],
+	// 	code: httpStatus.NOT_FOUND,
+	// 	message: `Package ${req.params.packageId} does not have any screenshots`
+	// });
 
 	return res.status(httpStatus.OK).send(packageScreenshotList.reduce((obj, item) => ({
 		...obj,

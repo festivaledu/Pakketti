@@ -44,11 +44,11 @@ router.get("/reviews", async (req, res) => {
 		}]
 	});
 	
-	if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: "Could not find any reviews"
-	});
+	// if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
+	// 	name: httpStatus[httpStatus.NOT_FOUND],
+	// 	code: httpStatus.NOT_FOUND,
+	// 	message: "Could not find any reviews"
+	// });
 
 	let packageReviewData = packageReviewList;
 
@@ -66,11 +66,11 @@ router.get("/reviews", async (req, res) => {
 		});
 	}
 
-	if (!packageReviewData || !packageReviewData.length) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: "Could not find any reviews"
-	});
+	// if (!packageReviewData || !packageReviewData.length) return res.status(httpStatus.NOT_FOUND).send({
+	// 	name: httpStatus[httpStatus.NOT_FOUND],
+	// 	code: httpStatus.NOT_FOUND,
+	// 	message: "Could not find any reviews"
+	// });
 
 	return res.status(httpStatus.OK).send(packageReviewData);
 });
@@ -126,11 +126,11 @@ router.get("/:packageId/reviews", async (req, res) => {
 		}]
 	});
 		
-	if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any reviews`
-	});
+	// if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
+	// 	name: httpStatus[httpStatus.NOT_FOUND],
+	// 	code: httpStatus.NOT_FOUND,
+	// 	message: `Package ${req.params.packageId} does not have any reviews`
+	// });
 
 	return res.status(httpStatus.OK).send(packageReviewList);
 });
@@ -711,11 +711,11 @@ router.get("/:packageId/versions/latest/reviews", async (req, res) => {
 		}]
 	});
 		
-	if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any reviews`
-	});
+	// if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
+	// 	name: httpStatus[httpStatus.NOT_FOUND],
+	// 	code: httpStatus.NOT_FOUND,
+	// 	message: `Package ${req.params.packageId} does not have any reviews`
+	// });
 
 	return res.status(httpStatus.OK).send(packageReviewList);
 });
@@ -786,11 +786,11 @@ router.get("/:packageId/versions/:versionId/reviews", async (req, res) => {
 		}]
 	});
 		
-	if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any reviews`
-	});
+	// if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
+	// 	name: httpStatus[httpStatus.NOT_FOUND],
+	// 	code: httpStatus.NOT_FOUND,
+	// 	message: `Package ${req.params.packageId} does not have any reviews`
+	// });
 
 	return res.status(httpStatus.OK).send(packageReviewList);
 });
