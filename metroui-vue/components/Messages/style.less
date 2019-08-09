@@ -1,0 +1,152 @@
+.messages {
+	width: 100%;
+	height: 100%;
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+	
+	.messages-container {
+		width: 100%;
+		height: 100%;
+		overflow-y: auto;
+		
+		.messages-wrapper {
+			flex: 1;
+			min-height: 100%;
+			padding-bottom: 16px;
+			
+			.message {
+				position: relative;
+				display: flex;
+				min-width: 136px;
+				max-width: 274px;
+				margin-top: 24px;
+				
+				& + .message:not(.message-first) {
+					margin-top: 4px;
+				}
+				
+				.message-content {
+					width: 100%;
+					
+					.message-bubble {
+						padding: 8px;
+						
+						.message-info {
+							flex-wrap: wrap;
+							
+							.message-name {
+								flex: 1;
+								margin-left: 8px;
+								white-space: nowrap;
+								overflow: hidden;
+								text-overflow: ellipsis;
+							}
+						}
+					}
+				}
+				
+				&.message-tail .message-bubble:after {
+					content: '';
+					position: absolute;
+					width: 0;
+					height: 0;
+					border-style: solid;
+				}
+				
+				&.message-sent {
+					background-color: var(--system-accent-color-dark-1);
+					align-self: flex-end;
+					margin-right: 10px;
+					
+					&.message-tail {
+						.message-bubble:after {
+							right: 10px;
+							bottom: -10px;
+							border-width: 0 11px 10px 0;
+							border-color: transparent var(--system-accent-color-dark-1) transparent transparent;
+						}
+					}
+				}
+				
+				&.message-received {
+					background-color: var(--system-accent-color);
+					align-self: flex-start;
+					margin-left: 10px;
+					
+					&.message-tail {
+						.message-bubble:after {
+							top: -10px;
+							left: 10px;
+							border-width: 10px 0 0 11px;
+							border-color: transparent transparent transparent var(--system-accent-color);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	.messages-input {
+		flex-shrink: 0;
+		min-height: 40px;
+		background-color: var(--alt-high);
+		
+		button {
+			width: 40px;
+			height: 40px;
+			
+			&:not(:active),
+			&[disabled] {
+				background-color: transparent;
+			}
+		}
+	}
+	
+	textarea {
+		display: block;
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		outline: none;
+		margin: 6px 8px;	
+		padding: 5px 8px 8px 12px;
+		width: 100%;
+		height: 32px;
+		background-color: var(--alt-high); 
+		box-shadow: inset 0 0 0 2px var(--chrome-disabled-low);
+		border-radius: 0;
+		resize: none;
+		
+		&::placeholder {
+			color: var(--base-medium);
+		}
+		
+		&:hover:not(:focus) {
+			box-shadow: inset 0 0 0 2px var(--base-medium-high);
+		}
+		
+		&:not(:focus) {
+			color: var(--base-high);
+		}
+		
+		&:focus {
+			background-color: #FFFFFF !important;
+			box-shadow: inset 0 0 0 2px var(--system-accent-color);
+			
+			&::placeholder {
+				color: var(--base-medium-low);
+			}
+		}
+		
+		&[disabled] {
+			pointer-events: none;
+			background-color: var(--base-low);
+			box-shadow: none;
+
+			&::placeholder {
+				color: var(--chrome-disabled-low);
+			}
+		}
+	}
+}

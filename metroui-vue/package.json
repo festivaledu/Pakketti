@@ -1,0 +1,17 @@
+{
+  "name": "metroui-vue",
+  "version": "1.0.0",
+  "description": "metroUI Framework, built for Vue.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SniperGER",
+  "license": "ISC",
+  "dependencies": {
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "deepmerge": "^4.0.0"
+  }
+}

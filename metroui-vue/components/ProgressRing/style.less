@@ -1,0 +1,59 @@
+@keyframes progress-ring-rotate {
+	0% {
+		transform: translate3d(-50%, -50%, 0) rotate(-70deg);
+		opacity: 1;
+		animation-timing-function: cubic-bezier(0, 0, 0, .58);
+	} 
+	7% {
+		transform: translate3d(-50%, -50%, 0) rotate(20deg);
+		animation-timing-function: linear;
+	}
+	30.8593% {
+		transform: translate3d(-50%, -50%, 0) rotate(154deg);
+		animation-timing-function: cubic-bezier(.59, .35, .16, .72);
+	}
+	42.96875% {
+		transform: translate3d(-50%, -50%, 0) rotate(380deg);
+		animation-timing-function: linear;
+	}
+	66.01562% {
+		transform: translate3d(-50%, -50%, 0) rotate(514deg);
+		animation-timing-function: cubic-bezier(.59, .35, .16, .72);
+		opacity: 1;
+	}
+	71.5% { opacity: 1; }
+	71.6% { opacity: 0; }
+	78.12507% {
+		transform: translate3d(-50%, -50%, 0) rotate(740deg);
+		animation-timing-function: linear;
+	}
+	100% { opacity: 0; }
+}
+
+.progress-ring {
+	position: relative;
+	width: 20px;
+	height: 20px;
+	
+	.ellipse {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 70.71067%;
+		height: 70.71067%;
+		opacity: 0;
+		transform: translate3d(-50%, -50%, 0) rotate(-69.86deg);
+		animation: progress-ring-rotate 4.26s infinite;
+		
+		&:after {
+			content: '';
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: 14.14213%;
+			height: 14.14213%;
+			border-radius: 50%;
+			background-color: var(--system-accent-color);
+		}
+	}
+}

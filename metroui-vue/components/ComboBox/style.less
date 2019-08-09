@@ -1,0 +1,87 @@
+.combo-box {
+	label {
+		display: block;
+		margin-bottom: 4px;
+	}
+	
+	select {
+		display: none;
+	}
+	
+	.combo-box-content {
+		display: inline-block;
+		position: relative;
+		min-width: 64px;
+		width: 100%;
+		height: 32px;
+		padding: 6px 32px 6px 12px;
+		background-color: var(--alt-medium-low);
+		box-shadow: inset 0 0 0 2px var(--base-medium-low);
+		cursor: default;
+		
+		&:hover:not(:active) {
+			box-shadow: inset 0 0 0 2px var(--base-medium);
+		}
+		
+		&:active {
+			background-color: var(--base-low);
+		}
+		
+		.drop-down-glyph {
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 32px;
+			height: 32px;
+			
+			&:after {
+				content: '\E0E5';
+				display: block;
+				width: 12px;
+				height: 12px;
+				line-height: 12px;
+				font-family: "Segoe MDL2 Assets";
+				font-size: 12px;
+				margin: 10px;
+				color: var(--base-medium-high);
+			}
+		}
+	}
+}
+		
+	.combo-box-popup {
+		position: absolute;
+		min-height: 32px;
+		background-color: var(--chrome-medium-low);
+		box-shadow: 0 0 0 1px var(--chrome-high);
+		z-index: 2000;
+		
+		.combo-box-items {
+			margin: 4px 0;
+			
+			.combo-box-item {
+				height: 32px;
+				padding: 6px 12px;
+				cursor: default;
+				white-space: nowrap;
+				
+				&:hover:not(:active) {
+					background-color: var(--list-low);
+				}
+				
+				&:active {
+					background-color: var(--list-medium-low);
+					transform: scale(0.99);
+				}
+				
+				&.selected {
+					background-color: var(--list-accent-low);
+					
+					&:hover:not(:active),
+					&:active {
+						background-color: var(--list-accent-medium);
+					}
+				}
+			}
+		}
+	}

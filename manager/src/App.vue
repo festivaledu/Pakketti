@@ -2,8 +2,6 @@
 	<router-view/>
 </template>
 
-<style src="metroui-vue/metroUI-4.0.css"></style>
-<style src="metroui-vue/metroUI-4.0-colors.css"></style>
 <style lang="less">
 	html {
 		background-image: none;
@@ -13,14 +11,14 @@
 			display: none; 
 		}
 	}
+	
+	.notification-center .notification {
+		background-color: var(--system-accent-color-dark-1) !important;
+	}
 		
 	.acrylic:not(.notification) {
 		backdrop-filter: none;
 		-webkit-backdrop-filter: none;
-	}
-	
-	.data-grid .toggle-switch {
-		margin-bottom: 0;
 	}
 	
 	body[data-theme="light"] {

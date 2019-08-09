@@ -1,0 +1,60 @@
+@keyframes progress-bar-indeterminate-container {
+	0% { transform: translate3d(-68px, 0, 0); }
+	
+	100% { transform: translate3d(68px, 0, 0); }
+}
+
+@keyframes progress-bar-indeterminate-ellipse {
+	0%,
+	4.72% {
+		right: 100%;
+		opacity: 1;
+	}
+	68.66% {
+		right: -32px;
+		opacity: 1;
+	}
+	69% { opacity: 0; }
+}
+
+.progress-bar {
+	display: flex;
+	align-items: center;
+	width: 320px;
+	overflow: hidden;
+	
+	.determinate-root {
+		position: relative;
+		width: 100%;
+		height: 4px;
+		background-color: var(--base-low);
+		
+		.progress-bar-indicator {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 4px;
+			background-color: var(--system-accent-color);
+		}
+	}
+	
+	.indeterminate-root {
+		position: relative;
+		width: 100%;
+		height: 4px;
+		animation-delay: -3.88s;
+		animation: progress-bar-indeterminate-container 3.88s infinite linear;
+		
+		.ellipse {
+			position: absolute;
+			top: 0;
+			right: 100%;
+			width: 4px;
+			height: 4px;
+			border-radius: 50%;
+			opacity: 0;
+			background-color: var(--system-accent-color);
+			animation: progress-bar-indeterminate-ellipse 3.88s infinite cubic-bezier(0, 1, 1, 0);
+		}
+	}
+}

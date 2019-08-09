@@ -1,0 +1,26 @@
+.views, .view {
+	position: absolute;
+	width: 100%;
+	top: 0;
+	bottom: 0;
+	z-index: 100;
+	transform: translate3d(0,0,0);
+	-webkit-transform: translate3d(0,0,0);
+}
+
+.views {
+	background-color: var(--alt-high);
+
+	.view {
+		overflow: hidden;
+		box-sizing: border-box;
+
+		&:not(.view-active) {
+			display: none;
+		}
+
+		&.view-active {
+			z-index: 1000;
+		}
+	}
+}

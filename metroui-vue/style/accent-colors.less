@@ -1,0 +1,108 @@
+.accent-color(@name, @displayName, @accentLight3, @accentLight2, @accentLight1, @accentColor, @accentDark1, @accentDark2, @accentDark3) {
+	.text-contrast(@color) {
+		@lightContrast: (abs(luma(#FFFFFF)) + 5) / (abs(luma(@color)) + 5);
+		@darkContrast: (abs(luma(@color)) + 5) / (abs(luma(#000000)) + 5);
+		
+		@return: if((@lightContrast > 4.45), #FFFFFF, if((@darkContrast > 4.45), #000000, #FFFFFF));
+	}
+	
+	@listAccentLow: fade(@accentColor, 40%);
+	@listAccentMedium: fade(@accentColor, 60%);
+	@listAccentHigh: fade(@accentColor, 70%);
+	
+	body[data-accent="@{name}"],
+	body[data-accent="@{displayName}"] {
+		--list-accent-low: @listAccentLow;
+		--list-accent-medium: @listAccentMedium;
+		--list-accent-high: @listAccentHigh;
+		
+		--system-accent-color-light-3: @accentLight3;
+		--system-accent-color-light-2: @accentLight2;
+		--system-accent-color-light-1: @accentLight1;
+		--system-accent-color: @accentColor;
+		--system-accent-color-dark-1: @accentDark1;
+		--system-accent-color-dark-2: @accentDark2;
+		--system-accent-color-dark-3: @accentDark3;
+		
+		button {
+			&.system-accent-color:not([disabled]) {
+				.text-contrast(@accentColor);
+				color: @return;
+			}
+		}
+		
+		.messages {
+			.message {
+				&.message-sent {
+					.text-contrast(@accentDark1);
+					color: @return;
+				}
+				
+				&.message-received {
+					.text-contrast(@accentColor);
+					color: @return;
+				}
+			}
+		}
+		
+		.notification-center {
+			.notification {
+				background-color: fade(@accentDark1, 80%);
+			}
+		}
+	}
+}
+
+.accent-color("win10-01", "yellow-gold", #FFE8A8, #FFE08C, #FFD35C, #FFB900, #BA8900, #805E00, #4D3800);
+.accent-color("win10-02", "gold", #FFDFB8, #FFCA8A, #FFAF4C, #FF8C00, #B36200, #733F00, #452600);
+.accent-color("win10-03", "orange-bright", #FD865F, #FC7551, #F86342, #F7630C, #D04122, #9C311A, #792714);
+.accent-color("win10-04", "orange-dark", #FF943E, #F28130, #E86F2E, #CA5010, #953B0C, #722D09, #502006);
+.accent-color("win10-05", "rust", #FFBAA1, #FF9873, #E76B3E, #DA3B01, #9C2B02, #661C01, #421200);
+.accent-color("win10-06", "pale-rust", #FFC9BF, #FFB7AB, #FA9482, #EF6950, #9E4434, #662C22, #33120C);
+.accent-color("win10-07", "brick-red", #FFB0B3, #FF9699, #FF6469, #D13438, #992629, #751D1F, #521415);
+.accent-color("win10-08", "mod-red", #FFC2C2, #FFB2B2, #FF8383, #FF4343, #B82A2A, #801212, #570808);
+
+.accent-color("win10-09", "pale-red", #FFCFD3, #FFADB4, #F7838D, #E74856, #9E212C, #6E1018, #40060B);
+.accent-color("win10-10", "red", #FFBDC2, #FF99A1, #F05965, #E81123, #99000D, #6E0009, #470006);
+.accent-color("win10-11", "rose-bright", #FFA8CB, #F783B2, #F75294, #EA005E, #AC0046, #880037, #6B002B);
+.accent-color("win10-12", "rose", #FFABCE, #FF7FB4, #F74A92, #C30052, #8C003A, #69002C, #4D0020);
+.accent-color("win10-13", "plum-light", #FFBDE6, #FF91D5, #F75CBC, #E3008C, #A30065, #700045, #47002C);
+.accent-color("win10-14", "plum", #FF8BD3, #E369B5, #C84898, #BF0077, #8A0055, #66003F, #4A002E);
+.accent-color("win10-15", "orchid-light", #FFABF5, #E989DE, #CF62C3, #C239B3, #8C2981, #631D5B, #3B0836);
+.accent-color("win10-16", "orchid", #FD8DF1, #F266E3, #CB3DBB, #9A0089, #700063, #500047, #33002D);
+
+.accent-color("win10-17", "default-blue", #A6D8FF, #76B9ED, #429CE3, #0078D7, #005A9E, #004275, #002642);
+.accent-color("win10-18", "navy-blue", #86CAFF, #5FB2F2, #1E91EA, #0063B1, #004275, #002D4F, #002038);
+.accent-color("win10-19", "purple-shadow", #D4D4FF, #C7C5FA, #ABA9E8, #8E8CD8, #6F6DA8, #565582, #3B3A59);
+.accent-color("win10-20", "purple-shadow-dark", #D5D4FF, #ADACF0, #8987E4, #6B69D6, #4F4D9E, #2D2B61, #1F1F4D);
+.accent-color("win10-21", "iris-pastel", #D4B5FF, #C096FA, #A882DD, #8764B8, #5B3E83, #3C2759, #2B1C40);
+.accent-color("win10-22", "iris-spring", #D0AEFF, #B290E2, #8F6BC0, #744DA9, #4E3078, #372254, #24153B);
+.accent-color("win10-23", "violet-red-light", #F6C0FF, #E59DF0, #CC7BD9, #B146C2, #7D3189, #512059, #38163D);
+.accent-color("win10-24", "violet-red", #F7B8FF, #E893F4, #D157E2, #881798, #62116E, #470C4F, #310638);
+
+.accent-color("win10-25", "cool-blue-bright", #A9EFFF, #79E6FF, #48D2F2, #0099BC, #006B83, #004B5C, #00323D);
+.accent-color("win10-26", "cool-blue", #A4E8FF, #7CD6F5, #4DACCF, #2D7D9A, #215D73, #0E4357, #0B2833);
+.accent-color("win10-27", "seafoam", #AAF5FA, #8CE7ED, #5CDCE6, #00B7C3, #007C85, #004A4F, #003033);
+.accent-color("win10-28", "seafoam-team", #B3F4F5, #80D6D9, #37A9AD, #038387, #005659, #00393B, #002626);
+.accent-color("win10-29", "mint-light", #B5F7EC, #91EBDC, #32E3C5, #00B294, #00826C, #004A3E, #002922);
+.accent-color("win10-30", "mint-dark", #99F7EB, #64DECE, #00B39B, #018574, #005E52, #004037, #002B26);
+.accent-color("win10-31", "turf-green", #C1F7DD, #A6F7D0, #68E3A8, #00CC6A, #008746, #00522A, #002B16);
+.accent-color("win10-32", "sport-green", #94E0B1, #75C795, #3DAD68, #10893E, #0B5C2A, #08421E, #052B14);
+
+.accent-color("win10-33", "gray", #D9D1CE, #C8C0BE, #A7A09F, #7A7574, #5F5B5A, #393636, #262525);
+.accent-color("win10-34", "gray-brown", #C5BFB9, #A39E9A, #878380, #5D5A58, #3E3C3B, #2B2A29, #1F1E1D);
+.accent-color("win10-35", "steel-blue", #9EB6DB, #8FA4C2, #7F90A8, #68768A, #4F5C6E, #37404F, #222B38);
+.accent-color("win10-36", "metal-blue", #9FB4D1, #8A9DB6, #6E7D91, #515C6B, #3B4452, #262F3B, #1C232E);
+.accent-color("win10-37", "pale-moss", #A4E1D2, #8BBFB2, #76A297, #567C73, #3A544E, #293A36, #1C2B28);
+.accent-color("win10-38", "moss", #97CFC1, #7FADA2, #688F85, #486860, #334A44, #23332F, #152420);
+.accent-color("win10-39", "meadow-green", #B7F26F, #9ED160, #79AB3C, #498205, #355E03, #244001, #152600);
+.accent-color("win10-40", "green", #90D690, #61BA61, #3D9C3D, #107C10, #0C5C0C, #094209, #022602);
+
+.accent-color("win10-41", "overcast", #CCCCCC, #AEAEAE, #929292, #767676, #4F4F4F, #373737, #262626);
+.accent-color("win10-42", "storm", #9B9A99, #848381, #6D6B6A, #4C4A48, #363533, #262524, #191919);
+.accent-color("win10-43", "blue-gray", #C2E7F2, #BAD7E0, #99B1B8, #69797E, #43585E, #2E4045, #1F2B2E);
+.accent-color("win10-44", "gray-dark", #98ABB6, #7D8D96, #637077, #4A5459, #373F42, #2C3235, #1F2325);
+.accent-color("win10-45", "liddy-green", #B6E0B6, #A5CCA5, #89AA89, #647C64, #485948, #324232, #243024);
+.accent-color("win10-46", "sage", #B8D4C1, #A3BBAB, #809386, #525E54, #3A433D, #2A332C, #1D2620);
+.accent-color("win10-47", "camouflage-desert", #DEC77D, #C3AF6E, #A9975F, #847545, #63562C, #4D421F, #3B3217);
+.accent-color("win10-48", "camouflage", #D6C3A3, #BDAC8F, #A09279, #7E735F, #5E5647, #453D30, #362F24);

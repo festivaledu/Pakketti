@@ -1,0 +1,130 @@
+@import "_mixins";
+
+body[data-theme="light"] {
+	@baseLow:				fade(#000000, 20%);
+	@baseMediumLow:			fade(#000000, 40%);
+	@baseMedium:			fade(#000000, 60%);
+	@baseMediumHigh:		fade(#000000, 80%);
+	@baseHigh:				fade(#000000, 100%);
+
+	@altLow:				fade(#FFFFFF, 20%);
+	@altMediumLow:			fade(#FFFFFF, 40%);
+	@altMedium:				fade(#FFFFFF, 60%);
+	@altMediumHigh:			fade(#FFFFFF, 80%);
+	@altHigh:				fade(#FFFFFF, 100%);
+
+	@listLow:				fade(#000000, 10%);
+	@listMediumLow:			fade(#000000, 20%);
+
+	@chromeLow:				#F2F2F2;
+	@chromeMediumLow:		#F2F2F2;
+	@chromeMedium:			#E6E6E6;
+	@chromeHigh:			#CCCCCC;
+
+	@chromeAltLow:			#171717;
+
+	@chromeDisabledLow:		#7A7A7A;
+	@chromeDisabledHigh:	#CCCCCC;
+
+	@chromeBlackLow:		fade(#000000, 20%);
+	@chromeBlackMediumLow:	fade(#000000, 40%);
+	@chromeBlackMedium:		fade(#000000, 80%);
+	@chromeBlackHigh:		fade(#000000, 100%);
+	
+	.theme-mixin();
+}
+
+body[data-theme="dark"] {
+	@baseLow:				fade(#FFFFFF, 20%);
+	@baseMediumLow:			fade(#FFFFFF, 40%);
+	@baseMedium:			fade(#FFFFFF, 60%);
+	@baseMediumHigh:		fade(#FFFFFF, 80%);
+	@baseHigh:				fade(#FFFFFF, 100%);
+
+	@altLow:				fade(#000000, 20%);
+	@altMediumLow:			fade(#000000, 40%);
+	@altMedium:				fade(#000000, 60%);
+	@altMediumHigh:			fade(#000000, 80%);
+	@altHigh:				fade(#000000, 100%);
+
+	@listLow:				fade(#FFFFFF, 10%);
+	@listMediumLow:			fade(#FFFFFF, 20%);
+
+	@chromeLow:				#171717;
+	@chromeMediumLow:		#2B2B2B;
+	@chromeMedium:			#1F1F1F;
+	@chromeHigh:			#767676;
+
+	@chromeAltLow:			#F2F2F2;
+
+	@chromeDisabledLow:		#858585;
+	@chromeDisabledHigh:	#333333;
+
+	@chromeBlackLow:		fade(#000000, 20%);
+	@chromeBlackMediumLow:	fade(#000000, 40%);
+	@chromeBlackMedium:		fade(#000000, 80%);
+	@chromeBlackHigh:		fade(#000000, 100%);
+	
+	.theme-mixin();
+}
+
+
+.theme-mixin() {
+	--base-low: @baseLow;
+	--base-medium-low: @baseMediumLow;
+	--base-medium: @baseMedium;
+	--base-medium-high: @baseMediumHigh;
+	--base-high: @baseHigh;
+
+	--alt-low: @altLow;
+	--alt-medium-low: @altMediumLow;
+	--alt-medium: @altMedium;
+	--alt-medium-high: @altMediumHigh;
+	--alt-high: @altHigh;
+
+	--list-low: @listLow;
+	--list-medium-low: @listMediumLow;
+
+	--chrome-low: @chromeLow;
+	--chrome-medium-low: @chromeMediumLow;
+	--chrome-medium: @chromeMedium;
+	--chrome-high: @chromeHigh;
+
+	--chrome-alt-low: @chromeAltLow;
+
+	--chrome-disabled-low: @chromeDisabledLow;
+	--chrome-disabled-high: @chromeDisabledHigh;
+
+	--chrome-black-low: @chromeBlackLow;
+	--chrome-black-medium-low: @chromeBlackMediumLow;
+	--chrome-black-medium: @chromeBlackMedium;
+	--chrome-black-high: @chromeBlackHigh;
+	
+	.radio-button {
+		input[type="radio"] {
+			&:checked + label {
+				&:after {
+					.encoded-svg-background("<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 20 20'><circle fill='@{baseMediumHigh}' cx='10' cy='10' r='5'/></svg>");
+				}
+				
+				&:hover:not(:active):after {
+					.encoded-svg-background("<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 20 20'><circle fill='@{baseHigh}' cx='10' cy='10' r='5'/></svg>");
+				}
+				
+				&:active:after {
+					.encoded-svg-background("<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 20 20'><circle fill='@{baseMedium}' cx='10' cy='10' r='5'/></svg>");
+				}
+			}
+		}
+		
+		&[disabled] {
+			input[type="radio"] {
+				&:checked + label {
+					&:after {
+						.encoded-svg-background("<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 20 20'><circle fill='@{baseMediumLow}' cx='10' cy='10' r='5'/></svg>");
+					}
+				}
+			}
+		}
+	}
+}

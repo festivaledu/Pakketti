@@ -1,84 +1,62 @@
 <template>
-	<div class="page" data-page-id="reviews" @pageShow="pageShow">
-		<metro-list-view :history="false" menuTitle="Reviews" acrylic="acrylic-80" ref="messagesView">
-			<template slot="list-items">
+	<MetroPage page-id="reviews" @navigatedTo.native="onPageShow">
+		<MetroListView pane-title="Reviews" ref="list-view">
+			<template slot="menu-items">
 				<template v-if="reviewData.length">
-					<template v-for="(reviewObj) in reviewData">
-						<div class="list-view-item" :class="{'selected': selectedThread && (selectedThread === reviewObj.id)}" @click="threadSelected(reviewObj.id)" :key="reviewObj.id">
-							<div class="list-view-item-inner">
-								<div class="list-view-item-content row">
-									<div class="col-fill">
+					<div class="list-view-item"
+						:class="{'selected': selectedThread && (selectedThread === reviewObj.id)}"
+						@click="threadSelected(reviewObj.id)"
+						v-for="(reviewObj) in reviewData"
+						:key="reviewObj.id"
+					>
+						<div class="list-view-item-inner">
+							<div class="list-view-item-content">
+								<MetroStackPanel vertical-alignment="top">
+									<MetroStackPanel>
 										<span class="text-label">{{ reviewObj.title }}</span>
 										<span class="detail-text-label">{{ getPackageInfo(reviewObj.packageId).name }} – {{ getPackageInfo(reviewObj.packageId).identifier }}</span>
-									</div>
-									<div>
+									</MetroStackPanel>
+									
+									<MetroStackPanel orientation="horizontal" vertical-alignment="center">
 										<span class="detail-text-label align-right">{{ reviewObj.createdAt | date }}</span>
-										<div class="review-rating-view">
-											<div class="rating-star" v-for="i in reviewObj.rating.value" :key="`${reviewObj.id}${i}`" />
-											<div class="rating-star outline" v-for="i in (5 - reviewObj.rating.value)" :key="`${reviewObj.id}${i + reviewObj.rating.value}`" />
-										</div>
-									</div>
-								</div>
+										<MetroRatingControl :value="reviewObj.rating.value" style="pointer-events: none" />
+									</MetroStackPanel>
+								</MetroStackPanel>
 							</div>
 						</div>
-					</template>
+					</div>
 				</template>
 			</template>
 			
-			<template slot="pages">
-				<div class="page" data-page-id="messages">
-					<metro-messages ref="messageContainer" :showEmojiSelector="false" :useTextarea="true" />
-				</div>
-			</template>
-		</metro-list-view>
-	</div>
+			<MetroPage page-id="messages">
+				<template slot="bottom-app-bar">
+					<MetroCommandBar>
+						<MetroAppBarButton icon="repeat-all" label="Reload" />
+						<MetroAppBarSeparator />
+						<MetroAppBarButton icon="delete" label="Delete" :disabled="!selectedThread" />
+					</MetroCommandBar>
+				</template>
+				<MetroMessages ref="messages" />
+			</MetroPage>
+		</MetroListView>
+	</MetroPage>
 </template>
 
 <style lang="less">
 .page[data-page-id="reviews"] {
-	.col-fill {
-		flex: 1;
-		min-width: 0;
-	}
-	
-	.review-rating-view {
-		display: flex;
-		justify-content: flex-end;
-		width: 72px;
-		height: 20px;
-		
-		.rating-star {
-			width: 12px;
-			height: 20px;
-			
-			&:after {
-				font-size: 12px;
-				font-family: "Segoe MDL2 Assets";
-			}
-			
-			&:not(.outline):after {
-				content: "\E735";
-				color: var(--system-accent-color);
-			}
-			
-			&.outline:after {
-				content: "\E734";
-				color: var(--base-medium);
-			}
-		}
+	& > .page-content {
+		height: 100%;
+		padding: 0 !important
 	}
 	
 	.list-view .list-view-item {
-		height: 64px;
+		height: 76px;
 		
 		.list-view-item-content {
 			margin-left: 0;
 			margin-right: 0;
 			padding-right: 16px;
-			
-			.col-fill {
-				padding-right: 15px;
-			}
+			max-height: 76px !important;
 			
 			span {
 				display: block;
@@ -97,18 +75,20 @@
 			}
 		}
 	}
-	
-	.messages-container .messages-wrapper .message .message-text {
-		word-break: normal;
-	}
 }
 </style>
 
 <script>
 import { PackageAPI } from "@/scripts/ApiUtil";
+import { AccountAPI } from "@/scripts/ApiUtil";
+
+import MetroListView from '@/components/ListViewComponent'
 
 export default {
 	name: "ReviewThreadsPage",
+	components: {
+		MetroListView
+	},
 	data() {
 		return {
 			packageData: [],
@@ -117,10 +97,12 @@ export default {
 		}
 	},
 	mounted() {
-		this.$refs["messagesView"].navigate("messages");
+		this.$refs["list-view"].navigate("messages");
 	},
 	methods: {
-		async pageShow() {
+		async onPageShow(event) {
+			this.$parent.setHeader("");
+			
 			this.packageData = await PackageAPI.getPackages();
 			this.reviewData = await PackageAPI.getReviews();
 		},
@@ -130,23 +112,34 @@ export default {
 		getReviewLastMessage(reviewObj) {
 			return reviewObj.messages[reviewObj.messages.length - 1].text;
 		},
-		threadSelected(threadId) {
+		async threadSelected(threadId) {
 			let thread = this.reviewData.find(reviewObj => reviewObj.id === threadId);
 			if (!thread) return;
+			
+			// thread.messages.find(messageObj => messageObj.
+			let packageOwnerAccountData = await AccountAPI.getUser(this.packageData.find(packageObj => packageObj.id === thread.packageId).accountId);
+			let reviewerAccountData = await AccountAPI.getUser(thread.accountId);
 			
 			this.selectedThread = threadId;
 			let messages = thread.messages.map(messageObj => {
 				return {
 					author: messageObj.accountId,
-					displayName: "Cockfotze",
+					displayName: [packageOwnerAccountData, reviewerAccountData].find(accountObj => accountObj.id === messageObj.accountId).username,
 					date: new Date(messageObj.createdAt),
 					text: messageObj.text,
-					type: "received"
+					type: messageObj.accountId === this.accountId ? "sent" : "received"
 				}
 			});
-			if (this.$refs["messageContainer"]) {
-				this.$refs["messageContainer"].setMessages(messages);
+			
+			this.$refs["list-view"].setHeader(thread.title);
+			if (this.$refs["messages"]) {
+				this.$refs["messages"].setMessages(messages);
 			}
+		}
+	},
+	computed: {
+		accountId() {
+			return this.$store.state.accountId;
 		}
 	},
 	filters: {

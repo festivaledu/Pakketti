@@ -1,0 +1,219 @@
+@import "../../style/_mixins.less";
+
+@keyframes notification-slide-in {
+	from { transform: translate3d(380px, 0, 0); }
+	to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes notification-slide-out {
+	from { transform: translate3d(0, 0, 0); }
+	to { transform: translate3d(380px, 0, 0); }
+}
+
+@keyframes notification-dismiss {
+	from { transform: scale(1) translate3d(0, 0, 0); }
+	to { transform: scale(0.64) translate3d(0, 0, 0); }
+}
+
+@keyframes notification-fade-out {
+	from { opacity: 1; }
+	to { opacity: 0; }
+}
+
+@keyframes notification-fade-out-slide {
+	from { opacity: 1; transform: scale(0.64) translate3d(0, 0, 0); }
+	to { opacity: 0; transform: scale(0.64) translate3d(0, -64px, 0); }
+}
+
+.notification-center {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 9000;
+	
+	.notification-wrapper {
+		position: absolute;
+		right: 16px;
+		bottom: 12px;
+		perspective: 1000px;
+		transition: margin-bottom .3s cubic-bezier(0.1,0.9,0.2,1);
+	}
+	
+	.notification {
+		position: relative;
+		width: 364px;
+		padding: 20px 16px 16px;
+		pointer-events: all;
+		transition: transform 200ms cubic-bezier(.15, .97, .44, .9);
+		
+		.dismiss-button {
+			position: absolute;
+			top: 8px;
+			right: 8px;
+			width: 20px;
+			height: 20px;
+			cursor: pointer;
+			
+			.icon {
+				color: fade(#FFFFFF, 40%);
+				font-size: 13px;
+			}
+			
+			&:hover:not(:active) .icon {
+				color: #FFFFFF;
+			}
+		}
+		
+		.notification-icon {
+			position: absolute;
+			top: 20px;
+			left: 16px;
+			width: 20px;
+			height: 20px;
+			pointer-events: none;
+			
+			.icon {
+				color: fade(#FFFFFF, 80%);
+			}
+			
+			& + .content {
+				padding-left: 35px;
+			}
+		}
+		
+		.content {
+			width: 100%;
+			color: #FFF;
+			pointer-events: none;
+			
+			.title-label {
+				font-weight: 600;
+			}
+		}
+		
+		.notification-inputs {
+			margin-top: 16px;
+			
+			input[type="email"],
+			input[type="number"],
+			input[type="password"],
+			input[type="search"],
+			input[type="tel"],
+			input[type="text"],
+			input[type="url"] {
+				max-width: initial;
+				
+				&:not(:focus) {
+					color: #FFFFFF;
+					background-color: fade(#000000, 40%);
+					box-shadow: inset 0 0 0 2px var(--system-accent-color-light-1);
+					
+					&::placeholder {
+						color: fade(#FFFFFF, 40%);
+					}
+				}
+				&:hover:not(:active):not(:focus) {
+					background-color: fade(#000000, 60%);
+					box-shadow: inset 0 0 0 2px var(--system-accent-color-light-2);
+				}
+			}
+			
+			.list {
+				max-width: initial;
+				
+				&:not(.open) {
+					.list-inner .list-item {
+						color: #FFFFFF;
+					}
+					
+					&:not(:hover) {
+						background-color: fade(#000000, 40%);
+						box-shadow: inset 0 0 0 2px var(--system-accent-color-light-1);
+					}
+					
+					&:hover {
+						background-color: fade(#000000, 60%);
+						box-shadow: inset 0 0 0 2px var(--system-accent-color-light-2);
+					}
+					
+					&:after {
+						.encoded-svg-background("<svg viewBox='0 0 28 28' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><polygon points='13.8886719 16.3613281 19.25 11 19.7773438 11.5273438 13.8886719 17.4160156 8 11.5273438 8.52734375 11' fill='#FFFFFF' /></svg>");
+					}
+				}
+				
+				&.open {
+					.list-inner .list-item {
+						color: var(--base-high);
+					}
+				}
+			}
+		}
+		
+		.notification-buttons {
+			display: flex;
+			margin-top: 16px;
+			
+			button {
+				color: #FFFFFF;
+				background-color: fade(#FFFFFF, 20%);
+				flex: 1;
+				
+				&:first-child:not(:last-child) {
+					margin-right: 2px;
+				}
+				
+				&:last-child:not(:first-child) {
+					margin-left: 2px;
+				}
+				
+				&:not(:first-child):not(:last-child) {
+					margin-left: 2px;
+					margin-right: 2px;
+				}
+				
+				&:not(:disabled) {
+					&:hover:not(:active) {
+						box-shadow: inset 0 0 0 2px fade(#FFFFFF, 40%);
+					}
+					&:active {
+						background-color: fade(#FFFFFF, 40%);
+					}
+				}
+				
+				&:disabled {
+					color: fade(#FFFFFF, 40%);
+				}
+			}
+		}
+		
+		
+		&.active-state {
+			transform: scale(0.98) translate3d(0, 0, 0);
+		}
+		&.slide-in {
+			transition: none;
+			animation: notification-slide-in 550ms cubic-bezier(.12, .87, .15, 1) forwards;
+		}
+		&.slide-out {
+			transition: none;
+			animation: notification-slide-out 450ms cubic-bezier(.09, .36, .17, .91) forwards;
+		}
+		&.dismissing {
+			transition: none;
+			animation: notification-dismiss 200ms cubic-bezier(.15, .97, .44, .9) forwards, notification-fade-out 100ms 200ms ease-out forwards;
+		}
+		&.dismissing-action {
+			transition: none;
+			animation: notification-dismiss 200ms cubic-bezier(.15, .97, .44, .9) forwards, notification-fade-out-slide 100ms 200ms ease-out forwards;
+		}
+		
+		&:not(:hover) {
+			.dismiss-button {
+				display: none;
+			}
+		}
+	}
+}

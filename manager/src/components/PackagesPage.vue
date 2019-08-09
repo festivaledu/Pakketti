@@ -1,85 +1,103 @@
 <template>
-	<div class="page" data-page-id="packages" data-page-title="Packages" @pageShow="onPageShow">
-		<div class="table-container" v-if="(isDeveloper || isModerator || isAdministrator) && packageData">
-			<table class="data-grid mb-3">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>Version</th>
-						<th>Downloads</th>
-						<th>Visible</th>
-						<th>Updated</th>
-						<th class="align-right">Actions</th>
-					</tr>
-				</thead>
-				<tbody v-if="packageData.length">
-					<tr v-for="packageObj in packageData" :key="packageObj.id">
-						<td>
-							<p>{{ packageObj.name }}</p>
-							<p class="caption">{{ packageObj.identifier }}</p>
-						</td>
-						<td>{{ packageObj.latestVersion.version }}</td>
-						<td>{{ packageObj.downloadCount | number }}</td>
-						<td>
-							<metro-toggle-switch :value="packageObj.visible" onContent="Yes" offContent="No" :readonly="true" />
-						</td>
-						<td>{{ packageObj.updatedAt | date }}</td>
-						<td class="align-right">
-							<button class="icon-button"><i class="icon more"></i></button>
-						</td>
-					</tr>
-				</tbody>
-				<tbody v-if="!packageData.length">
-					<tr>
-						<td colspan="6">
-							<p class="caption">No Packages to display</p>
-							<p class="caption" v-if="isDeveloper"><a href="#">Create a Package</a></p>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+	<MetroPage page-id="packages" @navigatedTo.native="onPageShow">
+		<template slot="bottom-app-bar">
+			<MetroCommandBar>
+				<MetroAppBarButton icon="add" label="Add" @click="navigate('package-editor')" />
+			</MetroCommandBar>
+		</template>
+		
+		<MetroStackPanel horizontal-alignment="center" v-if="!packageData">
+			<MetroProgressRing :active="true" style="width: 50px; height: 50px" />
+		</MetroStackPanel>
 			
-			<metro-command-bar>
-				<template slot="buttons">
-					<metro-app-bar-button icon="add" title="Add" @click="navigate('package-editor')" />
-				</template>
-			</metro-command-bar>
+		<div class="data-grid package-list" v-if="packageData">
+			<div class="data-grid-wrapper">
+				<div class="table">
+					<div class="column-headers-border" />
+					<div class="tr column-headers">
+						<div class="th column-header-item">Name</div>
+						<div class="th column-header-item">Version</div>
+						<div class="th column-header-item">Downloads</div>
+						<div class="th column-header-item">Visible</div>
+						<div class="th column-header-item">Updated</div>
+						<div class="th column-header-item align-right">Actions</div>
+					</div>
+					<div class="row-wrapper" v-for="(packageObj, index) in packageData" :key="index">
+						<div class="tr row">
+							<div class="td cell">
+								<MetroTextBlock>{{ packageObj.name }}</MetroTextBlock>
+								<MetroTextBlock text-style="caption">{{ packageObj.identifier }}</MetroTextBlock>
+							</div>
+							<div class="td cell">
+								<MetroTextBlock>{{ packageObj.latestVersion.version }}</MetroTextBlock>
+							</div>
+							<div class="td cell">
+								<MetroTextBlock>{{ packageObj.downloadCount | number }}</MetroTextBlock>
+							</div>
+							<div class="td cell">
+								<MetroToggleSwitch :value="packageObj.visible" offContent="No" onContent="Yes" :readonly="true" />
+							</div>
+							<div class="td cell">
+								<MetroTextBlock>{{ packageObj.updatedAt | date }}</MetroTextBlock>
+							</div>
+							<div class="td cell align-right">
+								<MetroButton @click="showPackageMenu($event, packageObj)">
+									<MetroSymbolIcon icon="more" />
+								</MetroButton>
+							</div>
+						</div>
+						<div class="row-background" :style="{'top': `${(index * 47) + 32}px`}" />
+					</div>
+					
+					<div class="row-wrapper" v-if="!packageData.length">
+						<div class="tr row">
+							<div class="td cell">
+								<MetroTextBlock text-style="caption">No Packages to display</MetroTextBlock>
+								<MetroHyperlinkButton>
+									<MetroTextBlock text-style="caption">Create a Package</MetroTextBlock>
+								</MetroHyperlinkButton>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-	</div>
+	</MetroPage>
 </template>
 
 <style lang="less">
-	.page[data-page-id="packages"] {
-		padding-bottom: 58px !important;
-	
-		.table-container {
-			height: 100%;
+.page[data-page-id="packages"] {
+	.data-grid {
+		.row {
+			.cell:not(:first-child) {
+				color: var(--base-medium);
+			}
+		}
+		
+		&.package-list {
+			.table {
+				width: 100%;
+			}
 			
-			.data-grid {
-				max-height: 100%;
-				display: flex;
-				flex-direction: column;
+			.row {
+				height: 47px;
+			}
+			.row-background {
+				height: 47px;
 				
-				thead,
-				tbody {
-					display: block;
+				&:after {
+					height: 47px;
 				}
-				
-				tbody {
-					overflow-y: scroll;
-					flex: 1;
-				}
-				
-				tr {
-					display: flex;
-					
-					th, td {
-						display: flex;
-					}
-				}
+			}
+			
+			.toggle-switch,
+			.rating-control {
+				pointer-events: none;
+				min-width: auto;
 			}
 		}
 	}
+}
 </style>
 
 <script>
@@ -93,12 +111,35 @@ export default {
 	}),
 	methods: {
 		async onPageShow() {
+			this.$parent.setHeader("Packages");
+			
 			if (this.isDeveloper || this.isModerator || this.isAdministrator) {
 				this.packageData = await PackageAPI.getPackages();
 			}
 		},
-		navigate(pageName) {
-			this.$parent.navigate(pageName, { addHistory: true });
+		showPackageMenu(event, packageObj) {
+			let packageFlyout = new metroUI.MenuFlyout({
+				items: [{
+					icon: "edit",
+					text: "Edit",
+					action: () => {
+						this.navigate("package-editor", packageObj)
+					}
+				}, {
+					icon: "delete",
+					text: "Delete",
+					action: () => {
+						console.log("delete")
+					}
+				}]
+			});
+			
+			packageFlyout.showAt(event.target);
+		},
+		navigate(pageName, packageObj) {
+			this.$parent.navigate(pageName, {
+				packageData: packageObj
+			});
 		}
 	},
 	computed: {

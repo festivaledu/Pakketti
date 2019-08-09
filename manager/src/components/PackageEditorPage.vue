@@ -1,156 +1,160 @@
 <template>
-	<div class="page no-padding" data-page-id="package-editor">
-		<metro-pivot>
-			<template slot="title">
-				<div class="pivot-title"><span>PACKAGE EDITOR</span></div>
-			</template>
-			
-			<template slot="header-items">
-				<div class="pivot-header-item" data-pivot-item="info">Info</div>
-				<div class="pivot-header-item" data-pivot-item="screenshots">Screenshots</div>
-				<div class="pivot-header-item" data-pivot-item="versions">Versions</div>
-				<div class="pivot-header-item disabled" data-pivot-item="reviews">Reviews</div>
-			</template>
-			
-			<template slot="items">
-				<div class="pivot-item" data-pivot-item="info">
-					<div class="row">
-						<div class="col-12 col-md-6">
-							<div class="mb-4">
-								<h4>Package Name</h4>
-								<input type="text" placeholder="Example Package" v-model="packageData.name" maxlength="50" autocomplete="off">
-								<div class="row">
-									<div class="col-6 align-left">
-										<a href="#" :disabled="!packageData.name.length">Check availability</a>
-									</div>
-									<div class="col-6 align-right">
-										<p class="text-muted align-right mb-0">{{ packageData.name.length }} / 50</p>
-									</div>
+	<MetroPage page-id="package-editor" @navigatedTo.native="onPageShow">
+		<template slot="top-app-bar">
+			<MetroCommandBar>
+				<MetroAppBarButton icon="delete" label="Delete" />
+				<MetroAppBarButton icon="save" label="Save" />
+			</MetroCommandBar>
+		</template>
+		
+		<MetroPivot title="PACKAGE EDITOR">
+			<MetroPivotItem header="Info">
+				<div class="row">
+					<div class="col-12 col-md-6">
+						<div class="mb-4">
+							<MetroTextBlock text-style="sub-title">Package Name</MetroTextBlock>
+							<MetroTextBox
+								placeholder-text="Example Package"
+								:maxlength="50"
+								v-model="packageData.name"
+							/>
+							<div class="row mt-2">
+								<div class="col-6">
+									<MetroHyperlinkButton :disabled="!packageData.name.length">Check availability</MetroHyperlinkButton>
 								</div>
-							</div>
-
-							<div class="mb-4">
-								<h4>Bundle Identifier</h4>
-								<input type="text" placeholder="com.example.package" v-model="packageData.identifier" maxlength="50" autocomplete="off">
-								
-								<div class="row">
-									<div class="col-6 align-left">
-										<a href="#" :disabled="!packageData.identifier.length">Check availability</a>
-									</div>
-									<div class="col-6 align-right">
-										<p class="text-muted align-right mb-0">{{ packageData.identifier.length }} / 50</p>
-									</div>
-								</div>
-							</div>
-						
-							<div class="mb-4">
-								<h4>Short Description</h4>
-								<textarea v-model="packageData.shortDescription" maxlength="255" autocomplete="off" style="height: 158px" />
-								<p class="text-muted align-right mb-4">{{ packageData.shortDescription.length }} / 255</p>
-							</div>
-						
-							<div class="mb-4">
-								<h4>Description</h4>
-								<VueEditor :editorToolbar="editorToolbar" v-model="packageData.detailedDescription" />
-								
-								<div class="row">
-									<div class="col-6 align-left">
-										<!-- <a href="#">What's this?</a> -->
-									</div>
-									<div class="col-6 align-right">
-										<p class="text-muted align-right mb-0">{{ decodeText(packageData.detailedDescription).length }} / 3000</p>
-									</div>
+								<div class="col-6">
+									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.name.length }} / 50</MetroTextBlock>
 								</div>
 							</div>
 						</div>
 						
-						<div class="col-12 col-md-6">
-							<div class="mb-4">
-							<h4>Device Families</h4>
-								<div class="control-group">
-									<metro-checkbox>Phone</metro-checkbox>
-									<metro-checkbox>Tablet</metro-checkbox>
-									<metro-checkbox>Desktop</metro-checkbox>
-									<metro-checkbox>TV</metro-checkbox>
+						<div class="mb-4">
+							<MetroTextBlock text-style="sub-title">Bundle Identifier</MetroTextBlock>
+							<MetroTextBox
+								placeholder-text="com.example.package"
+								:maxlength="50"
+								v-model="packageData.identifier"
+							/>
+							<div class="row mt-2">
+								<div class="col-6">
+									<MetroHyperlinkButton :disabled="!packageData.identifier.length">Check availability</MetroHyperlinkButton>
+								</div>
+								<div class="col-6">
+									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.identifier.length }} / 50</MetroTextBlock>
 								</div>
 							</div>
-							
-							<div class="mb-4">
-								<h4>Platform</h4>
-								<p>Select the platform your package will be available for.</p>
-								<metro-combo-box v-model="packageData.platform">
-									<select>
-										<option disabled selected>Select a platform</option>
-										<option>Windows</option>
-										<option>macOS</option>
-										<option>iOS (Cydia)</option>
-										<option>Linux (Debian)</option>
-										<option>Universal</option>
-									</select>
-								</metro-combo-box>
-								
-								<p>Select the architecture your package was built for.</p>
-								<metro-combo-box v-model="packageData.architecture" :disabled="!packageData.platform">
-									<select>
-										<option disabled selected>Select an architecture</option>
-										<option>x86 32 bit</option>
-										<option>x86 64 bit</option>
-										<option>ARM</option>
-										<option>Universal</option>
-									</select>
-								</metro-combo-box>
-							</div>
-							
-							<div class="mb-4">
-								<h4>System Requirements</h4>
-								<input type="text" placeholder="Minimum required OS" v-model="packageData.minOSVersion" autocomplete="off">
-								<input type="text" placeholder="Maximum supported OS" v-model="packageData.maxOSVersion" autocomplete="off">
-							</div>
-							
-							<h4>Publishing Options</h4>
-							<div class="control-group">
-								<div class="radio">
-									<input type="radio" id="packageVisibilityOn" name="visible" :value="true" v-model="packageData.visible">
-									<label for="packageVisibilityOn">
-										<p class="item-label">Publish this package immediately</p>
-									</label>
+						</div>
+						
+						<div class="mb-4">
+							<MetroTextBlock text-style="sub-title">Short Description</MetroTextBlock>
+							<MetroTextBox
+								:textarea="true"
+								:maxlength="255"
+								v-model="packageData.shortDescription"
+								style="height: 158px"
+							/>
+							<div class="row mt-2">
+								<div class="col-12">
+									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.shortDescription.length }} / 255</MetroTextBlock>
 								</div>
-								<div class="radio">
-									<input type="radio" id="packageVisibilityOff" name="visible" :value="false" v-model="packageData.visible">
-									<label for="packageVisibilityOff">
-										<p class="item-label">Publish this package manually</p>
-									</label>
+							</div>
+						</div>
+						
+						<div class="mb-4">
+							<MetroTextBlock text-style="sub-title">Description</MetroTextBlock>
+							<VueEditor
+								:editorToolbar="editorToolbar"
+								v-model="packageData.detailedDescription"
+							/>
+							<div class="row mt-2">
+								<div class="col-12">
+									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.detailedDescription.length }} / 3000</MetroTextBlock>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-				
-				<div class="pivot-item" data-pivot-item="screenshots">
-					<div class="grid-view">
-						<!-- <div class="grid-item" v-for="(index) in Array(20)" :key="index">
-							<div class="item-inner">
-								<p class="item-title">GridView Item {{ index + 1 }}</p>
-								<p class="item-subtitle">This is an example description</p>
-							</div>
-						</div> -->
-						<div class="grid-item add-button">
-							<div class="item-inner" />
+					
+					<div class="col-12 col-md-6">
+						<div class="mb-4">
+							<MetroTextBlock text-style="sub-title">Device Families</MetroTextBlock>
+							<MetroCheckbox content="Phone" />
+							<MetroCheckbox content="Tablet" />
+							<MetroCheckbox content="Desktop" />
+							<MetroCheckbox content="TV" />
+						</div>
+						
+						<div class="mb-4">
+							<MetroTextBlock text-style="sub-title">Platform</MetroTextBlock>
+							<MetroTextBlock>Select the platform your package will be available for.</MetroTextBlock>
+							<MetroComboBox
+								placeholder-text="Select a platform"
+								:items-source="{'win': 'Windows', 'darwin': 'macOS', 'iphoneos': 'iOS', 'debian': 'Linux (Debian/Ubuntu)', 'universal': 'Universal'}"
+								v-model="packageData.platform"
+								style="margin-top: 8px"
+							/>
+							
+							<MetroTextBlock style="margin-top: 8px">Select the architecture your package was built for.</MetroTextBlock>
+							<MetroComboBox
+								placeholder-text="Select an architecture"
+								:items-source="{'x86': 'x86 32-bit', 'x86_64': 'x86 64-bit', [packageData.platform === 'iphoneos' ? 'iphoneos-arm' : 'arm']: 'ARM', 'universal': 'Universal'}"
+								:disabled="!packageData.platform"
+								v-model="packageData.architecture"
+								style="margin-top: 8px"
+							/>
+						</div>
+						
+						<div class="mb-4">
+							<MetroTextBlock text-style="sub-title">System Requirements</MetroTextBlock>
+							<MetroTextBox
+								placeholder-text="Minimum required OS"
+								v-model="packageData.minOSVersion"
+							/>
+							<MetroTextBox
+								placeholder-text="Maximum supported OS"
+								v-model="packageData.maxOSVersion"
+								style="margin-top: 8px"
+							/>
+						</div>
+						
+						<div class="mb-4">
+							<MetroTextBlock text-style="sub-title">Publishing Options</MetroTextBlock>
+							<MetroRadioButton
+								group-name="package-visibility"
+								:name="true"
+								content="Publish this package immediately"
+								v-model="packageData.visible"
+							/>
+							<MetroRadioButton
+								group-name="package-visibility"
+								:name="false"
+								content="Publish this package manually"
+								v-model="packageData.visible"
+							/>
 						</div>
 					</div>
 				</div>
-				<div class="pivot-item" data-pivot-item="versions">Versions</div>
-				<div class="pivot-item" data-pivot-item="reviews">Reviews</div>
-			</template>
-		</metro-pivot>
-	</div>
+			</MetroPivotItem>
+			<MetroPivotItem header="Screenshots">
+				<div class="grid-view">
+					<div class="grid-view-item add-button">
+						<div class="grid-view-item-content" />
+					</div>
+				</div>
+			</MetroPivotItem>
+			<MetroPivotItem header="Versions">
+				<p>Versions</p>
+			</MetroPivotItem>
+			<MetroPivotItem header="Reviews" :disabled="true">
+				<p>test 3</p>
+			</MetroPivotItem>
+		</MetroPivot>
+	</MetroPage>
 </template>
 
 <style lang="less">
 .page[data-page-id="package-editor"] {
-	input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], textarea {
-		max-width: initial;
-		margin-right: 0;
+	.page-content {
+		padding: 0 !important;
 	}
 	
 	.row {
@@ -158,18 +162,12 @@
 		margin-right: -12px;
 	}
 	
-	.control-group {
-		.checkbox, .radio {
-			display: flex;
-			
-			label {
-				flex: 1;
-			}
-		}
-	}
-	
 	.text-muted {
 		color: var(--base-medium);
+	}
+	
+	.combo-box {
+		display: inline-block;
 	}
 	
 	.quillWrapper {
@@ -177,6 +175,62 @@
 		
 		.ql-snow {
 			border: none !important;
+			
+			a {
+				color: var(--system-accent-color);
+			}
+			
+			.ql-tooltip {
+				left: 8px !important;
+				right: 8px !important;
+				
+				height: auto;
+				line-height: 32px;
+				background-color: var(--alt-high);
+				border: none;
+				box-shadow: inset 0 0 0 2px var(--chrome-disabled-low);
+				color: var(--base-high);
+				
+				input[type="text"] {
+					appearance: none;
+					-webkit-appearance: none;
+					-moz-appearance: none;
+					outline: none;
+					padding: 5px 8px 8px 12px;
+					background-color: var(--alt-high); 
+					border: none;
+					box-shadow: inset 0 0 0 2px var(--chrome-disabled-low);
+					border-radius: 0;
+					resize: none;
+					height: auto;
+					font-size: inherit;
+					
+					&::placeholder {
+						color: var(--base-medium);
+					}
+					
+					&:hover:not(:focus) {
+						box-shadow: inset 0 0 0 2px var(--base-medium-high);
+					}
+					
+					&:not(:focus) {
+						color: var(--base-high);
+					}
+					
+					&:focus {
+						background-color: #FFFFFF !important;
+						box-shadow: inset 0 0 0 2px var(--system-accent-color);
+						
+						&::placeholder {
+							color: var(--base-medium-low);
+						}
+					}
+				}
+				
+				a {
+					line-height: 32px;
+				}
+			}
 		}
 		
 		.ql-toolbar {
@@ -186,27 +240,90 @@
 			.ql-formats {
 				margin: 0;
 				
+				.ql-stroke {
+					stroke: var(--chrome-disabled-low);
+				}
+				
+				.ql-fill {
+					fill: var(--chrome-disabled-low);
+				}
+				
+				.ql-active {
+					.ql-stroke {
+						stroke: var(--system-accent-color);
+					}
+					
+					.ql-fill {
+						fill: var(--system-accent-color);
+					}
+				}
+				
 				button {
 					width: 32px;
 					height: 32px;
 					margin: 0;
 					padding: 5px;
+				}
+				
+				.ql-picker {
+					top: 0;
+					height: 32px;
+					line-height: 32px;
+					outline: none;
 					
-					.ql-stroke {
-						stroke: var(--chrome-disabled-low);
+					.ql-picker-label {
+						border: none;
+						color: var(--chrome-disabled-low);
+						outline: none;
+						
+						&.ql-active {
+							color: var(--system-accent-color);
+						}
 					}
 					
-					.ql-fill {
-						fill: var(--chrome-disabled-low);
-					}
-					
-					&.ql-active {
+					&.ql-expanded {
+						.ql-picker-label {
+							color: var(--system-accent-color);
+						}
+						
 						.ql-stroke {
 							stroke: var(--system-accent-color);
 						}
 						
 						.ql-fill {
 							fill: var(--system-accent-color);
+						}
+					}
+					
+					.ql-picker-options {
+						background-color: var(--chrome-medium-low);
+						box-shadow: 0 0 0 1px var(--chrome-high);
+						border: none;
+						padding: 4px 0;
+						
+						.ql-picker-item {
+							padding: 0 12px;
+							color: var(--base-high);
+							outline: none;
+							
+							&:hover:not(:active) {
+								background-color: var(--list-low);
+							}
+							
+							&:active {
+								background-color: var(--list-medium-low);
+								transform: scale(0.98);
+							}
+							
+							&.ql-selected {
+								color: var(--base-high);
+								background-color: var(--list-accent-low);
+					
+								&:hover:not(:active),
+								&:active {
+									background-color: var(--list-accent-medium);
+								}
+							}
 						}
 					}
 				}
@@ -247,12 +364,8 @@
 	}
 	
 	.grid-view {
-		margin: 0;
-		
-		.grid-item {
+		.grid-view-item {
 			background-color: var(--list-low);
-			padding: 0;
-			// height: 240px;
 			
 			@media all and (max-width: 640px) {
 				width: calc(~"(100% - (1 * 4px)) / 2");
@@ -283,21 +396,12 @@
 				display: block;
 				padding-top: 100%;
 			}
-
-			.item-inner {
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				padding: 8px;
-
-				.item-title {
-					font-weight: 600;
-				}
-			}
 			
 			&.add-button {
-				.item-inner {
+				.grid-view-item-content {
+					position: absolute;
+					top: 0;
+					left: 0;
 					width: 100%;
 					height: 100%;
 					pointer-events: none;
@@ -314,11 +418,10 @@
 					}
 				}
 			}
-		}
+		}		
 	}
 }
 </style>
-
 
 <script>
 import { VueEditor } from "vue2-editor"
@@ -353,10 +456,14 @@ export default {
 				minOSVersion: null,
 				maxOSVersion: null,
 				visible: true,
-			}	
+			}
 		}
 	},
 	methods: {
+		onPageShow(event) {
+			this.$parent.setHeader("");
+			console.log(event.detail);
+		},
 		decodeText(text) {
 			return HtmlEntities.decode(text.replace(/<[^>]*>/g, ''));
 		}

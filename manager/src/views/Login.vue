@@ -1,59 +1,75 @@
 <template>
-	<div class="views transparent" data-page="root">
-		<div class="view" data-view-id="main-view">
-			<div class="pages">
-				<div class="page" data-page-id="login">
-					<vue-headful :title="$t('login.login_title')" />
-					<div class="container">
-						<div class="row justify-content-around">
-							<div class="col-md-4">
-								<nav class="mb-5">
-									<div class="nav-logo pb-0">
-										<div class="nav-link">
-											<h1 class="text-center">{{ $t('app.name') }}</h1>
-										</div>
-									</div>
-								</nav>
-								<hr>
-
-								<div class="row mt-3 d-flex">
-									<div class="col progress-indicator-container" >
-										<div class="progress indeterminate" v-show="isWorking" />
-									</div>
+	<MetroView view-id="main-view">
+		<MetroPage page-id="login">
+			<vue-headful :title="$t('login.login_title')" />
+			
+			<div class="container">
+				<div class="row justify-content-around">
+					<div class="col-md-4">
+						<nav class="mb-5">
+							<div class="nav-logo pb-0">
+								<div class="nav-link">
+									<MetroTextBlock text-style="header">{{ $t('app.name') }}</MetroTextBlock>
 								</div>
-
-								<form novalidate>
-									<div class="form-group">
-										<label>{{ $t("login.login_username") }}</label>
-										<input type="text" :placeholder="$t('login.login_username_placeholder')" v-model="user.username" :disabled="!socket" @input="$v.user.username.$touch()" @keyup.13="login">
-									</div>
-									<div class="form-group">
-										<label for="login-password">{{ $t("login.login_password") }}</label>
-										<input type="password" :placeholder="$t('login.login_password_required')" v-model="user.password" :disabled="!socket" @input="$v.user.password.$touch()" @keyup.13="login">
-									</div>
-								</form>
-
-								<div class="row mt-3 d-flex">
-									<div class="col col-6 text-right">
-										<button class="btn btn-primary d-inline-block colored" @click="login()" :disabled="!socket || $v.user.$invalid || isWorking">{{ $t("login.login_button") }}</button>
-									</div>
-
-									<div class="col align-right" v-show="!isWorking">
-										<a href="#" class="d-inline-block mt-2 p-0" @click.prevent="register" :disabled="!socket">{{ $t("login.login_register") }}</a>
-									</div>
-								</div>
+							</div>
+						</nav>
+						<hr>
+						
+						<div class="row mt-3 d-flex">
+							<div class="col progress-indicator-container" >
+								<MetroProgressBar :indeterminate="true" v-show="isWorking" style="width: 100%" />
+							</div>
+						</div>
+						
+						<form novalidate @submit.prevent>
+							<MetroStackPanel>
+								<MetroTextBox
+									:header="$t('login.login_username')"
+									:placeholder-text="$t('login.login_username_placeholder')"
+									v-model="user.username"
+									:disabled="!socket"
+									@input="$v.user.username.$touch()"
+									@keyup.13="login"
+									style="margin: 0 0 8px"
+								/>
+								<MetroPasswordBox
+									:header="$t('login.login_password')"
+									:placeholder-text="$t('login.login_password_required')"
+									v-model="user.password"
+									:disabled="!socket"
+									@input="$v.user.username.$touch()"
+									@keyup.13="login"
+								/>
+							</MetroStackPanel>
+						</form>
+						
+						<div class="row mt-3 d-flex">
+							<div class="col col-6 text-right">
+								<MetroButton class="system-accent-color"
+									:content="$t('login.login_button')"
+									:disabled="!socket || $v.user.$invalid || isWorking"
+									@click="login"
+								/>
+							</div>
+							
+							<div class="col align-right" v-show="!isWorking">
+								<MetroHyperlinkButton
+									:content="$t('login.login_register')"
+									@click.prevent="register"
+									style="margin: 6px 0"
+								/>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	</div>
+		</MetroPage>
+	</MetroView>
 </template>
 
 <style lang="less">
 	.container {
-		min-height: 100%;
+		min-height: 100vh;
 		display: flex;
 		align-items: center;
 		
@@ -114,7 +130,7 @@ export default {
 		async login() {
 			document.activeElement.blur();
 			this.isWorking = true;
-
+			
 			AuthAPI.login({
 				username: this.user.username,
 				password: CryptoJS.SHA512(this.user.password).toString(CryptoJS.enc.Hex)
@@ -139,21 +155,44 @@ export default {
 		async register() {
 			var registerDialog = new metroUI.ContentDialog({
 				title: this.$t("login.register_title"),
-				content: (() => {
-				return (
-					<div>
-						<input type="text" placeholder={this.$t("login.register_username")} data-required />
-						<input type="email" placeholder={this.$t("login.register_email")} data-required />
-						<input type="password" placeholder={this.$t("login.register_password")} data-minlength="8" />
-						<input type="password" placeholder={this.$t("login.register_password_confirm")} data-minlength="8" />
-					</div>
-				)
-			})(),
+				content: (
+					<MetroStackPanel>
+						<MetroTextBox
+							header={this.$t("login.register_username")}
+							placeholder-text={this.$t("login.register_username_placeholder")}
+							required={true}
+							name="username"
+							style="margin-bottom: 8px"
+						/>
+						<MetroTextBox
+							header={this.$t("login.register_email")}
+							placeholder-text={this.$t("login.register_email_placeholder")}
+							required={true}
+							name="email"
+							style="margin-bottom: 8px"
+						/>
+						<MetroPasswordBox
+							header={this.$t("login.register_password")}
+							placeholder-text={this.$t("login.register_password_required")}
+							required={true}
+							min-length={8}
+							name="password"
+							style="margin-bottom: 8px"
+						/>
+						<MetroPasswordBox
+							header={this.$t("login.register_password_confirm")}
+							placeholder-text={this.$t("login.register_password_required")}
+							required={true}
+							min-length={8}
+							name="password-confirm"
+						/>
+					</MetroStackPanel>
+				),
 				commands: [{ text: this.$t("app.cancel") }, { text: this.$t("app.ok"), primary: true }]
 			});
 			if (await registerDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
 				let texts = registerDialog.text;
-				if (texts[2].localeCompare(texts[3]) != 0) {
+				if (texts["password"].localeCompare(texts["password-confirm"]) != 0) {
 					new metroUI.ContentDialog({
 						title: this.$t("login.register_password_match_title"),
 						content: this.$t("login.register_password_match_message"),
@@ -164,9 +203,9 @@ export default {
 				
 				this.isWorking = true;
 				AuthAPI.register({
-					username: texts[0],
-					email: texts[1],
-					password: CryptoJS.SHA512(texts[2]).toString(CryptoJS.enc.Hex)
+					username: texts["username"],
+					email: texts["email"],
+					password: CryptoJS.SHA512(texts["password"]).toString(CryptoJS.enc.Hex)
 				}).then(async authData => {
 					this.isWorking = false;
 
@@ -183,6 +222,9 @@ export default {
 							content: this.$t("login.register_success_message"),
 							commands: [{ text: "Ok", primary: true }]
 						}).showAsync();
+						
+						this.$store.commit("setAccountId", authData.accountId);
+						this.$store.commit("setRole", authData.role);
 						
 						this.$router.replace("/");
 					}

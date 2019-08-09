@@ -1,60 +1,113 @@
 <template>
-	<div class="views transparent" data-page="root">
-		<div class="view" data-view-id="main-view">
-			<div class="pages">
-				<div class="page" data-page-id="root">
-					<vue-headful title="Pakketti" />
-								
-					<!-- Main navigation view, always visible -->
-					<metro-navigation-view menuTitle="Team FESTIVAL" :history="false" :showBackButton="true" :startRetracted="true" defaultPage="dashboard" acrylic="acrylic-80" class="fixed-width" ref="mainNavView">
-
-						<!-- Regular navigation items -->
-						<template slot="navigation-items">
-							<metro-navigation-view-menu-item page="dashboard" icon="home" title="Dashboard" />
-							<metro-navigation-view-menu-item page="packages" icon="package" title="Packages" />
-							<metro-navigation-view-menu-item page="reviews" icon="chat-bubbles" title="Reviews" />
-							<metro-navigation-view-menu-item page="devices" icon="cell-phone" title="Devices" :disabled="true" />
-							<metro-navigation-view-menu-item page="users" icon="people" title="Users" :disabled="true" />
-							<metro-navigation-view-menu-item page="log" icon="clipboard-list" title="Moderation Log" :disabled="true" />
-							<metro-navigation-view-menu-item page="statistics" icon="area-chart" title="Statistics" :disabled="true" />
+	<MetroView view-id="main-view">
+		<MetroPage page-id="root">
+			<vue-headful title="Pakketti" />
+			
+			<MetroNavigationView pane-title="Team FESTIVAL" pane-display-mode="left-compact" :settings-visible="false" ref="navigation-view">
+				<template slot="menu-items">
+					<MetroNavigationViewItem content="Dashboard" page-id="dashboard">
+						<template slot="icon">
+							<MetroSymbolIcon icon="home" />
 						</template>
-
-						<!-- Bottom navigation items -->
-						<template slot="bottom-items">
-							<metro-navigation-view-menu-item page="profile" icon="contact" title="Profil" :disabled="true" />
-							<metro-navigation-view-menu-item page="settings" icon="settings" title="Einstellungen" :disabled="true" />
-							<button class="colored" @click="signOut">Test</button>
+					</MetroNavigationViewItem>
+					<MetroNavigationViewItem content="Packages" page-id="packages">
+						<template slot="icon">
+							<MetroSymbolIcon icon="package" />
 						</template>
-
-						<!-- Pages stored in this navigation view -->
-						<template slot="pages">
-							<DashboardPage />
-							<PackagesPage />
-							<ReviewThreadsPage />
-							
-							<PackageEditorPage />
+					</MetroNavigationViewItem>
+					<MetroNavigationViewItem content="Reviews" page-id="reviews">
+						<template slot="icon">
+							<MetroSymbolIcon icon="chat-bubbles" />
 						</template>
-					</metro-navigation-view>
-				</div>
-			</div>
-		</div>
-	</div>
+					</MetroNavigationViewItem>
+					<MetroNavigationViewItem content="Devices" page-id="devices" :disabled="true">
+						<template slot="icon">
+							<MetroSymbolIcon icon="cell-phone" />
+						</template>
+					</MetroNavigationViewItem>
+					<MetroNavigationViewItem content="Users" page-id="users" :disabled="true">
+						<template slot="icon">
+							<MetroSymbolIcon icon="people" />
+						</template>
+					</MetroNavigationViewItem>
+					<MetroNavigationViewItem content="Moderation Log" page-id="logs" :disabled="true">
+						<template slot="icon">
+							<MetroSymbolIcon icon="clipboard-list" />
+						</template>
+					</MetroNavigationViewItem>
+					<MetroNavigationViewItem content="Statistics" page-id="statistics" :disabled="true">
+						<template slot="icon">
+							<MetroSymbolIcon icon="area-chart" />
+						</template>
+					</MetroNavigationViewItem>
+				</template>
+				
+				<template slot="pane-footer">
+					<MetroNavigationViewItem icon="contact" content="Profile" page-id="profile" :disabled="true" />
+					<MetroNavigationViewItem icon="setting" content="Settings" page-id="settings" :disabled="true" />
+					<MetroButton class="system-accent-color" @click="signOut">
+						<MetroSymbolIcon icon="ethernet-error" />
+					</MetroButton>
+				</template>
+				
+				<DashboardPage />
+				<PackagesPage />
+				<ReviewThreadsPage />
+				
+				<PackageEditorPage />
+			</MetroNavigationView>
+		</MetroPage>
+	</MetroView>
 </template>
 
 <style lang="less">
-	@media all and (max-width: 640px) {
-		.row {
-			margin-left: 0;
-			margin-right: 0;
+.page[data-page-id="root"] {
+	@media all and (min-width: 641px) {
+		.navigation-view {
+			& > .pane-content {
+				position: static;
+				flex-shrink: 0;
+			}
+			
+			& > .content-root {
+				width: calc(~"100% - 40px");
+				flex: 1 0 auto;
+				margin-left: 0;
+				
+				& > .content-frame > .page > .page-content {
+					padding: 24px;
+				}
+			}
 		}
 	}
-	@media all and (min-width: 1008px) {
-		.navigation-view.fixed-width > .frame {
-			width: calc(~"100% - 48px");
+	
+	.row.no-margin {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	
+	.text-block {
+		&.header {
+			margin-bottom: 16px;
 		}
 		
+		&.sub-header {
+			margin-bottom: 12px;
+		}
+		
+		&.title {
+			font-size: 24px;
+			font-weight: 300;
+			margin-bottom: 5px;
+		}
+		
+		&.sub-title {
+			margin: 15px 0;
+		}
 	}
+}
 </style>
+
 
 <script>
 import DashboardPage from "@/components/DashboardPage"
@@ -70,6 +123,9 @@ export default {
 		PackagesPage,
 		ReviewThreadsPage,
 		PackageEditorPage
+	},
+	mounted() {
+		this.$refs["navigation-view"].navigate("dashboard");
 	},
 	methods: {
 		signOut() {

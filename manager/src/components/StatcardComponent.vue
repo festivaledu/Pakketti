@@ -1,10 +1,10 @@
 <template>
 	<div class="statcard">
 		<div class="px-3 pt-3 mb-2">
-			<p class="statcard-desc caption">{{name}}</p>
+			<MetroTextBlock text-style="caption" class="statcard-description">{{ name }}</MetroTextBlock>
 			<h2 class="statcard-number" v-if="currentValue >= 0">
 				<span>{{ currentValue | number }}</span>
-				<small v-if="!isNaN(deltaValue)" class="delta-indicator" :class="{'delta-neutral': deltaValue == 0 || isNaN(deltaValue), 'delta-positive': deltaValue > 0, 'delta-negative': deltaValue < 0}">{{ Math.abs(deltaValue) }}</small>
+				<MetroTextBlock text-style="caption" v-if="!isNaN(deltaValue)" class="delta-indicator" :class="{'delta-neutral': deltaValue == 0 || isNaN(deltaValue), 'delta-positive': deltaValue > 0, 'delta-negative': deltaValue < 0}">{{ Math.abs(deltaValue) }}</MetroTextBlock>
 			</h2>
 			<hr class="statcard-hr mb-0">
 		</div>
@@ -19,8 +19,17 @@
 	border-radius: 6px;
 	box-shadow: 0 0 0 1px var(--base-low);
 	
-	.statcard-desc {
+	.statcard-description {
 		text-transform: uppercase;
+	}
+	
+	.statcard-number {
+		span {
+			display: inline-block;
+			font-size: 34px;
+			font-weight: 200;
+			margin-bottom: 12px;
+		}
 	}
 	
 	.delta-indicator {
@@ -43,7 +52,7 @@
 			}
 		}
 		&.delta-neutral {
-			color: #FFFFFF;
+			color: var(--base-high);
 			
 			&:before {
 				font-family: "Segoe UI";

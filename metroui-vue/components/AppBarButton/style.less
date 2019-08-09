@@ -1,0 +1,43 @@
+.app-bar-button {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 68px;
+	min-height: 56px;
+	
+	&:hover:not(:active) {
+		background-color: var(--list-low);
+	}
+	
+	&:active {
+		background-color: var(--list-medium-low);
+	}
+	
+	& > .icon,
+	.symbol-icon,
+	.font-icon,
+	.path-icon {
+		margin-top: 10px;
+	}
+	
+	label {
+		font-size: 12px;
+		margin: 0 2px 6px;
+	}
+	
+	&[disabled] {
+		label {
+			color: var(--base-medium-low);
+		}
+		
+		& > .icon,
+		.symbol-icon,
+		.font-icon {
+			color: var(--base-medium-low);
+		}
+		
+		.path-icon svg {
+			opacity: 0.4;
+		}
+	}
+}
