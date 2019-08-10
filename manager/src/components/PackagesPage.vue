@@ -1,8 +1,8 @@
 <template>
-	<MetroPage page-id="packages" @navigatedTo.native="onPageShow">
+	<MetroPage page-id="packages" @navigatedTo.native="onNavigatedTo" @navigatedBackTo.native="onNavigatedBackTo">
 		<template slot="bottom-app-bar">
 			<MetroCommandBar>
-				<MetroAppBarButton icon="add" label="Add" @click="navigate('package-editor')" />
+				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click="navigate('package-editor')" />
 			</MetroCommandBar>
 		</template>
 		
@@ -15,12 +15,12 @@
 				<div class="table">
 					<div class="column-headers-border" />
 					<div class="tr column-headers">
-						<div class="th column-header-item">Name</div>
-						<div class="th column-header-item">Version</div>
-						<div class="th column-header-item">Downloads</div>
-						<div class="th column-header-item">Visible</div>
-						<div class="th column-header-item">Updated</div>
-						<div class="th column-header-item align-right">Actions</div>
+						<div class="th column-header-item">{{ $t('packages.name') }}</div>
+						<div class="th column-header-item">{{ $t('packages.version') }}</div>
+						<div class="th column-header-item">{{ $t('packages.downloads') }}</div>
+						<div class="th column-header-item">{{ $t('packages.visible') }}</div>
+						<div class="th column-header-item">{{ $t('packages.updated') }}</div>
+						<div class="th column-header-item align-right">{{ $t('packages.actions') }}</div>
 					</div>
 					<div class="row-wrapper" v-for="(packageObj, index) in packageData" :key="index">
 						<div class="tr row">
@@ -35,7 +35,11 @@
 								<MetroTextBlock>{{ packageObj.downloadCount | number }}</MetroTextBlock>
 							</div>
 							<div class="td cell">
-								<MetroToggleSwitch :value="packageObj.visible" offContent="No" onContent="Yes" :readonly="true" />
+								<MetroToggleSwitch :value="packageObj.visible"
+									:offContent="$t('packages.visible_no')"
+									:onContent="$t('packages.visible_yes')"
+									:readonly="true"
+								/>
 							</div>
 							<div class="td cell">
 								<MetroTextBlock>{{ packageObj.updatedAt | date }}</MetroTextBlock>
@@ -52,9 +56,9 @@
 					<div class="row-wrapper" v-if="!packageData.length">
 						<div class="tr row">
 							<div class="td cell">
-								<MetroTextBlock text-style="caption">No Packages to display</MetroTextBlock>
+								<MetroTextBlock text-style="caption">{{ $t('packages.no_items') }}</MetroTextBlock>
 								<MetroHyperlinkButton>
-									<MetroTextBlock text-style="caption">Create a Package</MetroTextBlock>
+									<MetroTextBlock text-style="caption">{{ $t('packages.create') }}</MetroTextBlock>
 								</MetroHyperlinkButton>
 							</div>
 						</div>
@@ -110,24 +114,27 @@ export default {
 		packageData: null
 	}),
 	methods: {
-		async onPageShow() {
-			this.$parent.setHeader("Packages");
+		async onNavigatedTo() {
+			this.$parent.setHeader(this.$t('root.item_packages'));
 			
 			if (this.isDeveloper || this.isModerator || this.isAdministrator) {
 				this.packageData = await PackageAPI.getPackages();
 			}
 		},
+		onNavigatedBackTo() {
+			this.$parent.setHeader(this.$t('root.item_packages'));
+		},
 		showPackageMenu(event, packageObj) {
 			let packageFlyout = new metroUI.MenuFlyout({
 				items: [{
 					icon: "edit",
-					text: "Edit",
+					text: this.$t('app.actions.edit'),
 					action: () => {
 						this.navigate("package-editor", packageObj)
 					}
 				}, {
 					icon: "delete",
-					text: "Delete",
+					text: this.$t('app.actions.delete'),
 					action: () => {
 						console.log("delete")
 					}
@@ -155,10 +162,10 @@ export default {
 	},
 	filters: {
 		number(value) {
-			return new Intl.NumberFormat("en-US").format(value)
+			return new Intl.NumberFormat().format(value)
 		},
 		date(value) {
-			return new Date(value).toLocaleString("en-US");
+			return new Date(value).toLocaleString();
 		}
 	}
 }

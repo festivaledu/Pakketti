@@ -1,7 +1,7 @@
 <template>
-	<MetroPage page-id="dashboard" @navigatedTo.native="onPageShow">		
+	<MetroPage page-id="dashboard" @navigatedTo.native="onNavigatedTo" @navigatedBackTo.native="onNavigatedBackTo">		
 		<div class="mb-2" v-if="(isModerator || isAdministrator)">
-			<MetroTextBlock text-style="sub-title">Overview</MetroTextBlock>
+			<MetroTextBlock text-style="sub-title">{{ $t('dashboard.overview_header') }}</MetroTextBlock>
 			
 			<MetroStackPanel horizontal-alignment="center" v-if="!statisticsData">
 					<MetroProgressRing :active="true" style="width: 50px; height: 50px" />
@@ -9,28 +9,28 @@
 			
 			<div class="row no-margin" v-if="statisticsData">
 				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard name="Downloads" :dataset="this.statisticsData.items.map(item => item['versionDownloaded'])" />
+					<Statcard :name="$t('dashboard.overview_downloads')" :dataset="this.statisticsData.items.map(item => item['versionDownloaded'])" />
 				</div>
 				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard name="Packages Created" :dataset="this.statisticsData.items.map(item => item['packageCreated'])" />
+					<Statcard :name="$t('dashboard.overview_packages_created')" :dataset="this.statisticsData.items.map(item => item['packageCreated'])" />
 				</div>
 				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard name="Packages Updated" :dataset="this.statisticsData.items.map(item => item['versionCreated'])" />
+					<Statcard :name="$t('dashboard.overview_packages_updated')" :dataset="this.statisticsData.items.map(item => item['versionCreated'])" />
 				</div>
 				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard name="Reviews" :dataset="this.statisticsData.items.map(item => item['reviewCreated'])" />
+					<Statcard :name="$t('dashboard.overview_reviews')" :dataset="this.statisticsData.items.map(item => item['reviewCreated'])" />
 				</div>
 				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard name="Registrations" :dataset="this.statisticsData.items.map(item => item['userRegistration'])" />
+					<Statcard :name="$t('dashboard.overview_registrations')" :dataset="this.statisticsData.items.map(item => item['userRegistration'])" />
 				</div>
 				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard name="Logins" :dataset="this.statisticsData.items.map(item => item['userLogin'])" />
+					<Statcard :name="$t('dashboard.overview_logins')" :dataset="this.statisticsData.items.map(item => item['userLogin'])" />
 				</div>
 			</div>
 		</div>
 		
 		<div class="mb-2" v-if="(isDeveloper || isModerator)">
-			<MetroTextBlock text-style="sub-title">Packages</MetroTextBlock>
+			<MetroTextBlock text-style="sub-title">{{ $t('packages.header') }}</MetroTextBlock>
 			
 			<MetroStackPanel horizontal-alignment="center" v-if="!packageData">
 				<MetroProgressRing :active="true" style="width: 50px; height: 50px" />
@@ -41,12 +41,12 @@
 					<div class="table">
 						<div class="column-headers-border" />
 						<div class="tr column-headers">
-							<div class="th column-header-item">Name</div>
-							<div class="th column-header-item">Version</div>
-							<div class="th column-header-item">Downloads</div>
-							<div class="th column-header-item">Visible</div>
-							<div class="th column-header-item">Updated</div>
-							<div class="th column-header-item align-right">Actions</div>
+							<div class="th column-header-item">{{ $t('packages.name') }}</div>
+							<div class="th column-header-item">{{ $t('packages.version') }}</div>
+							<div class="th column-header-item">{{ $t('packages.downloads') }}</div>
+							<div class="th column-header-item">{{ $t('packages.visible') }}</div>
+							<div class="th column-header-item">{{ $t('packages.updated') }}</div>
+							<div class="th column-header-item align-right">{{ $t('packages.actions') }}</div>
 						</div>
 						<div class="row-wrapper" v-for="(packageObj, index) in packageData.slice(0, 5)" :key="index">
 							<div class="tr row">
@@ -61,7 +61,11 @@
 									<MetroTextBlock>{{ packageObj.downloadCount | number }}</MetroTextBlock>
 								</div>
 								<div class="td cell">
-									<MetroToggleSwitch :value="packageObj.visible" offContent="No" onContent="Yes" :readonly="true" />
+									<MetroToggleSwitch :value="packageObj.visible"
+										:offContent="$t('packages.visible_no')"
+										:onContent="$t('packages.visible_yes')"
+										:readonly="true"
+									/>
 								</div>
 								<div class="td cell">
 									<MetroTextBlock>{{ packageObj.updatedAt | date }}</MetroTextBlock>
@@ -78,9 +82,9 @@
 						<div class="row-wrapper" v-if="!packageData.length">
 							<div class="tr row">
 								<div class="td cell">
-									<MetroTextBlock text-style="caption">No Packages to display</MetroTextBlock>
+									<MetroTextBlock text-style="caption">{{ $t('packages.no_items') }}</MetroTextBlock>
 									<MetroHyperlinkButton>
-										<MetroTextBlock text-style="caption">Create a Package</MetroTextBlock>
+										<MetroTextBlock text-style="caption">{{ $t('packages.create') }}</MetroTextBlock>
 									</MetroHyperlinkButton>
 								</div>
 							</div>
@@ -90,13 +94,13 @@
 			</div>
 			
 			<MetroHyperlinkButton v-if="packageData && packageData.length > 5">
-				<MetroTextBlock text-style="caption">See all Packages</MetroTextBlock>
+				<MetroTextBlock text-style="caption">{{ $t('packages.see_all') }}</MetroTextBlock>
 			</MetroHyperlinkButton>
 		</div>
 		
 		<div class="row">
 			<div class="col-12 col-md-6">
-				<MetroTextBlock text-style="sub-title">Reviews</MetroTextBlock>
+				<MetroTextBlock text-style="sub-title">{{ $t('dashboard.reviews_header') }}</MetroTextBlock>
 				
 				<MetroStackPanel horizontal-alignment="center" v-if="!reviewData || !packageData">
 					<MetroProgressRing :active="true" style="width: 50px; height: 50px" />
@@ -107,9 +111,9 @@
 						<div class="table">
 							<div class="column-headers-border" />
 							<div class="tr column-headers">
-								<div class="th column-header-item">Title</div>
-								<div class="th column-header-item">Date</div>
-								<div class="th column-header-item">Rating</div>
+								<div class="th column-header-item">{{ $t('dashboard.reviews_title') }}</div>
+								<div class="th column-header-item">{{ $t('dashboard.reviews_date') }}</div>
+								<div class="th column-header-item">{{ $t('dashboard.reviews_rating') }}</div>
 							</div>
 							<div class="row-wrapper" v-for="(reviewObj, index) in reviewData.slice(0,5)" :key="index">
 								<div class="tr row">
@@ -130,7 +134,7 @@
 							<div class="row-wrapper" v-if="!reviewData.length">
 								<div class="tr row">
 									<div class="td cell">
-										<MetroTextBlock text-style="caption">No Reviews to display</MetroTextBlock>
+										<MetroTextBlock text-style="caption">{{ $t('dashboard.reviews_no_items') }}</MetroTextBlock>
 									</div>
 								</div>
 							</div>
@@ -139,12 +143,12 @@
 				</div>
 				
 				<MetroHyperlinkButton v-if="reviewData && reviewData.length > 5">
-					<MetroTextBlock text-style="caption">See all Reviews</MetroTextBlock>
+					<MetroTextBlock text-style="caption">{{ $t('dashboard.reviews_see_all') }}</MetroTextBlock>
 				</MetroHyperlinkButton>
 			</div>
 			
 			<div class="col-12 col-md-6">
-				<MetroTextBlock text-style="sub-title">Devices</MetroTextBlock>
+				<MetroTextBlock text-style="sub-title">{{ $t('dashboard.devices_header') }}</MetroTextBlock>
 				
 				<MetroStackPanel horizontal-alignment="center" v-if="!deviceData">
 					<MetroProgressRing :active="true" style="width: 50px; height: 50px" />
@@ -155,8 +159,8 @@
 						<div class="table">
 							<div class="column-headers-border" />
 							<div class="tr column-headers">
-								<div class="th column-header-item">Device Type</div>
-								<div class="th column-header-item">Serial Number</div>
+								<div class="th column-header-item">{{ $t('dashboard.devices_type') }}</div>
+								<div class="th column-header-item">{{ $t('dashboard.devices_serial_number') }}</div>
 							</div>
 							
 							<div class="row-wrapper" v-for="(deviceObj, index) in deviceData.slice(0,5)" :key="index">
@@ -181,9 +185,9 @@
 							<div class="row-wrapper" v-if="!deviceData.length">
 								<div class="tr row">
 									<div class="td cell">
-										<MetroTextBlock text-style="caption">No Devices to display</MetroTextBlock>
+										<MetroTextBlock text-style="caption">{{ $t('dashboard.devices_no_items') }}</MetroTextBlock>
 										<MetroHyperlinkButton>
-											<MetroTextBlock text-style="caption">Link a Device</MetroTextBlock>
+											<MetroTextBlock text-style="caption">{{ $t('dashboard.devices_create') }}</MetroTextBlock>
 										</MetroHyperlinkButton>
 									</div>
 								</div>
@@ -193,7 +197,7 @@
 				</div>
 				
 				<MetroHyperlinkButton v-if="deviceData && deviceData.length > 5">
-					<MetroTextBlock text-style="caption">See all Devices</MetroTextBlock>
+					<MetroTextBlock text-style="caption">{{ $t('dashboard.devices_see_all') }}</MetroTextBlock>
 				</MetroHyperlinkButton>
 			</div>
 		</div>
@@ -257,8 +261,8 @@ export default {
 		progressRingActive: false
 	}),
 	methods: {
-		async onPageShow() {
-			this.$parent.setHeader("");
+		async onNavigatedTo() {
+			this.$parent.setHeader(this.$t('root.item_dashboard'));
 			
 			// if (this.isDeveloper) {
 				this.packageData = await PackageAPI.getPackages();
@@ -270,6 +274,9 @@ export default {
 			
 			this.reviewData = await PackageAPI.getReviews()
 			this.deviceData = await DeviceAPI.getDevices();
+		},
+		onNavigatedBackTo() {
+			this.$parent.setHeader(this.$t('root.item_dashboard'));
 		},
 		
 		getPackageInfo(packageId) {
@@ -289,10 +296,10 @@ export default {
 	},
 	filters: {
 		number(value) {
-			return new Intl.NumberFormat("en-US").format(value)
+			return new Intl.NumberFormat().format(value)
 		},
 		date(value) {
-			return new Date(value).toLocaleString("en-US");
+			return new Date(value).toLocaleString();
 		}
 	}
 }

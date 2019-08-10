@@ -2,7 +2,22 @@ import Vue from "vue";
 import crypto from "crypto";
 import SocketIOClient from "socket.io-client";
 
+
+import VueI18n from 'vue-i18n';
+Vue.use(VueI18n);
+const i18n = new VueI18n({
+	locale: navigator.language,
+	fallbackLocale: "en",
+	messages: {
+		en: require("@/locale/en.json"),
+		"en-US": require("@/locale/en.json"),
+		de: require("@/locale/de.json"),
+		"de-DE": require("@/locale/de.json"),
+	}
+});
+
 export const SocketService = new Vue({
+	i18n,
 	data: {
 		url: null,
 		socket: null,
@@ -51,8 +66,8 @@ export const SocketService = new Vue({
 			
 			let notification = new metroUI.Notification({
 				payload: {},
-				title: "Connection interrupted",
-				content: "The WebSocket connection has been interrupted. Click here to reconnect.",
+				title: this.$t('app.connection_interrupted_title'),
+				content: this.$t('app.connection_interrupted_message'),
 				icon: "ethernet-error",
 				reminder: true,
 				dismissAction: (payload) => {
@@ -76,8 +91,8 @@ export const SocketService = new Vue({
 			
 			let notification = new metroUI.Notification({
 				payload: {},
-				title: "Connection failed",
-				content: "The WebSocket connection could not be established. Click here to try again.",
+				title: this.$t('app.connection_failure_title'),
+				content: this.$t('app.connection_failure_message'),
 				icon: "ethernet-error",
 				reminder: true,
 				dismissAction: (payload) => {

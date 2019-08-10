@@ -2,26 +2,152 @@
 	"app": {
 		"name": "Team FESTIVAL",
 		"ok": "Ok",
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"connection_interrupted_title": "Connection interrupted",
+		"connection_interrupted_message": "The WebSocket connection has been interrupted. Click here to reconnect.",
+		"connection_failure_title": "Connection failed",
+		"connection_failure_message": "The WebSocket connection could not be established. Click here to try again.",
+		
+		"actions": {
+			"add": "Add",
+			"edit": "Edit",
+			"delete": "Delete",
+			"reload": "Refresh",
+			"save": "Save"
+		}
 	},
 	"login": {
 		"login_title": "@:(app.name) – Login",
 		"login_username": "Username or E-Mail Address",
-		"login_username_placeholder": "Johnny Appleseed",
+		"login_username_placeholder": "John Appleseed",
 		"login_password": "Password",
 		"login_password_required": "Required",
 		"login_button": "Sign In",
 		"login_register": "No Account?",
 		"login_error_title": "There was an error signing you in",
 		"login_error_message": "The server responded with the following message:",
+		
 		"register_title": "Register with @:(app.name)",
 		"register_username": "Username",
+		"register_username_placeholder": "John Appleseed",
 		"register_email": "E-Mail Address",
-		"register_password": "Password (min. 8 characters)",
+		"register_email_placeholder": "j.appleseed@festival.ml",
+		"register_password": "Password (8 characters minimum)",
 		"register_password_confirm": "Confirm Password",
+		"register_password_required": "Required",
 		"register_password_match_title": "There was an error creating your Account",
-		"register_password_match_message": "The passwords you've entered do not match",
+		"register_password_match_message": "The passwords you've entered do not match.",
 		"register_success_title": "Registration successful",
 		"register_success_message": "<p>Your account has been successfully created.<br>You will now be redirected to the Dashboard.<p>"
+	},
+	"root": {
+		"pane_title": "@:(app.name)",
+		"item_dashboard": "Dashboard",
+		"item_packages": "Packages",
+		"item_reviews": "Reviews",
+		"item_devices": "Devices",
+		"item_users": "Users",
+		"item_moderation_log": "Moderation Log",
+		"item_statistics": "Statistics",
+		
+		"item_profile": "Profile",
+		"item_settings": "Settings"
+	},
+	"dashboard": {
+		"overview_header": "Overview",
+		"overview_downloads": "Downloads",
+		"overview_packages_created": "Packages Created",
+		"overview_packages_updated": "Packages Updated",
+		"overview_reviews": "Reviews",
+		"overview_registrations": "Registrations",
+		"overview_logins": "Logins",
+		
+		"reviews_header": "Reviews",
+		"reviews_title": "Title",
+		"reviews_date": "Date",
+		"reviews_rating": "Rating",
+		"reviews_no_items": "No Reviews to display",
+		"reviews_see_all": "See all Reviews",
+		
+		"devices_header": "Devices",
+		"devices_type": "Type",
+		"devices_serial_number": "Serial Number",
+		"devices_no_items": "No Devices to display",
+		"devices_create": "Link a Device",
+		"devices_see_all": "See all Devices"
+	},
+	"packages": {
+		"header": "Packages",
+		"name": "Packages",
+		"version": "Version",
+		"downloads": "Downloads",
+		"visible": "Visible",
+		"updated": "Updated",
+		"actions": "Actions",
+		"no_items": "No Packages to display",
+		"create": "Create a Package",
+		"see_all": "See all Packages",
+		
+		"visible_yes": "Yes",
+		"visible_no": "No"
+	},
+	"reviews": {
+		"messages_placeholder": "Type a message"
+	},
+	
+	"package_editor": {
+		"pivot_title": "Package Editor",
+		"pivot_headers": {
+			"info": "Info",
+			"media": "Media",
+			"versions": "Versions",
+			"reviews": "Reviews"
+		},
+		
+		"info": {
+			"package_name_title": "Package Name",
+			"package_name_placeholder": "Example Package",
+			"bundle_identifier_title": "Bundle Identifier",
+			"bundle_identifier_placeholder": "com.example.package",
+			"button_check_availability": "Check availability",
+			"short_description_title": "Short Description",
+			"detailed_description_title": "Description",
+			
+			"device_families_title": "Device Families",
+			"device_family": {
+				"phone": "Phone",
+				"tablet": "Tablet",
+				"desktop": "Desktop",
+				"tv": "TV"
+			},
+			
+			"platform_title": "Platform",
+			"platform_description": "Select the platform your Package will be available for.",
+			"platform_placeholder": "Select a platform",
+			"platform": {
+				"win": "Windows",
+				"darwin": "macOS",
+				"iphoneos": "iOS",
+				"debian": "Linux (Debian/Ubuntu)",
+				"universal": "Universal"
+			},
+			"architecture_description": "Select the architecture your Package was built for.",
+			"architecture_placeholder": "Select an architecture",
+			"architecture": {
+				"x86": "x86 32-bit",
+				"x86_64": "x86 64-bit",
+				"arm": "ARM",
+				"iphoneos-arm": "ARM",
+				"universal": "Universal"
+			},
+			
+			"system_requirements_title": "System Requirements",
+			"system_requirements_min_os": "Minimum required OS",
+			"system_requirements_max_os": "Maximum supported OS",
+			
+			"publishing_title": "Publishing Options",
+			"publishing_now": "Publish this Package immediately",
+			"publishing_later": "Publish this Package manually"
+		}
 	}
 }

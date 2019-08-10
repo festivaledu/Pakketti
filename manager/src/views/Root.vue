@@ -3,39 +3,39 @@
 		<MetroPage page-id="root">
 			<vue-headful title="Pakketti" />
 			
-			<MetroNavigationView pane-title="Team FESTIVAL" pane-display-mode="left-compact" :settings-visible="false" ref="navigation-view">
+			<MetroNavigationView :pane-title="$t('root.pane_title')" pane-display-mode="left-compact" :settings-visible="false" ref="navigation-view">
 				<template slot="menu-items">
-					<MetroNavigationViewItem content="Dashboard" page-id="dashboard">
+					<MetroNavigationViewItem :content="$t('root.item_dashboard')" page-id="dashboard">
 						<template slot="icon">
 							<MetroSymbolIcon icon="home" />
 						</template>
 					</MetroNavigationViewItem>
-					<MetroNavigationViewItem content="Packages" page-id="packages">
+					<MetroNavigationViewItem :content="$t('root.item_packages')" page-id="packages">
 						<template slot="icon">
 							<MetroSymbolIcon icon="package" />
 						</template>
 					</MetroNavigationViewItem>
-					<MetroNavigationViewItem content="Reviews" page-id="reviews">
+					<MetroNavigationViewItem :content="$t('root.item_reviews')" page-id="reviews">
 						<template slot="icon">
 							<MetroSymbolIcon icon="chat-bubbles" />
 						</template>
 					</MetroNavigationViewItem>
-					<MetroNavigationViewItem content="Devices" page-id="devices" :disabled="true">
+					<MetroNavigationViewItem :content="$t('root.item_devices')" page-id="devices" :disabled="true">
 						<template slot="icon">
 							<MetroSymbolIcon icon="cell-phone" />
 						</template>
 					</MetroNavigationViewItem>
-					<MetroNavigationViewItem content="Users" page-id="users" :disabled="true">
+					<MetroNavigationViewItem :content="$t('root.item_users')" page-id="users" :disabled="true">
 						<template slot="icon">
 							<MetroSymbolIcon icon="people" />
 						</template>
 					</MetroNavigationViewItem>
-					<MetroNavigationViewItem content="Moderation Log" page-id="logs" :disabled="true">
+					<MetroNavigationViewItem :content="$t('root.item_moderation_log')" page-id="logs" :disabled="true">
 						<template slot="icon">
 							<MetroSymbolIcon icon="clipboard-list" />
 						</template>
 					</MetroNavigationViewItem>
-					<MetroNavigationViewItem content="Statistics" page-id="statistics" :disabled="true">
+					<MetroNavigationViewItem :content="$t('root.item_statistics')" page-id="statistics" :disabled="true">
 						<template slot="icon">
 							<MetroSymbolIcon icon="area-chart" />
 						</template>
@@ -43,8 +43,8 @@
 				</template>
 				
 				<template slot="pane-footer">
-					<MetroNavigationViewItem icon="contact" content="Profile" page-id="profile" :disabled="true" />
-					<MetroNavigationViewItem icon="setting" content="Settings" page-id="settings" :disabled="true" />
+					<MetroNavigationViewItem icon="contact" :content="$t('root.item_profile')" page-id="profile" :disabled="true" />
+					<MetroNavigationViewItem icon="setting" :content="$t('root.item_settings')" page-id="settings" :disabled="true" />
 					<MetroButton class="system-accent-color" @click="signOut">
 						<MetroSymbolIcon icon="ethernet-error" />
 					</MetroButton>

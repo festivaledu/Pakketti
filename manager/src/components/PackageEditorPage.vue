@@ -2,25 +2,25 @@
 	<MetroPage page-id="package-editor" @navigatedTo.native="onPageShow">
 		<template slot="top-app-bar">
 			<MetroCommandBar>
-				<MetroAppBarButton icon="delete" label="Delete" />
-				<MetroAppBarButton icon="save" label="Save" />
+				<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" />
+				<MetroAppBarButton icon="save" :label="$t('app.actions.save')" />
 			</MetroCommandBar>
 		</template>
 		
-		<MetroPivot title="PACKAGE EDITOR">
-			<MetroPivotItem header="Info">
+		<MetroPivot :title="$t('package_editor.pivot_title')">
+			<MetroPivotItem :header="$t('package_editor.pivot_headers.info')">
 				<div class="row">
 					<div class="col-12 col-md-6">
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">Package Name</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.package_name_title') }}</MetroTextBlock>
 							<MetroTextBox
-								placeholder-text="Example Package"
+								:placeholder-text="$t('package_editor.info.package_name_placeholder')"
 								:maxlength="50"
 								v-model="packageData.name"
 							/>
 							<div class="row mt-2">
 								<div class="col-6">
-									<MetroHyperlinkButton :disabled="!packageData.name.length">Check availability</MetroHyperlinkButton>
+									<MetroHyperlinkButton :disabled="!packageData.name.length">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
 								</div>
 								<div class="col-6">
 									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.name.length }} / 50</MetroTextBlock>
@@ -29,15 +29,15 @@
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">Bundle Identifier</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.bundle_identifier_title') }}</MetroTextBlock>
 							<MetroTextBox
-								placeholder-text="com.example.package"
+								:placeholder-text="$t('package_editor.info.bundle_identifier_placeholder')"
 								:maxlength="50"
 								v-model="packageData.identifier"
 							/>
 							<div class="row mt-2">
 								<div class="col-6">
-									<MetroHyperlinkButton :disabled="!packageData.identifier.length">Check availability</MetroHyperlinkButton>
+									<MetroHyperlinkButton :disabled="!packageData.identifier.length">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
 								</div>
 								<div class="col-6">
 									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.identifier.length }} / 50</MetroTextBlock>
@@ -46,7 +46,7 @@
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">Short Description</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.short_description_title') }}</MetroTextBlock>
 							<MetroTextBox
 								:textarea="true"
 								:maxlength="255"
@@ -61,7 +61,7 @@
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">Description</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.detailed_description_title') }}</MetroTextBlock>
 							<VueEditor
 								:editorToolbar="editorToolbar"
 								v-model="packageData.detailedDescription"
@@ -76,26 +76,26 @@
 					
 					<div class="col-12 col-md-6">
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">Device Families</MetroTextBlock>
-							<MetroCheckbox content="Phone" />
-							<MetroCheckbox content="Tablet" />
-							<MetroCheckbox content="Desktop" />
-							<MetroCheckbox content="TV" />
+							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.device_families_title') }}</MetroTextBlock>
+							<MetroCheckbox :content="$t('package_editor.info.device_family.phone')" />
+							<MetroCheckbox :content="$t('package_editor.info.device_family.tablet')" />
+							<MetroCheckbox :content="$t('package_editor.info.device_family.desktop')" />
+							<MetroCheckbox :content="$t('package_editor.info.device_family.tv')" />
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">Platform</MetroTextBlock>
-							<MetroTextBlock>Select the platform your package will be available for.</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.platform_title') }}</MetroTextBlock>
+							<MetroTextBlock>{{ $t('package_editor.info.platform_description') }}</MetroTextBlock>
 							<MetroComboBox
-								placeholder-text="Select a platform"
+								:placeholder-text="$t('package_editor.info.platform_placeholder')"
 								:items-source="{'win': 'Windows', 'darwin': 'macOS', 'iphoneos': 'iOS', 'debian': 'Linux (Debian/Ubuntu)', 'universal': 'Universal'}"
 								v-model="packageData.platform"
 								style="margin-top: 8px"
 							/>
 							
-							<MetroTextBlock style="margin-top: 8px">Select the architecture your package was built for.</MetroTextBlock>
+							<MetroTextBlock style="margin-top: 8px">{{ $t('package_editor.info.architecture_description') }}</MetroTextBlock>
 							<MetroComboBox
-								placeholder-text="Select an architecture"
+								:placeholder-text="$t('package_editor.info.architecture_placeholder')"
 								:items-source="{'x86': 'x86 32-bit', 'x86_64': 'x86 64-bit', [packageData.platform === 'iphoneos' ? 'iphoneos-arm' : 'arm']: 'ARM', 'universal': 'Universal'}"
 								:disabled="!packageData.platform"
 								v-model="packageData.architecture"
@@ -104,47 +104,47 @@
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">System Requirements</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.system_requirements_title') }}</MetroTextBlock>
 							<MetroTextBox
-								placeholder-text="Minimum required OS"
+								:placeholder-text="$t('package_editor.info.system_requirements_min_os')"
 								v-model="packageData.minOSVersion"
 							/>
 							<MetroTextBox
-								placeholder-text="Maximum supported OS"
+								:placeholder-text="$t('package_editor.info.system_requirements_max_os')"
 								v-model="packageData.maxOSVersion"
 								style="margin-top: 8px"
 							/>
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">Publishing Options</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.publishing_title') }}</MetroTextBlock>
 							<MetroRadioButton
 								group-name="package-visibility"
 								:name="true"
-								content="Publish this package immediately"
+								:content="$t('package_editor.info.publishing_now')"
 								v-model="packageData.visible"
 							/>
 							<MetroRadioButton
 								group-name="package-visibility"
 								:name="false"
-								content="Publish this package manually"
+								:content="$t('package_editor.info.publishing_later')"
 								v-model="packageData.visible"
 							/>
 						</div>
 					</div>
 				</div>
 			</MetroPivotItem>
-			<MetroPivotItem header="Screenshots">
+			<MetroPivotItem :header="$t('package_editor.pivot_headers.media')">
 				<div class="grid-view">
 					<div class="grid-view-item add-button">
 						<div class="grid-view-item-content" />
 					</div>
 				</div>
 			</MetroPivotItem>
-			<MetroPivotItem header="Versions">
+			<MetroPivotItem :header="$t('package_editor.pivot_headers.versions')">
 				<p>Versions</p>
 			</MetroPivotItem>
-			<MetroPivotItem header="Reviews" :disabled="true">
+			<MetroPivotItem :header="$t('package_editor.pivot_headers.reviews')" :disabled="true">
 				<p>test 3</p>
 			</MetroPivotItem>
 		</MetroPivot>
@@ -153,6 +153,10 @@
 
 <style lang="less">
 .page[data-page-id="package-editor"] {
+	.title-content {
+		text-transform: uppercase;
+	}
+	
 	.page-content {
 		padding: 0 !important;
 	}

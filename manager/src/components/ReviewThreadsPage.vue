@@ -1,6 +1,6 @@
 <template>
 	<MetroPage page-id="reviews" @navigatedTo.native="onPageShow">
-		<MetroListView pane-title="Reviews" ref="list-view">
+		<MetroListView :pane-title="$t('root.item_reviews')" ref="list-view">
 			<template slot="menu-items">
 				<template v-if="reviewData.length">
 					<div class="list-view-item"
@@ -18,7 +18,7 @@
 									</MetroStackPanel>
 									
 									<MetroStackPanel orientation="horizontal" vertical-alignment="center">
-										<span class="detail-text-label align-right">{{ reviewObj.createdAt | date }}</span>
+										<span class="detail-text-label align-right">{{ reviewObj.createdAt | dateTime }}</span>
 										<MetroRatingControl :value="reviewObj.rating.value" style="pointer-events: none" />
 									</MetroStackPanel>
 								</MetroStackPanel>
@@ -31,12 +31,12 @@
 			<MetroPage page-id="messages">
 				<template slot="bottom-app-bar">
 					<MetroCommandBar>
-						<MetroAppBarButton icon="repeat-all" label="Reload" />
+						<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" />
 						<MetroAppBarSeparator />
-						<MetroAppBarButton icon="delete" label="Delete" :disabled="!selectedThread" />
+						<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" :disabled="!selectedThread" />
 					</MetroCommandBar>
 				</template>
-				<MetroMessages ref="messages" />
+				<MetroMessages :placeholder-text="$t('reviews.messages_placeholder')" ref="messages" v-show="selectedThread" />
 			</MetroPage>
 		</MetroListView>
 	</MetroPage>
@@ -144,10 +144,10 @@ export default {
 	},
 	filters: {
 		date(value) {
-			return new Date(value).toLocaleDateString("en-US");
+			return new Date(value).toLocaleDateString();
 		},
 		dateTime(value) {
-			return new Date(value).toLocaleString("en-US");
+			return new Date(value).toLocaleString();
 		}
 	}
 }
