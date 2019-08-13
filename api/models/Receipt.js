@@ -48,6 +48,14 @@ module.exports = (Sequelize, DataTypes) => {
 		},
 		
 		/**
+		 * The currency a User was charged a price in
+		 */
+		currency: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		
+		/**
 		 * Reflects the status of a submitted Refund
 		 */
 		status: {
