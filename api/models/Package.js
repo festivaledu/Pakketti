@@ -105,6 +105,16 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
+		 * The current status of this Package. Represents the progress of the submission process
+		 */
+		status: {
+			// 0: Submission incomplete
+			// 1: Submission complete
+			type: DataTypes.INTEGER,
+			defaultValue: 1
+		},
+		
+		/**
 		 * The binary data of a pPackage's icon
 		 */
 		icon: {
