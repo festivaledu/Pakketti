@@ -107,7 +107,9 @@ export default class ContentDialog {
 		}
 		
 		Object.assign(flyout.container.style, {
-			left: `${Math.max(Math.min(window.innerWidth - width, (offset.left + (offset.width / 2)) - width / 2), 0)}px`
+			left: `${Math.max(Math.min(window.innerWidth - width, (offset.left + (offset.width / 2)) - width / 2), 0)}px`,
+			width: `${Math.round(flyout.container.clientWidth / 2) * 2}px`,
+			height: `${Math.round(flyout.container.clientHeight / 2) * 2}px`
 		});
 		
 		flyout.eventListener = this._hide_internal.bind(flyout);
