@@ -97,15 +97,19 @@ router.post("/new", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
+		error: {
 		name: httpStatus[httpStatus.UNAUTHORIZED],
 		code: httpStatus.UNAUTHORIZED,
 		message: "Invalid authorization token"
+		}
 	});
 
 	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
 		name: httpStatus[httpStatus.FORBIDDEN],
 		code: httpStatus.FORBIDDEN,
 		message: "You are not allowed to perform this action"
+		}
 	});
 
 	const { Package, PackageVersion, LogItem } = req.models;
@@ -116,9 +120,11 @@ router.post("/new", async (req, res) => {
 	});
 
 	if (packageObj) return res.status(httpStatus.CONFLICT).send({
+		error: {
 		name: httpStatus[httpStatus.CONFLICT],
 		code: httpStatus.CONFLICT,
-		message: `Package with identifier ${packageData.identifier} already exists`
+			message: `Package with identifier ${packageData.identifier} or name ${packageData.name} already exists`
+		}
 	});
 
 	if (!req.files || !req.files.file) return res.status(httpStatus.BAD_REQUEST).send({
