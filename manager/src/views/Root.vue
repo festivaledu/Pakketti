@@ -30,6 +30,11 @@
 							<MetroSymbolIcon icon="people" />
 						</template>
 					</MetroNavigationViewItem>
+					<MetroNavigationViewItem :content="$t('root.item_requests')" page-id="requests" :disabled="true">
+						<template slot="icon">
+							<MetroSymbolIcon icon="report-hacked" />
+						</template>
+					</MetroNavigationViewItem>
 					<MetroNavigationViewItem :content="$t('root.item_moderation_log')" page-id="logs" :disabled="true">
 						<template slot="icon">
 							<MetroSymbolIcon icon="clipboard-list" />
