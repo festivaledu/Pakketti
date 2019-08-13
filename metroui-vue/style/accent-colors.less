@@ -25,7 +25,7 @@
 		--system-accent-color-dark-3: @accentDark3;
 		
 		button {
-			&.system-accent-color:not([disabled]) {
+			&.system-accent-color:not([disabled]):not(:hover):not(:active) {
 				.text-contrast(@accentColor);
 				color: @return;
 			}
