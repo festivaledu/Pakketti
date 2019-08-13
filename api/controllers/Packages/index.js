@@ -159,36 +159,59 @@ router.post("/new", async (req, res) => {
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		error: {
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
 		}
 	});
 
 	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		error: {
-		name: httpStatus[httpStatus.FORBIDDEN],
-		code: httpStatus.FORBIDDEN,
-		message: "You are not allowed to perform this action"
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
 		}
 	});
 
 	const { Package, PackageVersion, LogItem } = req.models;
 	let packageData = req.body;
+	
+	if (!packageData.identifier || !packageData.name) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "Package identifier or name missing"
+		}
+	});
 
 	let packageObj = await Package.findOne({
-		where: { identifier: packageData.identifier }
+		where: {
+			[Sequelize.Op.or]: {
+				identifier: packageData.identifier,
+				name: packageData.name
+			}
+		}
 	});
 
 	if (packageObj) return res.status(httpStatus.CONFLICT).send({
 		error: {
-		name: httpStatus[httpStatus.CONFLICT],
-		code: httpStatus.CONFLICT,
+			name: httpStatus[httpStatus.CONFLICT],
+			code: httpStatus.CONFLICT,
 			message: `Package with identifier ${packageData.identifier} or name ${packageData.name} already exists`
 		}
 	});
+	
+	return Package.create(Object.assign(packageData, {
+		id: String.prototype.concat(packageData.name, packageData.identifier, new Date().getTime()),
+		accountId: account.id,
+		screenshots: {},
+	})).then(packageObj => {
+		delete packageObj.dataValues.icon;
+		
+		return res.status(httpStatus.OK).send(packageObj);
+	}).catch(error => ErrorHandler(req, res, error));
 
-	if (!req.files || !req.files.file) return res.status(httpStatus.BAD_REQUEST).send({
+	/*if (!req.files || !req.files.file) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No package file specified"
@@ -265,7 +288,7 @@ router.post("/new", async (req, res) => {
 				packageVersion: packageVersionObj
 			});
 		}).catch(error => ErrorHandler(req, res, error));
-	}).catch(error => ErrorHandler(req, res, error));
+	}).catch(error => ErrorHandler(req, res, error));*/
 });
 
 /**

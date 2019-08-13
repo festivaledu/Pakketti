@@ -46,15 +46,17 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		shortDescription: {
 			type: DataTypes.STRING,
-			allowNull: false
+			// allowNull: false,
+			defaultValue: ""
 		},
 		
 		/**
 		 * The Detailed Description explains a Package's purpose in detail. Can also support HTML and Markdown
 		 */
 		detailedDescription: {
-			type: DataTypes.STRING,
-			allowNull: false
+			type: DataTypes.TEXT,
+			// allowNull: false
+			defaultValue: ""
 		},
 		
 		/**
@@ -62,7 +64,8 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		platform: {
 			type: DataTypes.STRING,
-			allowNull: false
+			// allowNull: false
+			defaultValue: ""
 		},
 		
 		/**
@@ -70,7 +73,8 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		architecture: {
 			type: DataTypes.STRING,
-			allowNull: false
+			// allowNull: false
+			defaultValue: ""
 		},
 		
 		/**
@@ -78,14 +82,16 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		minOSVersion: {
 			type: DataTypes.STRING,
-			allowNull: false
+			// allowNull: false
+			defaultValue: ""
 		},
 		
 		/**
 		 * The maximum supported operating system version
 		 */
 		maxOSVersion: {
-			type: DataTypes.STRING
+			type: DataTypes.STRING,
+			defaultValue: ""
 		},
 		
 		/**

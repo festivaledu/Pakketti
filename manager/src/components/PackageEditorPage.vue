@@ -33,11 +33,12 @@
 							<MetroTextBox
 								:placeholder-text="$t('package_editor.info.bundle_identifier_placeholder')"
 								:maxlength="50"
+								:disabled="existingPackage"
 								v-model="packageData.identifier"
 							/>
 							<div class="row mt-2">
 								<div class="col-6">
-									<MetroHyperlinkButton :disabled="!packageData.identifier.length">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
+									<MetroHyperlinkButton :disabled="!packageData.identifier.length || existingPackage">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
 								</div>
 								<div class="col-6">
 									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.identifier.length }} / 50</MetroTextBlock>
@@ -55,7 +56,7 @@
 							/>
 							<div class="row mt-2">
 								<div class="col-12">
-									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.shortDescription.length }} / 255</MetroTextBlock>
+									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.shortDescription.length || 0 }} / 255</MetroTextBlock>
 								</div>
 							</div>
 						</div>
@@ -106,17 +107,19 @@
 						<div class="mb-4">
 							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.system_requirements_title') }}</MetroTextBlock>
 							<MetroTextBox
+							:header="$t('package_editor.info.system_requirements_min_os')"
 								:placeholder-text="$t('package_editor.info.system_requirements_min_os')"
 								v-model="packageData.minOSVersion"
 							/>
 							<MetroTextBox
+								:header="$t('package_editor.info.system_requirements_max_os')"
 								:placeholder-text="$t('package_editor.info.system_requirements_max_os')"
 								v-model="packageData.maxOSVersion"
 								style="margin-top: 8px"
 							/>
 						</div>
 						
-						<div class="mb-4">
+						<div class="mb-4" v-if="packageData.status == 1">
 							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.publishing_title') }}</MetroTextBlock>
 							<MetroRadioButton
 								group-name="package-visibility"
@@ -447,6 +450,7 @@ export default {
 				[{'align': ''}, {'align': 'center'}, {'align': 'right'}, {'align': 'justify'}],
 				['link'],
 			],
+			_packageData: {},
 			packageData: {
 				name: "",
 				identifier: "",
@@ -460,13 +464,46 @@ export default {
 				minOSVersion: null,
 				maxOSVersion: null,
 				visible: true,
-			}
+			},
+			existingPackage: false
 		}
+	},
+	mounted() {
+		this._packageData = this.packageData;
 	},
 	methods: {
 		onPageShow(event) {
 			this.$parent.setHeader("");
-			console.log(event.detail);
+
+			if (event.detail.packageData) {
+				this.packageData = event.detail.packageData;
+				this.existingPackage = true;
+			} else {
+				this.packageData = this._packageData;
+				this.existingPackage = false;
+			}
+		},
+		async checkNameAvailability() {
+			this.isWorking.packageName = true;
+			
+			let packageList = await PackageAPI.getPackage({
+				name: this.packageData.name
+			});
+			this.isWorking.packageName = false;
+			
+			if (packageList.length) {
+				new metroUI.ContentDialog({
+					title: "Package name unavailable",
+					content: "The selected Package name is already in use. Please use a different Package name.",
+					commands: [{ text: "Ok", primary: true }]
+				}).show();
+			} else {
+				new metroUI.ContentDialog({
+					title: "Package name is available",
+					content: "The selected Package name is available for use.",
+					commands: [{ text: "Ok", primary: true }]
+				}).show();
+			}
 		},
 		decodeText(text) {
 			return HtmlEntities.decode(text.replace(/<[^>]*>/g, ''));
