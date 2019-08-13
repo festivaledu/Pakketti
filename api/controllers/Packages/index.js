@@ -14,6 +14,21 @@ const ArchiveParser = require("../../helpers/ArchiveParser");
 
 Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ [k]: v })));
 
+router.use((req, res, next) => {
+	if (req.query) {
+		Object.keys(req.query).forEach(query => {
+			const keys = query.split('.');
+			const lastKey = keys.pop();
+			const lastObj = keys.reduce((obj, key) => 
+				obj[key] = obj[key] || {}, req.query); 
+			lastObj[lastKey] = req.query[query];
+			delete req.query[query];
+		});
+	}
+	
+	return next();
+});
+
 /**
  * GET /packages
  * 

@@ -47,6 +47,16 @@ module.exports = (models, port = 62486) => {
 		ws.on('message', (data) => {
 			(async () => {
 				const _data = JSON.parse(data);
+				if (_data.query) {
+					Object.keys(_data.query).forEach(query => {
+						const keys = query.split('.');
+						const lastKey = keys.pop();
+						const lastObj = keys.reduce((obj, key) => 
+							obj[key] = obj[key] || {}, _data.query); 
+						lastObj[lastKey] = _data.query[query];
+						delete _data.query[query];
+					});
+				}
 				
 				let rq = new HttpRequestWrapper.Request.createRequest(Object.assign(_data, {
 					models: models
