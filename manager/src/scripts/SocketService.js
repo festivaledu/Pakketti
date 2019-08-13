@@ -138,7 +138,13 @@ export const SocketService = new Vue({
 		get(path, options = {}) {
 			return this.send(Object.assign(options, {
 				method: "GET",
-				path: path
+				path: path.split("?")[0],
+				query: !path.split("?")[1] ? undefined : path.split("?")[1].split("&").reduce((obj, query, index) => {
+					var pair = query.split('=');
+					obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+					
+					return obj;
+				}, {})
 			}));
 		},
 		post(path, data = {}, options = {}) {

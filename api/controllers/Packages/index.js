@@ -34,7 +34,7 @@ router.use((req, res, next) => {
  * 
  * Gets a list of available (visible) packages, including the latest version and screenshot metadata
  */
-router.get("/", async (req, res) => {
+/*router.get("/", async (req, res) => {
 	const { Package, PackageVersion, PackageScreenshot } = req.models;
 	let packageList = await Package.findAll({
 		where: req.account && req.account.role >= UserRole.MODERATOR ? {} : {
@@ -84,6 +84,67 @@ router.get("/", async (req, res) => {
 		}
 	});
 
+	return res.status(httpStatus.OK).send(packageList);
+});*/
+router.get("/", async (req, res) => {
+	const { Package, PackageVersion, PackageScreenshot } = req.models;
+	
+	let packageQuery = req.query.package || {};
+
+	if (Object.keys(packageQuery).length) {
+		if (!Object.keys(packageQuery).some(r => Object.keys(Package.rawAttributes).includes(r))) return res.status(httpStatus.FORBIDDEN).send({
+			error: {
+				name: httpStatus[httpStatus.BAD_REQUEST],
+				code: httpStatus.BAD_REQUEST,
+				message: `Bad attribute '${Object.keys(packageQuery).find(r => !Object.keys(Package.rawAttributes).includes(r))}' in model 'Packages'`
+			}
+		});
+	}
+	
+	let packageList = await Package.findAll({
+		where: Object.assign(packageQuery, req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+			[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
+					visible: true,
+					accountId: req.developer !== undefined ? req.developer.id : undefined
+				}))
+			)()
+		}),
+		attributes: { exclude: ["icon"] },
+		order: [["createdAt", "DESC"]],
+		include: [{
+			model: PackageVersion,
+			as: "versions",
+			separate: true,
+			attributes: { exclude: ["fileData"] },
+			visible: { [Sequelize.Op.gte]: req.developer === undefined },
+			order: [["createdAt", "DESC"]],
+			// limit: 1
+		}, {
+			model: PackageScreenshot,
+			as: "screenshots",
+			attributes: { exclude: ["fileData"] },
+			order: [["createdAt", "ASC"]]
+		}]
+	});
+	
+	packageList.forEach(packageObj => {
+		if (packageObj.versions.length) {
+			packageObj.dataValues.latestVersion = packageObj.versions[0];
+			packageObj.dataValues.downloadCount = packageObj.versions.map(item => item.dataValues.downloadCount).reduce((a, b) => a + b);
+		} else {
+			packageObj.dataValues.latestVersion = {};
+			packageObj.dataValues.downloadCount = 0;
+		}
+		delete packageObj.dataValues.versions;
+
+		if (packageObj.screenshots.length) {
+			packageObj.screenshots = packageObj.screenshots.reduce((obj, item) => ({
+				...obj,
+				[item["screenClass"]]: (obj[item["screenClass"]] || []).concat(item)
+			}), {});
+		}
+	});
+	
 	return res.status(httpStatus.OK).send(packageList);
 });
 
