@@ -17,8 +17,9 @@ module.exports = (models, port = 62486) => {
 			
 			const route = path.concat(split(layer.regexp)).filter(Boolean).join('/');
 			mappedMethods[layer.method]["/" + route] = {
+				route: route,
 				handle: layer.handle,
-				regexp: regexp,
+				regexp: regexp.replace("\\/\\/", "\\/"),
 				keys: keys
 			}
 		}
