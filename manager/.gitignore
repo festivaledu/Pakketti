@@ -3,6 +3,9 @@ node_modules
 /dist
 
 public/css/fonts/*
+metroui-vue/
+src/views_old/
+src/components_old/
 
 # local env files
 .env.local

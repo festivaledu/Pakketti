@@ -8,6 +8,8 @@ import CheckBox from './CheckBox/Component.vue'
 import ComboBox from './ComboBox/Component.vue'
 import CommandBar from './CommandBar/Component.vue'
 import DataGrid from './DataGrid/Component.vue'
+import FlipView from './FlipView/Component.vue'
+import FontIcon from './FontIcon/Component.vue'
 import GridView from './GridView/Component.vue'
 import HyperlinkButton from './HyperlinkButton/Component.vue'
 import Messages from './Messages/Component.vue'
@@ -42,6 +44,8 @@ const components = [
 	ComboBox,
 	CommandBar,
 	DataGrid,
+	FlipView,
+	FontIcon,
 	GridView,
 	HyperlinkButton,
 	Messages,

@@ -316,6 +316,7 @@
 			position: absolute;
 			
 			& > .stack-panel.pane-toggle-button-container {
+				position: absolute;
 				display: flex;
 				flex-direction: column;
 			}
@@ -325,6 +326,10 @@
 			& > .menu-items .navigation-view-item,
 			& > .menu-items .navigation-view-item-header {
 				min-width: auto;
+			}
+			
+			& > .auto-suggest-area {
+				margin-top: 0;
 			}
 			
 			._collapsed(0px);
@@ -370,12 +375,14 @@
 			height: 40px;
 			flex-direction: row;
 			z-index: 1;
+			transition: none;
 			
 			& > .pane-title {
 				display: none;
 			}
 			
 			& > .auto-suggest-area {
+				margin-top: 0;
 				order: 2;
 				
 				.text-box,
@@ -410,10 +417,15 @@
 						.symbol-icon {
 							margin: 0;
 						}
+						
+						& + .navigation-view-item-content {
+							margin: 0 16px 0 8px;
+						}
 					}
 					
 					.navigation-view-item-content {
-						margin: 0 16px 0 8px;
+						padding: 0;
+						margin: 0 12px;
 					}
 					
 					&.selected:after {
@@ -443,9 +455,8 @@
 				flex-direction: row;
 				
 				.navigation-view-item {
-					.navigation-view-item-icon {
-						margin: 0 16px;
-					}
+					width: auto;
+					min-width: auto;
 					
 					.navigation-view-item-content {
 						display: none;
