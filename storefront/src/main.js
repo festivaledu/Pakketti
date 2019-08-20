@@ -5,6 +5,9 @@ import store from './store'
 
 Vue.config.productionTip = false
 
+import metroUI from 'metroUI-vue'
+Vue.use(metroUI);
+
 new Vue({
   router,
   store,
