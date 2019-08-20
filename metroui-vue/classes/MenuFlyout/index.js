@@ -134,13 +134,13 @@ export default class ContentDialog {
 		if (offset.top - (height + 8) >= 0) {
 			Object.assign(flyout.container.style, {
 				top: null,
-				bottom: `${window.innerHeight - (offset.top - 8)}px`
+				bottom: `${Math.round((window.innerHeight - (offset.top - 8)) / 2) * 2}px`
 			});
 			
 			flyout.container.classList.add("animate-bottom");
 		} else if (offset.top + (offset.height + 8) <= window.innerHeight) {
 			Object.assign(flyout.container.style, {
-				top: `${offset.top + (offset.height + 8)}px`,
+				top: `${Math.round((offset.top + (offset.height + 8)) / 2) * 2}px`,
 				bottom: null
 			});
 			
@@ -148,9 +148,7 @@ export default class ContentDialog {
 		}
 		
 		Object.assign(flyout.container.style, {
-			left: `${Math.max(Math.min(window.innerWidth - width, (offset.left + (offset.width / 2)) - width / 2), 0)}px`,
-			width: `${Math.round(flyout.container.clientWidth / 2) * 2}px`,
-			height: `${Math.round(flyout.container.clientHeight / 2) * 2}px`
+			left: `${Math.max(Math.min(window.innerWidth - width, (offset.left + (offset.width / 2)) - width / 2), 0)}px`
 		});
 		
 		setTimeout(() => {
