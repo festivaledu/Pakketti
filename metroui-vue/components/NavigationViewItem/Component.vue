@@ -1,7 +1,7 @@
 <template>
 	<div class="navigation-view-item" :data-page-id="pageId" :disabled="disabled">
 		<div class="navigation-view-item-inner">
-			<div class="navigation-view-item-icon">
+			<div class="navigation-view-item-icon" v-if="icon || this.$slots.icon">
 				<slot name="icon" />
 				<MetroSymbolIcon v-if="icon && !this.$slots.icon" :symbol="icon" />
 			</div>

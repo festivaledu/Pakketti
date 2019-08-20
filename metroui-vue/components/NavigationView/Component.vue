@@ -1,6 +1,6 @@
 <template>
-	<div :class="`navigation-view ${paneDisplayMode}`">
-		<MetroStackPanel class="pane-toggle-button-container" :class="{'collapsed': collapsed, 'expanded': expanded}">
+	<div :class="`navigation-view ${$data._paneDisplayMode}`">
+		<MetroStackPanel class="pane-toggle-button-container" horizontal-alignment="left" :class="{'collapsed': collapsed, 'expanded': expanded}">
 			<MetroButton class="navigation-view-back-button" v-if="backButtonVisible" :disabled="history.length <= 1" @click="goBack">
 				<MetroSymbolIcon symbol="back" />
 			</MetroButton>
@@ -10,7 +10,7 @@
 		</MetroStackPanel>
 			
 		<div class="pane-content" :class="{'collapsed': collapsed, 'expanded': expanded, 'back-button-visible': backButtonVisible}">
-			<MetroStackPanel class="pane-toggle-button-container" :class="{'collapsed': collapsed, 'expanded': expanded}">
+			<MetroStackPanel class="pane-toggle-button-container" horizontal-alignment="left" :class="{'collapsed': collapsed, 'expanded': expanded}">
 				<MetroButton class="toggle-pane-button" :class="{'fill': paneTitle}" @click="togglePane">
 					<MetroSymbolIcon symbol="global-navigation-button" />
 				</MetroButton>
@@ -20,7 +20,7 @@
 				<MetroTextBlock text-style="base" :text="paneTitle" />
 			</MetroStackPanel>
 			
-			<MetroStackPanel orientation="horizontal" class="auto-suggest-area" v-if="this.$slots['auto-suggest-box']">
+			<MetroStackPanel orientation="horizontal" vertical-alignment="center" class="auto-suggest-area" v-if="this.$slots['auto-suggest-box']">
 				<slot name="auto-suggest-box" />
 				
 				<MetroButton class="auto-suggest-button" @click="focusAutoSuggest">
@@ -78,6 +78,7 @@ export default {
 			
 			collapsed: false,
 			expanded: false,
+			_paneDisplayMode: this.$props.paneDisplayMode,
 			minimal: this.$props.paneDisplayMode === "left-minimal",
 			top: this.$props.paneDisplayMode === "top",
 			
@@ -116,7 +117,7 @@ export default {
 						isSettingsSelected: item === this.$refs["settings-nav-pane-item"]
 					});
 
-					if ((this.paneDisplayMode === "left-compact" || this.paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.paneDisplayMode !== "left")) {
+					if ((this._paneDisplayMode === "left-compact" || this._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this._paneDisplayMode !== "left")) {
 						this.expanded = false
 					}
 				});
@@ -133,7 +134,7 @@ export default {
 					this.menuItems[item.__vue__.$props.pageId] = item;
 					
 					item.addEventListener("click", () => {
-						if ((this.paneDisplayMode === "left-compact" || this.paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.paneDisplayMode !== "left")) {
+						if ((this._paneDisplayMode === "left-compact" || this._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this._paneDisplayMode !== "left")) {
 							this.expanded = false
 							
 							setTimeout(() => {
@@ -242,7 +243,7 @@ export default {
 		},
 		
 		togglePane() {
-			if ((this.paneDisplayMode === "left-compact" || this.paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.paneDisplayMode !== "left")) {
+			if ((this._paneDisplayMode === "left-compact" || this._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this._paneDisplayMode !== "left")) {
 				this.expanded = !this.expanded
 			} else {
 				this.collapsed = !this.collapsed
@@ -261,6 +262,11 @@ export default {
 			setTimeout(() => {
 				!this.$el.querySelector(".auto-suggest-area input").focus();
 			}, 0);
+		},
+		setPaneDisplayMode(displayMode) {
+			this.$data._paneDisplayMode = displayMode;
+			this.minimal = (displayMode === "left-minimal");
+			this.top = (displayMode === "top");
 		}
 	}
 }
