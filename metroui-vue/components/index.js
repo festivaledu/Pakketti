@@ -9,6 +9,7 @@ import ComboBox from './ComboBox/Component.vue'
 import CommandBar from './CommandBar/Component.vue'
 import DataGrid from './DataGrid/Component.vue'
 import FlipView from './FlipView/Component.vue'
+import FlipViewItem from './FlipViewItem/Component.vue'
 import FontIcon from './FontIcon/Component.vue'
 import GridView from './GridView/Component.vue'
 import HyperlinkButton from './HyperlinkButton/Component.vue'
@@ -45,6 +46,7 @@ const components = [
 	CommandBar,
 	DataGrid,
 	FlipView,
+	FlipViewItem,
 	FontIcon,
 	GridView,
 	HyperlinkButton,

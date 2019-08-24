@@ -2,23 +2,7 @@
 	<div class="flip-view">
 		<div class="scrolling-host">
 			<div class="scroll-content" :style="`transform: translate3d(-${this.page * 100}%, 0, 0)`" ref="scroll-content">
-				
-					<div class="flip-view-item">
-						<div class="item" style="width: 400px; height: 270px; background-color: #f0f">1</div>
-					</div>
-					<div class="flip-view-item">
-						<div class="item" style="width: 400px; height: 270px; background-color: #f0f">2</div>
-					</div>
-					<div class="flip-view-item">
-						<div class="item" style="width: 400px; height: 270px; background-color: #f0f">3</div>
-					</div>
-					<div class="flip-view-item">
-						<div class="item" style="width: 400px; height: 270px; background-color: #f0f">4</div>
-					</div>
-					<div class="flip-view-item">
-						<div class="item" style="width: 400px; height: 270px; background-color: #f0f">5</div>
-					</div>
-
+				<slot />
 			</div>
 		</div>
 		<MetroButton class="previous-button" @click="previousPage" v-show="this.page > 0">
@@ -36,11 +20,13 @@ export default {
 	data() {
 		return {
 			page: 0,
-			itemCount: this.$refs["scroll-content"]
+			itemCount: -1
 		}
 	},
 	mounted() {
-		this.itemCount = this.$refs["scroll-content"].querySelectorAll(".flip-view-item").length;
+		if (this.$refs["scroll-content"].querySelector(".flip-view-item")) {
+			this.itemCount = this.$refs["scroll-content"].querySelectorAll(".flip-view-item").length;
+		}
 	},
 	methods: {
 		previousPage() {
@@ -48,6 +34,11 @@ export default {
 		},
 		nextPage() {
 			this.page = Math.min(this.page + 1, this.itemCount - 1);
+		}
+	},
+	calculated: {
+		flipViewItems() {
+			return this.$slots.default;
 		}
 	}
 }
