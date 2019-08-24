@@ -328,10 +328,6 @@
 				min-width: auto;
 			}
 			
-			& > .auto-suggest-area {
-				margin-top: 0;
-			}
-			
 			._collapsed(0px);
 			&.expanded {
 				._expanded();
@@ -430,11 +426,15 @@
 					
 					&.selected:after {
 						top: auto;
-						left: 16px;
-						right: 16px;
+						left: 12px;
+						right: 12px;
 						bottom: 4px;
 						width: auto;
 						height: 2px;
+					}
+					&.icon.selected:after {
+						left: 16px;
+						right: 16px;
 					}
 				}
 				
@@ -469,6 +469,10 @@
 					margin-left: 40px;
 				}
 			}
+		}
+		
+		& > .content-root {
+			height: calc(~"100vh - 40px");
 		}
 	}
 	

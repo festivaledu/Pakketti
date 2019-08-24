@@ -39,8 +39,9 @@
 		</div>
 		
 		<div class="content-root">
-			<div class="header-content" :class="{'back-button-visible': backButtonVisible}" v-if="headerText">
-				<MetroTextBlock :text="headerText" />
+			<div class="header-content" :class="{'back-button-visible': backButtonVisible}" v-if="headerText || this.$slots['header']">
+				<slot name="header" :local="headerText" />
+				<MetroTextBlock v-if="this.$slots['header'] === null" :text="headerText" />
 			</div>
 			
 			<div class="content-frame" ref="content-frame">
