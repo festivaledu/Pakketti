@@ -6,10 +6,10 @@
 			</div>
 		</div>
 		<MetroButton class="previous-button" @click="previousPage" v-show="this.page > 0">
-			<MetroFontIcon font-size="12pt" glyph="&#xE0E2;" />
+			<MetroFontIcon font-size="12px" glyph="&#xE0E2;" />
 		</MetroButton>
 		<MetroButton class="next-button" @click="nextPage" v-show="this.page < this.itemCount - 1">
-			<MetroFontIcon font-size="12pt" glyph="&#xE0E3;" />
+			<MetroFontIcon font-size="12px" glyph="&#xE0E3;" />
 		</MetroButton>
 	</div>
 </template>

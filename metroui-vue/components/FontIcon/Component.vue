@@ -14,7 +14,7 @@ export default {
 		},
 		fontSize: {
 			type: String,
-			default: "20pt"
+			default: "20px"
 		},
 		fontStyle: {
 			type: String,
