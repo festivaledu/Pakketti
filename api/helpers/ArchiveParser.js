@@ -57,7 +57,12 @@ module.exports = {
 					controlData["architecture"] !== architecture) return {
 					name: httpStatus[httpStatus.CONFLICT],
 					code: httpStatus.CONFLICT,
-					message: "Package file information does not match package data"
+					message: "Package file information does not match package data",
+					detail: {
+						package: controlData["package"] !== identifier,
+						name: controlData["name"] !== name,
+						architecture: controlData["architecture"] !== architecture
+					}
 				};
 				
 				return controlData;

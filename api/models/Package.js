@@ -121,7 +121,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
-		 * The binary data of a pPackage's icon
+		 * The binary data of a Package's icon
 		 */
 		icon: {
 			type: DataTypes.BLOB,
@@ -133,6 +133,22 @@ module.exports = (sequelize, DataTypes) => {
 		 * The MIME type is used when requesting a Packages's icon and is then added to the Content-Type response header.
 		 */
 		iconMime: {
+			type: DataTypes.STRING
+		},
+		
+		/**
+		 * The binary data of a Package's header image
+		 * Header images should be 1920x1080
+		 */
+		headerImage: {
+			type: DataTypes.BLOB
+		},
+		
+		/**
+		 * The MIME type of a Package's header image.
+		 * The MIME type is used when requesting a Packages's header image and is then added to the Content-Type response header.
+		 */
+		headerImageMime: {
 			type: DataTypes.STRING
 		},
 		
@@ -160,11 +176,23 @@ module.exports = (sequelize, DataTypes) => {
 	/**
 	 * Define this model's association to other models
 	 */
-	Package.associate = ({ Account, PackageVersion, PackageScreenshot }) => {
+	Package.associate = ({ Account, PackageRating, PackageReview, PackageVersion, PackageScreenshot }) => {
 		// A Package belongs to a single Account (n-1)
 		Package.belongsTo(Account, {
 			foreignKey: "accountId",
 			onDelete: "CASCADE"
+		});
+		
+		Package.hasMany(PackageRating, {
+			as: "ratings",
+			foreignKey: "packageId",
+			onDelete: "CASCADE",
+		});
+		
+		Package.hasMany(PackageReview, {
+			as: "reviews",
+			foreignKey: "packageId",
+			onDelete: "CASCADE",
 		});
 		
 		// A Package can have many Versions (1-n)
