@@ -2,7 +2,32 @@ import { SocketService } from "@/scripts/SocketService";
 import { get, post, put, delete as _delete } from "axios";
 
 // const apiUrl = `${window.location.origin}/api`
-const apiUrl = `http://localhost:3000/api`
+const apiUrl = `http://${window.location.hostname}:3000/api`
+
+const flattenObject = (obj) => {
+	var returnObj = {};
+	
+	for (var i in obj) {
+		if (!obj.hasOwnProperty(i)) continue;
+		
+		if ((typeof obj[i]) == 'object') {
+			var flatObject = flattenObject(obj[i]);
+			for (var x in flatObject) {
+				if (!flatObject.hasOwnProperty(x)) continue;
+				
+				returnObj[i + '.' + x] = flatObject[x];
+			}
+		} else {
+			returnObj[i] = obj[i];
+		}
+	}
+	
+	return returnObj;
+};
+
+const parseUrlFromObject = (obj) => {
+	return Object.keys(obj).map(key => `${key}=${encodeURIComponent(obj[key])}`).join('&');
+}
 
 export class AccountAPI {
 	static async getMe() {
@@ -187,8 +212,18 @@ export class PackageAPI {
 		});
 	}
 
-	static async getPackage(packageId) {
-		return await SocketService.get(`/packages/${packageId}`, {
+	// static async getPackage(packageId) {
+	// 	return await SocketService.get(`/packages/${packageId}`, {
+	// 		headers: {
+	// 			"authorization": `Bearer ${window.$cookies.get("authToken")}`,
+	// 			"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
+	// 		}
+	// 	});
+	// }
+	static async getPackage(parameters) {
+		const query = parseUrlFromObject(flattenObject({ package: parameters }));
+		
+		return await SocketService.get(`/packages?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
 				"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`

@@ -185,7 +185,33 @@ const LogItemType = {
 	DELETE_REQUEST: 38
 };
 
+/**
+ * The LogItemStatus enumeration describes the status of LogItems in the database.
+ */
+const LogItemStatus = {
+	/**
+	 * This type is used when a user submits a Request (such as DevApplication) which hasn't been reviewed yet
+	 */
+	NOT_REVIEWED: -1,
+	
+	/**
+	 * This type is used when a submitted Request has been reviewed and accepted by a Moderator (or higher role)
+	 */
+	ACCEPTED: 0,
+	
+	/**
+	 * This type is used when a submitted Request has been reviewed and rejected by a Moderator (or higher role)
+	 */
+	REJECTED: 1,
+	
+	/**
+	 * This type is used when the API creates LogItems which are only used for log purposes
+	 */
+	LOG_USAGE: 2
+}
+
 module.exports = {
 	UserRole: UserRole,
-	LogItemType: LogItemType
+	LogItemType: LogItemType,
+	LogItemStatus: LogItemStatus
 };

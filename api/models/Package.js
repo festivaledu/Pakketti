@@ -46,15 +46,17 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		shortDescription: {
 			type: DataTypes.STRING,
-			allowNull: false
+			// allowNull: false,
+			defaultValue: ""
 		},
 		
 		/**
 		 * The Detailed Description explains a Package's purpose in detail. Can also support HTML and Markdown
 		 */
 		detailedDescription: {
-			type: DataTypes.STRING,
-			allowNull: false
+			type: DataTypes.TEXT,
+			// allowNull: false
+			defaultValue: ""
 		},
 		
 		/**
@@ -62,7 +64,8 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		platform: {
 			type: DataTypes.STRING,
-			allowNull: false
+			// allowNull: false
+			defaultValue: ""
 		},
 		
 		/**
@@ -70,7 +73,8 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		architecture: {
 			type: DataTypes.STRING,
-			allowNull: false
+			// allowNull: false
+			defaultValue: ""
 		},
 		
 		/**
@@ -78,14 +82,16 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		minOSVersion: {
 			type: DataTypes.STRING,
-			allowNull: false
+			// allowNull: false
+			defaultValue: ""
 		},
 		
 		/**
 		 * The maximum supported operating system version
 		 */
 		maxOSVersion: {
-			type: DataTypes.STRING
+			type: DataTypes.STRING,
+			defaultValue: ""
 		},
 		
 		/**
@@ -115,7 +121,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
-		 * The binary data of a pPackage's icon
+		 * The binary data of a Package's icon
 		 */
 		icon: {
 			type: DataTypes.BLOB,
@@ -127,6 +133,22 @@ module.exports = (sequelize, DataTypes) => {
 		 * The MIME type is used when requesting a Packages's icon and is then added to the Content-Type response header.
 		 */
 		iconMime: {
+			type: DataTypes.STRING
+		},
+		
+		/**
+		 * The binary data of a Package's header image
+		 * Header images should be 1920x1080
+		 */
+		headerImage: {
+			type: DataTypes.BLOB
+		},
+		
+		/**
+		 * The MIME type of a Package's header image.
+		 * The MIME type is used when requesting a Packages's header image and is then added to the Content-Type response header.
+		 */
+		headerImageMime: {
 			type: DataTypes.STRING
 		},
 		
@@ -154,11 +176,23 @@ module.exports = (sequelize, DataTypes) => {
 	/**
 	 * Define this model's association to other models
 	 */
-	Package.associate = ({ Account, PackageVersion, PackageScreenshot }) => {
+	Package.associate = ({ Account, PackageRating, PackageReview, PackageVersion, PackageScreenshot }) => {
 		// A Package belongs to a single Account (n-1)
 		Package.belongsTo(Account, {
 			foreignKey: "accountId",
 			onDelete: "CASCADE"
+		});
+		
+		Package.hasMany(PackageRating, {
+			as: "ratings",
+			foreignKey: "packageId",
+			onDelete: "CASCADE",
+		});
+		
+		Package.hasMany(PackageReview, {
+			as: "reviews",
+			foreignKey: "packageId",
+			onDelete: "CASCADE",
 		});
 		
 		// A Package can have many Versions (1-n)

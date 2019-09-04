@@ -34,7 +34,7 @@ router.use((req, res, next) => {
  * 
  * Gets a list of available (visible) packages, including the latest version and screenshot metadata
  */
-router.get("/", async (req, res) => {
+/*router.get("/", async (req, res) => {
 	const { Package, PackageVersion, PackageScreenshot } = req.models;
 	let packageList = await Package.findAll({
 		where: req.account && req.account.role >= UserRole.MODERATOR ? {} : {
@@ -85,6 +85,67 @@ router.get("/", async (req, res) => {
 	});
 
 	return res.status(httpStatus.OK).send(packageList);
+});*/
+router.get("/", async (req, res) => {
+	const { Package, PackageVersion, PackageScreenshot } = req.models;
+	
+	let packageQuery = req.query.package || {};
+
+	if (Object.keys(packageQuery).length) {
+		if (!Object.keys(packageQuery).some(r => Object.keys(Package.rawAttributes).includes(r))) return res.status(httpStatus.FORBIDDEN).send({
+			error: {
+				name: httpStatus[httpStatus.BAD_REQUEST],
+				code: httpStatus.BAD_REQUEST,
+				message: `Bad attribute '${Object.keys(packageQuery).find(r => !Object.keys(Package.rawAttributes).includes(r))}' in model 'Packages'`
+			}
+		});
+	}
+	
+	let packageList = await Package.findAll({
+		where: Object.assign(packageQuery, req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+			[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
+					visible: true,
+					accountId: req.developer !== undefined ? req.developer.id : undefined
+				}))
+			)()
+		}),
+		attributes: { exclude: ["icon"] },
+		order: [["createdAt", "DESC"]],
+		include: [{
+			model: PackageVersion,
+			as: "versions",
+			separate: true,
+			attributes: { exclude: ["fileData"] },
+			visible: { [Sequelize.Op.gte]: req.developer === undefined },
+			order: [["createdAt", "DESC"]],
+			// limit: 1
+		}, {
+			model: PackageScreenshot,
+			as: "screenshots",
+			attributes: { exclude: ["fileData"] },
+			order: [["createdAt", "ASC"]]
+		}]
+	});
+	
+	packageList.forEach(packageObj => {
+		if (packageObj.versions.length) {
+			packageObj.dataValues.latestVersion = packageObj.versions[0];
+			packageObj.dataValues.downloadCount = packageObj.versions.map(item => item.dataValues.downloadCount).reduce((a, b) => a + b);
+		} else {
+			packageObj.dataValues.latestVersion = {};
+			packageObj.dataValues.downloadCount = 0;
+		}
+		delete packageObj.dataValues.versions;
+
+		if (packageObj.screenshots.length) {
+			packageObj.screenshots = packageObj.screenshots.reduce((obj, item) => ({
+				...obj,
+				[item["screenClass"]]: (obj[item["screenClass"]] || []).concat(item)
+			}), {});
+		}
+	});
+	
+	return res.status(httpStatus.OK).send(packageList);
 });
 
 /**
@@ -98,36 +159,59 @@ router.post("/new", async (req, res) => {
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
 		error: {
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
 		}
 	});
 
 	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
 		error: {
-		name: httpStatus[httpStatus.FORBIDDEN],
-		code: httpStatus.FORBIDDEN,
-		message: "You are not allowed to perform this action"
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
 		}
 	});
 
 	const { Package, PackageVersion, LogItem } = req.models;
 	let packageData = req.body;
+	
+	if (!packageData.identifier || !packageData.name) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "Package identifier or name missing"
+		}
+	});
 
 	let packageObj = await Package.findOne({
-		where: { identifier: packageData.identifier }
+		where: {
+			[Sequelize.Op.or]: {
+				identifier: packageData.identifier,
+				name: packageData.name
+			}
+		}
 	});
 
 	if (packageObj) return res.status(httpStatus.CONFLICT).send({
 		error: {
-		name: httpStatus[httpStatus.CONFLICT],
-		code: httpStatus.CONFLICT,
+			name: httpStatus[httpStatus.CONFLICT],
+			code: httpStatus.CONFLICT,
 			message: `Package with identifier ${packageData.identifier} or name ${packageData.name} already exists`
 		}
 	});
+	
+	return Package.create(Object.assign(packageData, {
+		id: String.prototype.concat(packageData.name, packageData.identifier, new Date().getTime()),
+		accountId: account.id,
+		screenshots: {},
+	})).then(packageObj => {
+		delete packageObj.dataValues.icon;
+		
+		return res.status(httpStatus.OK).send(packageObj);
+	}).catch(error => ErrorHandler(req, res, error));
 
-	if (!req.files || !req.files.file) return res.status(httpStatus.BAD_REQUEST).send({
+	/*if (!req.files || !req.files.file) return res.status(httpStatus.BAD_REQUEST).send({
 		name: httpStatus[httpStatus.BAD_REQUEST],
 		code: httpStatus.BAD_REQUEST,
 		message: "No package file specified"
@@ -204,7 +288,7 @@ router.post("/new", async (req, res) => {
 				packageVersion: packageVersionObj
 			});
 		}).catch(error => ErrorHandler(req, res, error));
-	}).catch(error => ErrorHandler(req, res, error));
+	}).catch(error => ErrorHandler(req, res, error));*/
 });
 
 /**

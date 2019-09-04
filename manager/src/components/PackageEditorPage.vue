@@ -2,8 +2,13 @@
 	<MetroPage page-id="package-editor" @navigatedTo.native="onPageShow">
 		<template slot="top-app-bar">
 			<MetroCommandBar>
+				<template slot="content">
+					<MetroStackPanel vertical-alignment="center" style="height: 40px">
+						<MetroProgressRing :active="isWorking.savePackage || isWorking.deletePackage" />
+					</MetroStackPanel>
+				</template>
 				<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" />
-				<MetroAppBarButton icon="save" :label="$t('app.actions.save')" />
+				<MetroAppBarButton icon="save" :label="$t('app.actions.save')" :disabled="$v.$invalid || !$v.$anyDirty || isWorking.savePackage" @click="savePackage" />
 			</MetroCommandBar>
 		</template>
 		
@@ -17,10 +22,12 @@
 								:placeholder-text="$t('package_editor.info.package_name_placeholder')"
 								:maxlength="50"
 								v-model="packageData.name"
+								@input="$v.packageData.name.$touch()"
 							/>
 							<div class="row mt-2">
 								<div class="col-6">
-									<MetroHyperlinkButton :disabled="!packageData.name.length">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
+									<MetroHyperlinkButton v-if="!isWorking.packageName" :disabled="!packageData.name.length || !$v.packageData.name.$dirty" @click="checkNameAvailability">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
+									<MetroProgressRing v-if="isWorking.packageName" :active="true" />
 								</div>
 								<div class="col-6">
 									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.name.length }} / 50</MetroTextBlock>
@@ -33,11 +40,13 @@
 							<MetroTextBox
 								:placeholder-text="$t('package_editor.info.bundle_identifier_placeholder')"
 								:maxlength="50"
+								:disabled="existingPackage"
 								v-model="packageData.identifier"
+								@input="$v.packageData.identifier.$touch()"
 							/>
 							<div class="row mt-2">
 								<div class="col-6">
-									<MetroHyperlinkButton :disabled="!packageData.identifier.length">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
+									<MetroHyperlinkButton :disabled="!packageData.identifier.length || existingPackage">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
 								</div>
 								<div class="col-6">
 									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.identifier.length }} / 50</MetroTextBlock>
@@ -51,11 +60,12 @@
 								:textarea="true"
 								:maxlength="255"
 								v-model="packageData.shortDescription"
+								@input="$v.packageData.shortDescription.$touch()"
 								style="height: 158px"
 							/>
 							<div class="row mt-2">
 								<div class="col-12">
-									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.shortDescription.length }} / 255</MetroTextBlock>
+									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.shortDescription.length || 0 }} / 255</MetroTextBlock>
 								</div>
 							</div>
 						</div>
@@ -90,6 +100,7 @@
 								:placeholder-text="$t('package_editor.info.platform_placeholder')"
 								:items-source="{'win': 'Windows', 'darwin': 'macOS', 'iphoneos': 'iOS', 'debian': 'Linux (Debian/Ubuntu)', 'universal': 'Universal'}"
 								v-model="packageData.platform"
+								@input="$v.packageData.platform.$touch()"
 								style="margin-top: 8px"
 							/>
 							
@@ -99,6 +110,7 @@
 								:items-source="{'x86': 'x86 32-bit', 'x86_64': 'x86 64-bit', [packageData.platform === 'iphoneos' ? 'iphoneos-arm' : 'arm']: 'ARM', 'universal': 'Universal'}"
 								:disabled="!packageData.platform"
 								v-model="packageData.architecture"
+								@input="$v.packageData.architecture.$touch()"
 								style="margin-top: 8px"
 							/>
 						</div>
@@ -106,29 +118,35 @@
 						<div class="mb-4">
 							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.system_requirements_title') }}</MetroTextBlock>
 							<MetroTextBox
+							:header="$t('package_editor.info.system_requirements_min_os')"
 								:placeholder-text="$t('package_editor.info.system_requirements_min_os')"
 								v-model="packageData.minOSVersion"
+								@input="$v.packageData.minOSVersion.$touch()"
 							/>
 							<MetroTextBox
+								:header="$t('package_editor.info.system_requirements_max_os')"
 								:placeholder-text="$t('package_editor.info.system_requirements_max_os')"
 								v-model="packageData.maxOSVersion"
+								@input="$v.packageData.maxOSVersion.$touch()"
 								style="margin-top: 8px"
 							/>
 						</div>
 						
-						<div class="mb-4">
+						<div class="mb-4" v-if="packageData.status == 1">
 							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.publishing_title') }}</MetroTextBlock>
 							<MetroRadioButton
 								group-name="package-visibility"
 								:name="true"
 								:content="$t('package_editor.info.publishing_now')"
 								v-model="packageData.visible"
+								@input="$v.packageData.visible.$touch()"
 							/>
 							<MetroRadioButton
 								group-name="package-visibility"
 								:name="false"
 								:content="$t('package_editor.info.publishing_later')"
 								v-model="packageData.visible"
+								@input="$v.packageData.visible.$touch()"
 							/>
 						</div>
 					</div>
@@ -430,6 +448,9 @@
 <script>
 import { VueEditor } from "vue2-editor"
 import HtmlEntities from "he"
+import { required } from 'vuelidate/lib/validators'
+
+import { PackageAPI } from "@/scripts/ApiUtil"
 
 export default {
 	name: "PackageEditor",
@@ -447,6 +468,7 @@ export default {
 				[{'align': ''}, {'align': 'center'}, {'align': 'right'}, {'align': 'justify'}],
 				['link'],
 			],
+			_packageData: {},
 			packageData: {
 				name: "",
 				identifier: "",
@@ -460,13 +482,69 @@ export default {
 				minOSVersion: null,
 				maxOSVersion: null,
 				visible: true,
+			},
+			existingPackage: false,
+			isWorking: {
+				packageName: false,
+				packageIdentifier: false,
+				savePackage: false,
+				deletePackage: false
 			}
 		}
+	},
+	validations: {
+		packageData: {
+			name: { required },
+			identifier: { required },
+			shortDescription: { required },
+			detailedDescription: { required },
+			platform: { required },
+			architecture: { required },
+			minOSVersion: { required }
+		}
+	},
+	mounted() {
+		this._packageData = this.packageData;
 	},
 	methods: {
 		onPageShow(event) {
 			this.$parent.setHeader("");
-			console.log(event.detail);
+
+			if (event.detail.packageData) {
+				this.packageData = event.detail.packageData;
+				this.existingPackage = true;
+			} else {
+				this.packageData = this._packageData;
+				this.existingPackage = false;
+			}
+		},
+		async checkNameAvailability() {
+			this.isWorking.packageName = true;
+			
+			let packageList = await PackageAPI.getPackage({
+				name: this.packageData.name
+			});
+			this.isWorking.packageName = false;
+			
+			if (packageList.length) {
+				new metroUI.ContentDialog({
+					title: "Package name unavailable",
+					content: "The selected Package name is already in use. Please use a different Package name.",
+					commands: [{ text: "Ok", primary: true }]
+				}).show();
+			} else {
+				new metroUI.ContentDialog({
+					title: "Package name is available",
+					content: "The selected Package name is available for use.",
+					commands: [{ text: "Ok", primary: true }]
+				}).show();
+			}
+		},
+		async savePackage() {
+			this.isWorking.savePackage = true;
+			
+			let result = await PackageAPI.updatePackage(this.packageData.identifier, this.packageData);
+			console.log(result);
 		},
 		decodeText(text) {
 			return HtmlEntities.decode(text.replace(/<[^>]*>/g, ''));
