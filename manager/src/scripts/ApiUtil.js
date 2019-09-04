@@ -77,12 +77,16 @@ export class AccountAPI {
 		});
 	}
 
-	static async getUser(userId) {
-		return await SocketService.get(`/account/${userId}`);
+	static async getUser(parameters) {
+		const query = parseUrlFromObject(flattenObject({ user: parameters }));
+		
+		return await SocketService.get(`/account?${query}`);
 	}
 
-	static async deleteUser(userId) {
-		return await SocketService.delete(`/account/${userId}`, {
+	static async deleteUser(parameters) {
+		const query = parseUrlFromObject(flattenObject({ user: parameters }));
+		
+		return await SocketService.delete(`/account?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
@@ -113,40 +117,38 @@ export class AuthAPI {
 }
 
 export class DeviceAPI {
-	static async getDevices() {
-		return await SocketService.get("/devices", {
+	static async getDevices(parameters) {
+		const query = parseUrlFromObject(flattenObject({ device: parameters }));
+		
+		return await SocketService.get(`/devices?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 
+	static async updateDevice(parameters, data) {
+		const query = parseUrlFromObject(flattenObject({ device: parameters }));
+		
+		return await SocketService.put(`/devices?${query}`, data, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+			}
+		});
+	}
+
+	static async deleteDevice(parameters) {
+		const query = parseUrlFromObject(flattenObject({ device: parameters }));
+		
+		return await SocketService.delete(`/devices?${query}`, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+			}
+		});
+	}
+	
 	static async createDevice(data) {
 		return await SocketService.post("/devices/new", data, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
-			}
-		});
-	}
-
-	static async getDevice(deviceId) {
-		return await SocketService.get(`/devices/${deviceId}`, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
-			}
-		});
-	}
-
-	static async updateDevice(deviceId, data) {
-		return await SocketService.put(`/devices/${deviceId}`, data, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
-			}
-		});
-	}
-
-	static async deleteDevice(deviceId) {
-		return await SocketService.delete(`/devices/${deviceId}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
@@ -155,32 +157,30 @@ export class DeviceAPI {
 }
 
 export class LogAPI {
-	static async getLogItems() {
-		return await SocketService.get("/log", {
+	static async getLogItems(parameters) {
+		const query = parseUrlFromObject(flattenObject({ logitem: parameters }));
+		
+		return await SocketService.get(`/log?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 
-	static async getLogItem(logItemId) {
-		return await SocketService.get(`/log/${logItemId}`, {
+	static async updateLogItem(parameters, data) {
+		const query = parseUrlFromObject(flattenObject({ logitem: parameters }));
+		
+		return await SocketService.put(`/log/${query}`, data, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 
-	static async updateLogItem(logItemId, data) {
-		return await SocketService.put(`/log/${logItemId}`, data, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
-			}
-		});
-	}
-
-	static async deleteLogItem(logItemId) {
-		return await SocketService.delete(`/log/${logItemId}`, {
+	static async deleteLogItem(parameters) {
+		const query = parseUrlFromObject(flattenObject({ logitem: parameters }));
+		
+		return await SocketService.delete(`/log/${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
@@ -190,11 +190,13 @@ export class LogAPI {
 
 export class PackageAPI {
 	// - General
-	static async getPackages() {
+	static async getPackages(parameters) {
+		const query = parseUrlFromObject(flattenObject({ package: parameters }));
+		
 		return await SocketService.get("/packages", {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
-				"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
+				//"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
 			}
 		});
 	}
