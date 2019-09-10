@@ -33,7 +33,7 @@ HTMLElement.prototype.parentNodeOfClass = function(className) {
 	return null;
 }
 
-export default class ContentDialog {
+export default class Flyout {
 	constructor(params = {}) {
 		const flyout = this;
 		

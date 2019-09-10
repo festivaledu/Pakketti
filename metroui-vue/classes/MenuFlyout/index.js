@@ -33,7 +33,7 @@ HTMLElement.prototype.parentNodeOfClass = function(className) {
 	return null;
 }
 
-export default class ContentDialog {
+export default class MenuFlyout {
 	constructor(params = {}) {
 		const flyout = this;
 		
@@ -60,6 +60,14 @@ export default class ContentDialog {
 			
 				let icon = document.createElement("i");
 				icon.className = `icon ${item.icon}`;
+				menuItemIcon.appendChild(icon);
+			} else if (item.symbol) {
+				let menuItemIcon = document.createElement("div");
+				menuItemIcon.className = "menu-flyout-item-icon";
+				menuItem.appendChild(menuItemIcon);
+			
+				let icon = document.createElement("i");
+				icon.className = `symbol ${item.icon}`;
 				menuItemIcon.appendChild(icon);
 			}
 			
@@ -131,16 +139,16 @@ export default class ContentDialog {
 		const height = flyout.container.clientHeight;
 		let offset = element.getBoundingClientRect()
 
-		if (offset.top - (height + 8) >= 0) {
+		if (offset.top - height >= 0) {
 			Object.assign(flyout.container.style, {
 				top: null,
-				bottom: `${Math.round((window.innerHeight - (offset.top - 8)) / 2) * 2}px`
+				bottom: `${Math.round((window.innerHeight - offset.top) / 2) * 2}px`
 			});
 			
 			flyout.container.classList.add("animate-bottom");
-		} else if (offset.top + (offset.height + 8) <= window.innerHeight) {
+		} else if (offset.top + offset.height <= window.innerHeight) {
 			Object.assign(flyout.container.style, {
-				top: `${Math.round((offset.top + (offset.height + 8)) / 2) * 2}px`,
+				top: `${Math.round((offset.top + offset.height) / 2) * 2}px`,
 				bottom: null
 			});
 			

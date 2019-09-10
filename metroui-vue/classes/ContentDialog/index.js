@@ -130,10 +130,11 @@ class ContentDialog {
 			document.querySelector(".content-dialog-background").classList.remove("animate-out");
 		}
 		
+		document.body.appendChild(dialog.container);
+		
 		dialog.container.style.width = `${Math.round(dialog.container.clientWidth / 2) * 2}px`;
 		dialog.container.style.height = `${Math.round(dialog.container.clientHeight / 2) * 2}px`;
 		
-		document.body.appendChild(dialog.container);
 		dialog.container.classList.add("animate-in");
 		dialog.container.classList.remove("animate-out");
 	}
