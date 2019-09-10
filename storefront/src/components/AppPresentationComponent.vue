@@ -11,7 +11,7 @@
 			<router-link tag="div" :to="`/package/${packageObj.identifier}`" class="lockup-collection-cell" v-for="(packageObj, index) in limitedData" :key="index">
 				<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" class="icon-container">
 					<img :src="`http://localhost:3000/media/icon/${packageObj.id}`" v-if="packageObj.iconMime" />
-					<MetroTextBlock class="contrast-text" style="position: relative; width: 32px; height: 32px">
+					<MetroTextBlock class="contrast-text" style="position: relative; width: 32px; height: 32px" v-if="!packageObj.iconMime">
 						<MetroFontIcon glyph="&#xE739;" font-size="32px" style="position: absolute" />
 						<MetroFontIcon glyph="&#xE894;" font-size="32px" style="position: absolute" />
 					</MetroTextBlock>
@@ -38,7 +38,49 @@
 </template>
 
 <style lang="less">
-
+.lockup-collection-cell {
+	display: flex;
+	flex-direction: column;
+	width: 162px;
+	height: 272px;
+	background-color: var(--list-low);
+	
+	&:not(:last-child) {
+		margin-right: 12px;
+	}
+	
+	&:last-child:after {
+		content: '';
+		display: block;
+		margin-left: 100%;
+		width: 12px;
+		height: 1px;
+		visibility: hidden;
+	}
+	
+	.icon-container {
+		width: 162px;
+		height: 162px;
+		background-color: var(--system-accent-color);
+		
+		img {
+			width: 100%;
+			height: 100%;
+		}
+	}
+	
+	& > .stack-panel.description-container {
+		flex: 1;
+		justify-content: space-between;
+		
+		.text-block.base {
+			max-height: 38px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
+}
 </style>
 
 <script>
