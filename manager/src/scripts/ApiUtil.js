@@ -170,7 +170,7 @@ export class LogAPI {
 	static async updateLogItem(parameters, data) {
 		const query = parseUrlFromObject(flattenObject({ logitem: parameters }));
 		
-		return await SocketService.put(`/log/${query}`, data, {
+		return await SocketService.put(`/log?${query}`, data, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
@@ -180,7 +180,7 @@ export class LogAPI {
 	static async deleteLogItem(parameters) {
 		const query = parseUrlFromObject(flattenObject({ logitem: parameters }));
 		
-		return await SocketService.delete(`/log/${query}`, {
+		return await SocketService.delete(`/log?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
@@ -191,16 +191,36 @@ export class LogAPI {
 export class PackageAPI {
 	// - General
 	static async getPackages(parameters) {
-		const query = parseUrlFromObject(flattenObject({ package: parameters }));
+		const query = parseUrlFromObject(flattenObject(parameters));
 		
-		return await SocketService.get("/packages", {
+		return await SocketService.get(`/packages?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
-				//"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
+				"x-pakketti-developer": localStorage.getItem("vuex") ? `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}` : undefined
 			}
 		});
 	}
 
+	static async updatePackage(parameters, data) {
+		const query = parseUrlFromObject(flattenObject(parameters));
+		
+		return await SocketService.put(`/packages?${query}`, data, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+			}
+		});
+	}
+
+	static async deletePackage(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters));
+		
+		return await SocketService.delete(`/packages?${query}`, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+			}
+		});
+	}
+	
 	static async createPackage(data) {
 		const formData = new FormData();
 		Object.keys(data).forEach(key => {
@@ -214,58 +234,63 @@ export class PackageAPI {
 		});
 	}
 
-	// static async getPackage(packageId) {
-	// 	return await SocketService.get(`/packages/${packageId}`, {
-	// 		headers: {
-	// 			"authorization": `Bearer ${window.$cookies.get("authToken")}`,
-	// 			"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
-	// 		}
-	// 	});
-	// }
-	static async getPackage(parameters) {
-		const query = parseUrlFromObject(flattenObject({ package: parameters }));
+	static async updatePackageIcon(parameters, file) {
+		const query = parseUrlFromObject(flattenObject(parameters));
 		
-		return await SocketService.get(`/packages?${query}`, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
-				"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
-			}
-		});
-	}
+		const formData = new FormData();
+		formData.append("file", file);
 
-	static async updatePackage(packageId, data) {
-		return await SocketService.put(`/packages/${packageId}`, data, {
+		return await put(`${apiUrl}/packages/icon?${query}`, formData, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 
-	static async deletePackage(packageId) {
-		return await SocketService.delete(`/packages/${packageId}`, {
+	static async deletePackageIcon(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters));
+		
+		return await SocketService.delete(`/packages/icon?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 	
-	static async getPackageIcon(packageId) {
-		throw new Error("Not implemented");
-	}
-
-	static async updatePackageIcon(packageId, file) {
+	static async updatePackageHero(parameters, file) {
+		const query = parseUrlFromObject(flattenObject(parameters));
+		
 		const formData = new FormData();
 		formData.append("file", file);
 
-		return await put(`${apiUrl}/packages/${packageId}/icon`, formData, {
+		return await put(`${apiUrl}/packages/hero?${query}`, formData, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 
-	static async deletePackageIcon(packageId) {
-		return await SocketService.delete(`/packages/${packageId}/icon`, {
+	static async deletePackageHero(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters));
+		
+		return await SocketService.delete(`/packages/hero?${query}`, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+			}
+		});
+	}
+	
+	// - Ratings
+	static async getPackageRatings(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters));
+		
+		return await SocketService.get(`/packages/ratings?${query}`);
+	}
+	
+	static async updatePackageRating(parameters, data) {
+		const query = parseUrlFromObject(flattenObject(parameters));
+		
+		return await SocketService.put(`/packages/rating?${query}`, data, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
@@ -273,44 +298,40 @@ export class PackageAPI {
 	}
 
 	// - Reviews
-	static async getReviews() {
-		return await SocketService.get("/packages/reviews", {
+	static async getReviews(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.get(`/packages/reviews?${query}`, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+			}
+		});
+	}
+	
+	static async createPackageReview(parameters, data) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.post(`/packages/reviews/new?${query}`, data, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 
-	static async getPackageRatings(packageId) {
-		return await SocketService.get(`/packages/${packageId}/ratings`);
-	}
-
-	static async getPackageReviews(packageId) {
-		return await SocketService.get(`/packages/${packageId}/reviews`);
-	}
-
-	static async createPackageReview(packageId, data) {
-		return await SocketService.post(`/packages/${packageId}/reviews/new`, data, {
+	static async deletePackageReview(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.delete(`/packages/review${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 
-	static async getPackageReview(packageId, reviewId) {
-		return await SocketService.get(`/packages/${packageId}/reviews/${reviewId}`);
-	}
-
-	static async deletePackageReview(packageId, reviewId) {
-		return await SocketService.delete(`/packages/${packageId}/reviews/${reviewId}`, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
-			}
-		});
-	}
-
-	static async addPackageReviewMessage(packageId, reviewId, data) {
-		return await SocketService.post(`/packages/${packageId}/reviews/${reviewId}/message`, data, {
+	static async addPackageReviewMessage(parameters, data) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.post(`/packages/review/message?${query}`, data, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			},
@@ -318,8 +339,10 @@ export class PackageAPI {
 		});
 	}
 
-	static async updatePackageReviewMessage(packageId, reviewId, messageId) {
-		return await SocketService.put(`/packages/${packageId}/reviews/${reviewId}/${messageId}`, data, {
+	static async updatePackageReviewMessage(parameters, data) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.put(`/packages/review?${query}`, data, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			},
@@ -327,20 +350,8 @@ export class PackageAPI {
 		});
 	}
 
-	static async deletePackageReviewMessage(packageId, reviewId, messageId) {
-		return await SocketService.delete(`/packages/${packageId}/reviews/${reviewId}/${messageId}`, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
-			}
-		});
-	}
-
-	static async getPackageReviewRating(packageId, reviewId) {
-		return await SocketService.get(`/packages/${packageId}/reviews/${reviewId}/rating`);
-	}
-
-	static async updatePackageReviewRating(packageId, reviewId, data) {
-		return await SocketService.put(`/packages/${packageId}/reviews/${reviewId}/rating`, data, {
+	static async deletePackageReviewMessage(parameters) {
+		return await SocketService.delete(`/packages/review?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
@@ -349,12 +360,16 @@ export class PackageAPI {
 
 	// - Screenshots
 
-	static async getPackageScreenshots(packageId) {
-		return await SocketService.get(`/packages/${packageId}/screenshots`);
+	static async getPackageScreenshots(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.get(`/packages/screenshots?${query}`);
 	}
 
-	static async createPackageScreenshots(packageId, data) {
-		return await SocketService.post(`/packages/${packageId}/screenshots`, data, {
+	static async createPackageScreenshots(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.post(`/packages/screenshots?${query}`, data, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
@@ -367,32 +382,17 @@ export class PackageAPI {
 			formData.append(key, data[key]);
 		});
 		
-		return await post(`${apiUrl}/packages/${packageId}/screenshots/files`, formData, {
+		return await post(`${apiUrl}/packages/screenshots/files?${query}`, formData, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 	
-	static async getPackageScreenshot(packageId, screenshotId) {
-		throw new Error("Not implemented");
-	}
-	
-	static async updatePackageScreenshot(packageId, screenshotId, data) {
-		const formData = new FormData();
-		Object.keys(data).forEach(key => {
-			formData.append(key, data[key]);
-		});
+	static async deletePackageScreenshot(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
 		
-		return await put(`${apiUrl}/packages/${packageId}/screenshots/${screenshotId}`, formData, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
-			}
-		});
-	}
-	
-	static async deletePackageScreenshot(packageId, screenshotId) {
-		return await SocketService.delete(`/packages/${packageId}/screenshots/${screenshotId}`, {
+		return await SocketService.delete(`/packages/screenshot?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
@@ -402,113 +402,92 @@ export class PackageAPI {
 	// - Versions
 	
 	static async getPackageVersions(packageId) {
-		return await SocketService.get(`/packages/${packageId}/versions`, {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.get(`/packages/versions?${query}`, {
 			"authorization": `Bearer ${window.$cookies.get("authToken")}`,
-			"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
+			"x-pakketti-developer": localStorage.getItem("vuex") ? `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}` : undefined
 		});
 	}
 	
-	static async createPackageVersion(packageId, data) {
+	static async createPackageVersion(parameters, data) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
 		const formData = new FormData();
 		Object.keys(data).forEach(key => {
 			formData.append(key, data[key]);
 		});
 		
-		return await post(`${apiUrl}/packages/${packageId}/versions/new`, formData, {
+		return await post(`${apiUrl}/packages/versions/new?${query}`, formData, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 	
-	static async getPackageLatestVersion(packageId) {
-		return await SocketService.get(`/packages/${packageId}/versions/latest`);
-	}
-	
-	static async getPackageLatestVersionFile(packageId) {
-		throw new Error("Not implemented");
-	}
-	
-	static async getPackageLatestVersionRatings(packageId) {
-		return await SocketService.get(`/packages/${packageId}/versions/latest/ratings`);
-	}
-	
-	static async getPackageLatestVersionReviews(packageId) {
-		return await SocketService.get(`/packages/${packageId}/versions/latest/reviews`);
-	}
-	
-	static async getPackageVersion(packageId, versionId) {
-		return await SocketService.get(`/packages/${packageId}/versions/${versionId}`, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
-				"x-pakketti-developer": `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}`
-			}
-		});
-	}
-	
-	static async updatePackageVersion(packageId, versionId, data) {
-		return await SocketService.put(`/packages/${packageId}/versions/${versionId}`, data, {
+	static async updatePackageVersion(parameters, data) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.put(`/packages/versions?${query}`, data, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 	
-	static async deletePackageVersion(packageId, versionId) {
-		return await SocketService.delete(`/packages/${packageId}/versions/${versionId}`);
-	}
-	
-	static async getPackageVersionFile(packageId, versionId) {
-		throw new Error("Not implemented");
-	}
-	
-	static async updatePackageVersionFile(packageId, versionId, file) {
+	static async updatePackageVersionFile(parameters, file) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
 		const formData = new FormData();
 		formData.append("file", file);
 
-		return await put(`${apiUrl}/packages/${packageId}/versions/${versionId}/file`, formData, {
+		return await put(`${apiUrl}/packages/versions/file?${query}`, formData, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 	
-	static async getPackageVersionRatings(packageId, versionId) {
-		return await SocketService.get(`/packages/${packageId}/versions/${versionId}/ratings`);
-	}
-	
-	static async getPackageVersionReviews(packageId, versionId) {
-		return await SocketService.get(`/packages/${packageId}/versions/${versionId}/reviews`);
+	static async deletePackageVersion(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.delete(`/packages/versions?${query}`);
 	}
 }
 
 export class RequestAPI {
-	static async getRequests() {
-		return await SocketService.get("/requests", {
+	static async getRequests(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.get(`/requests?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
 		});
 	}
 
+	static async updateRequest(parameters, data) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.put(`/requests?${query}`, data, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+			}
+		});
+	}
+
+	static async deleteRequest(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
+		return await SocketService.delete(`/requests?${query}`, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+			}
+		});
+	}
+	
 	static async createRequest(data) {
 		return await SocketService.post("/requests/new", data, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
-			}
-		});
-	}
-
-	static async updateRequest(requestId, data) {
-		return await SocketService.put(`/requests/${requestId}`, data, {
-			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
-			}
-		});
-	}
-
-	static async deleteRequest(requestId) {
-		return await SocketService.delete(`/requests/${requestId}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`
 			}
