@@ -130,13 +130,6 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
-		 * The category to sort this version in
-		 */
-		section: {
-			type: DataTypes.STRING,
-		},
-		
-		/**
 		 * The size of the downloadable file
 		 */
 		size: {

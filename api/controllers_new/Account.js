@@ -315,7 +315,7 @@ router.get("/", async (req, res) => {
 });
 
 /**
- * DELETE /account/:userId
+ * DELETE /account
  * 
  * Deletes a specified User
  * Users can only be deleted by Users with a Moderator role or higher
@@ -403,7 +403,7 @@ router.delete("/", async (req, res) => {
 
 
 /**
- * GET /account/:userId/avatar
+ * GET /account/avatar
  * 
  * Gets the binary file for the Avatar of a specified User
  */

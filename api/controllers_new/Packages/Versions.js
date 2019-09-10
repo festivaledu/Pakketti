@@ -298,7 +298,7 @@ router.post("/versions/new", async (req, res) => {
 });
 
 /**
- * PUT /packages/:packageId/versions/:versionId
+ * PUT /packages/versions
  * 
  * Updates the metadata for a specific Version associated to a Package
  */
@@ -405,7 +405,7 @@ router.put("/versions", async (req, res) => {
 });
 
 /**
- * PUT /packages/:packageId/versions/:versionId/file
+ * PUT /packages/versions/file
  * 
  * Updates the binary file for a specific Version associated to a Package
  */

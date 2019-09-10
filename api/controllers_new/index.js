@@ -7,7 +7,12 @@ const router = express.Router();
 /**
  * Make every route use the AuthHelper before reaching their logic to inject a User's account into the Request object
  */
-router.use("/", require("../helpers/AuthHelper"));
+router.use(require("../helpers/AuthHelper"));
+
+/**
+ * Inject includes into routes
+ */
+router.use(require("../helpers/IncludeHelper"));
 
 router.use((req, res, next) => {
 	if (req.query) {

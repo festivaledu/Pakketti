@@ -95,6 +95,13 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
+		 * The category to sort this Package in
+		 */
+		section: {
+			type: DataTypes.STRING,
+		},
+		
+		/**
 		 * The Package creator's Account ID
 		 */
 		accountId: {
