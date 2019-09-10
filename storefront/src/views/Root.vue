@@ -54,6 +54,20 @@
 
 <style lang="less">
 .page[data-page-id="root"] {
+	@media all and (min-width: 641px) and (max-width: 1007px) {
+		.navigation-view .page > .page-content {
+			padding-left: 24px !important;
+			padding-right: 24px !important;
+			padding-bottom: 24px !important;
+		}
+	}
+	@media all and (min-width: 1008px) {
+		.navigation-view .page > .page-content {
+			padding-left: 48px !important;
+			padding-right: 48px !important;
+			padding-bottom: 48px !important;
+		}
+	}
 	
 	@media all and (max-width: 640px) {
 		.navigation-view {
@@ -252,7 +266,7 @@ export default {
 				switch (match[1]) {
 					case "package":
 						match = this.$route.path.match(/^\/package\/((?:[^\/]+?))(?:\/(?=$))?$/i);
-						if (match) this.$refs["navigation-view"].navigate("packages", { packageId: match[1] });
+						if (match) this.$refs["navigation-view"].navigate("package", { packageId: match[1] });
 						break;
 					case "section":
 						break;

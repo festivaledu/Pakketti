@@ -14,7 +14,7 @@
 }
 
 .current-rating {
-	margin-top: 6px;
+	margin: 6px 0;
 	
 	.rating-stars {
 		width: 54px;
