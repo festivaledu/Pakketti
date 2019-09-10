@@ -1,7 +1,7 @@
 <template>
 	<MetroView view-id="main-view">
 		<MetroPage page-id="root">
-			<MetroNavigationView pane-display-mode="top" pane-title="Team FESTIVAL" header="FUKC TIHS SIHT" ref="navigation-view" :settings-visible="false">
+			<MetroNavigationView pane-display-mode="top" pane-title="Team FESTIVAL" ref="navigation-view" :settings-visible="false">
 				<template slot="header" slot-scope="{ local }">
 					<MetroStackPanel orientation="vertical" vertical-alignment="center" style="height: 40px; margin-top: -5px">
 						<MetroTextBlock text-style="base" :text="local" />
@@ -15,9 +15,9 @@
 					<template v-if="windowWidth <= 640">
 						<MetroNavigationViewItemSeparator />
 						
-						<MetroNavigationViewItem content="Item" />
-						<MetroNavigationViewItem content="Item" />
-						<MetroNavigationViewItem content="Item" />
+						<MetroNavigationViewItem content="Dashboard" />
+						<!-- <MetroNavigationViewItem content="Item" />
+						<MetroNavigationViewItem content="Item" /> -->
 					</template>
 				</template>
 				
@@ -26,7 +26,18 @@
 				</template>
 				
 				<template slot="pane-footer">
-					<MetroNavigationViewItem icon="add-friend" content="Sign in" />
+					<MetroNavigationViewItem content="Sign in" @click.native="profileButtonClicked">
+						<template slot="icon" v-if="!accountData">
+							<MetroSymbolIcon symbol="contact" />
+						</template>
+						<span v-if="!accountData">Sign in</span>
+						
+						<template slot="icon" v-if="accountData">
+							<MetroPersonPicture v-if="!accountData.profileImage" />
+							<MetroPersonPicture :profile-picture="`http://localhost:3000/media/avatar/${accountData.id}`" v-if="accountData.profileImage" />
+						</template>
+						<span v-if="accountData">{{ accountData.username }}</span>
+					</MetroNavigationViewItem>
 					
 					<template v-if="windowWidth > 640">
 						<MetroNavigationViewItem icon="more" />
@@ -34,6 +45,8 @@
 				</template>
 				
 				<StartPage />
+				
+				<PackagePage />
 			</MetroNavigationView>
 		</MetroPage>
 	</MetroView>
@@ -65,26 +78,39 @@
 			}
 		}
 	}
+	
+	.navigation-view-item-icon {
+		.person-picture {
+			width: 20px;
+			height: 20px;
+			margin: 10px;
+		}
+	}
 }
 </style>
 
 <script>
+import { AccountAPI, AuthAPI } from '@/scripts/ApiUtil'
+
 import StartPage from'@/components/StartPage.vue'
+import PackagePage from'@/components/PackagePage.vue'
+import CryptoJS from "crypto-js"
 
 export default {
 	name: "Root",
 	components: {
-		StartPage
+		StartPage,
+		PackagePage
 	},
 	data() {
 		return {
 			resizeEventListener: null,
-			windowWidth: 0
+			windowWidth: 0,
+			accountData: null,
+			allowRouteMatching: true
 		}
 	},
-	mounted() {
-		this.$refs["navigation-view"].navigate("start");
-		
+	async mounted() {
 		if (!this.resizeEventListener) {
 			this.resizeEventListener = window.addEventListener("resize", () => {
 				this.windowWidth = window.innerWidth;
@@ -102,6 +128,149 @@ export default {
 		this.$nextTick(() => {
 			window.dispatchEvent(new Event("resize"));
 		});
+		
+		if (this.$store.state.accountId) {
+			this.accountData = await AccountAPI.getMe();
+		}
+		
+		// Navigation Stuff
+		const old_goBack = this.$refs["navigation-view"].goBack;
+		this.$refs["navigation-view"].goBack = () => {
+			old_goBack();
+			window.history.back();
+		}
+		
+		this.matchRoute(this.$route);
+		const self = this;
+		window.addEventListener("popstate", () => {
+			old_goBack();
+		});
+	},
+	methods: {
+		profileButtonClicked(e) {
+			if (!this.accountData) {
+				if (window.innerWidth <= 640) {
+					this.login();
+					return;
+				}
+				
+				let flyout = new metroUI.MenuFlyout({
+					items: [{
+						icon: "contact",
+						text: "Sign in",
+						action: this.login
+					}, {
+						icon: "add-friend",
+						text: "Register"
+					}]
+				});
+
+				flyout.showAt(e.target);
+			} else {
+				if (window.innerWidth <= 640) {
+						let flyout = new metroUI.MenuFlyout({
+						items: [{
+							icon: "block-contact",
+							text: "Sign out",
+							action: this.logout
+						}]
+					});
+					
+					flyout.showAt(e.target);
+				} else {
+					let flyout = new metroUI.MenuFlyout({
+						items: [{
+							icon: "tiles",
+							text: "Dashboard",
+							action: () => {
+								
+							}
+						}, {
+							icon: "block-contact",
+							text: "Sign out",
+							action: this.logout
+						}]
+					});
+					
+					flyout.showAt(e.target);
+				}
+			}
+		},
+		async login() {
+			let loginDialog = new metroUI.ContentDialog({
+				title: this.$t('login.register_title'),
+				content: (
+					<MetroStackPanel>
+						<MetroTextBox
+							header={this.$t('login.login_username')}
+							placeholder-text={this.$t('login.login_username_placeholder')}
+							required={true}
+							name="username"
+							style="margin-bottom: 8px"
+						/>
+						<MetroPasswordBox
+							header={this.$t('login.login_password')}
+							placeholder-text={this.$t('login.login_password_required')}
+							required={true}
+							name="password"
+						/>
+					</MetroStackPanel>
+				),
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+			});
+
+			if (await loginDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
+				let texts = loginDialog.text;
+				
+				AuthAPI.login({
+					username: texts["username"],
+					password: CryptoJS.SHA512(texts["password"]).toString(CryptoJS.enc.Hex)
+				}).then(authData => {
+					if (authData.error) {
+						new metroUI.ContentDialog({
+							title: this.$t('login.login_error_title'),
+							content: `<p>${this.$t('login.login_error_message')}<br><span style="font-style: italic">${typeof authData === 'string' ? authData : `${authData.error.code}: ${authData.error.message}`}</span></p>`,
+							commands: [{ text: "Ok", primary: true }]
+						}).show();
+						return;
+					}
+					
+					this.$store.commit("setAccountId", authData.accountId);
+					window.location.reload("true");
+				});
+			}
+		},
+		logout() {
+			this.$store.commit("setAccountId", null);
+			window.location.reload("true");
+		},
+		
+		matchRoute(route) {
+			var match = route.path.match(/((?:[^\/]+)).+$/i);
+			if (match) {
+				if (this.$refs["navigation-view"].history.indexOf("start") < 0) this.$refs["navigation-view"].history.push("start");
+				switch (match[1]) {
+					case "package":
+						match = this.$route.path.match(/^\/package\/((?:[^\/]+?))(?:\/(?=$))?$/i);
+						if (match) this.$refs["navigation-view"].navigate("packages", { packageId: match[1] });
+						break;
+					case "section":
+						break;
+					case "developer":
+						break;
+					default: break;
+				}
+			} else {
+				this.$refs["navigation-view"].navigate("start");
+			}
+		}
+	},
+	watch: {
+		$route(to, from) {
+			setTimeout(() => {
+				if (!this.$refs["navigation-view"].$el.querySelector(".page[class*='page-fade'], .page[class*='page-slide']")) this.matchRoute(to);
+			});
+		}
 	}
 }
 </script>

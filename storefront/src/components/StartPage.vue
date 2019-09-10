@@ -1,50 +1,25 @@
 <template>
-	<MetroPage page-id="start">
+	<MetroPage page-id="start" @navigatedTo.native="onNavigatedTo">
 		<template v-if="!packageData">
 			<MetroProgressRing :active="true" style="position: absolute; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: 80px; height: 80px" />
 		</template>
 		
 		<template v-if="packageData">
-			<MetroFlipView class="promo-flip-view">
+			<MetroFlipView class="promo-flip-view" v-show="featuredPackages.length">
 				<template v-for="(packageObj, index) in featuredPackages">
-					<MetroFlipViewItem :key="index" v-if="packageObj.headerImageMime">
-						<div class="editorial-item-container" style="background-image: url(http://via.placeholder.com/1920x1080)">
+					<MetroFlipViewItem :key="index">
+						<router-link tag="div" :to="`/package/${packageObj.identifier}`" class="editorial-item-container" :style="`background-image: url(http://localhost:3000/media/hero/${packageObj.id})`">
 							<MetroStackPanel horizontal-alignment="center" vertical-alignment="bottom">
 								<MetroTextBlock text-style="sub-title">{{ packageObj.name }}</MetroTextBlock>
 								<MetroTextBlock text-style="caption">{{ packageObj.shortDescription }}</MetroTextBlock>
 							</MetroStackPanel>
-						</div>
+						</router-link>
 					</MetroFlipViewItem>
 				</template>
 			</MetroFlipView>
 			
-			<MetroStackPanel style="margin-top: 40px; margin-bottom: 16px">
-				<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="center">
-					<MetroTextBlock text-style="sub-title">Most Downloaded</MetroTextBlock>
-					<MetroHyperlinkButton style="margin-left: 12px">See All: {{ packageData.length >= 100 ? "99+" : packageData.length }}</MetroHyperlinkButton>
-				</MetroStackPanel>
-			</MetroStackPanel>
-			
-			<MetroStackPanel orientation="horizontal" horizontal-alignment="left" style="max-width: 100vw; overflow-y: auto; margin: 0 -12px; padding: 0 12px;">
-				<div class="lockup-collection-cell" v-for="(packageObj, index) in mostDownloadedPackages" :key="index">
-					<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" class="icon-container">
-						<img :src="`http://localhost:3000/media/icon/${packageObj.id}`" v-if="packageObj.iconMime" />
-						<MetroTextBlock class="contrast-text" style="position: relative; width: 32px; height: 32px">
-							<MetroFontIcon glyph="&#xE739;" font-size="32px" style="position: absolute" />
-							<MetroFontIcon glyph="&#xE894;" font-size="32px" style="position: absolute" />
-						</MetroTextBlock>
-					</MetroStackPanel>
-					
-					<MetroStackPanel style="padding: 8px">
-						<div>
-							<MetroTextBlock text-style="base">{{ packageObj.name }}</MetroTextBlock>
-							<CurrentRating />
-						</div>
-						
-						<MetroTextBlock text-style="caption">Free</MetroTextBlock>
-					</MetroStackPanel>
-				</div>
-			</MetroStackPanel>
+			<AppPresentation :app-data="mostDownloadedPackages" title="Most Downloaded" />
+			<AppPresentation :app-data="recentlyUpdatedPackages" title="Recently Updated" />
 		</template>
 	</MetroPage>
 </template>
@@ -60,6 +35,7 @@
 		& > .page-content {
 			padding-left: 24px !important;
 			padding-right: 24px !important;
+			padding-bottom: 24px !important;
 		}
 		
 		.promo-flip-view {
@@ -70,6 +46,7 @@
 		& > .page-content {
 			padding-left: 48px !important;
 			padding-right: 48px !important;
+			padding-bottom: 48px !important;
 		}
 		
 		.promo-flip-view {
@@ -101,7 +78,7 @@
 			width: 100%;
 			height: 100%;
 			z-index: 0;
-			background: linear-gradient(to bottom, rgba(0,0,0,0) 60%,rgba(0,0,0,0.4) 100%);
+			background: linear-gradient(to bottom, rgba(0,0,0,0) 60%,rgba(0,0,0,0.6) 100%);
 		}
 	}
 	
@@ -116,6 +93,15 @@
 			margin-right: 12px;
 		}
 		
+		&:last-child:after {
+			content: '';
+			display: block;
+			margin-left: 100%;
+			width: 12px;
+			height: 1px;
+			visibility: hidden;
+		}
+		
 		.icon-container {
 			width: 162px;
 			height: 162px;
@@ -127,7 +113,7 @@
 			}
 		}
 		
-		& > .stack-panel:not(.icon-container) {
+		& > .stack-panel.description-container {
 			flex: 1;
 			justify-content: space-between;
 			
@@ -145,6 +131,7 @@
 <script>
 import { PackageAPI } from '@/scripts/ApiUtil'
 
+import AppPresentation from '@/components/AppPresentationComponent'
 import CurrentRating from '@/components/CurrentRatingComponent'
 
 var shuffle = function(a) {
@@ -161,6 +148,7 @@ var shuffle = function(a) {
 export default {
 	name: "StartPage",
 	components: {
+		AppPresentation,
 		CurrentRating
 	},
 	data() {
@@ -169,16 +157,27 @@ export default {
 		}
 	},
 	async mounted() {
-		this.packageData = await PackageAPI.getPackages();
+		this.packageData = await PackageAPI.getPackages({
+			include: "ratings"
+		});
+	},
+	methods: {
+		async onNavigatedTo() {
+			this.$parent.setHeader("Start");
+		}
 	},
 	computed: {
 		featuredPackages() {
-			let _packageData = [...this.packageData];
+			let _packageData = [...this.packageData].filter(_ => _.headerImageMime !== null);
 			return shuffle(_packageData).splice(0,5);
 		},
 		mostDownloadedPackages() {
 			let _packageData = [...this.packageData];
-			return _packageData.sort((a, b) => b.downloadCount - a.downloadCount).splice(0, 15);
+			return _packageData.sort((a, b) => b.downloadCount - a.downloadCount).splice(0, 12);
+		},
+		recentlyUpdatedPackages() {
+			let _packageData = [...this.packageData];
+			return _packageData.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).splice(0, 12);
 		}
 	}
 }
