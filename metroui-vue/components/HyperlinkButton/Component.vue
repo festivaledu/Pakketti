@@ -16,6 +16,7 @@ export default {
 	methods: {
 
 		onClick(e) {
+			if (!this.navigateUri) e.preventDefault();
 			this.$emit("click", e);
 		},
 	}
