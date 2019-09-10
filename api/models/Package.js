@@ -102,6 +102,17 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
+		 * The device families this Package supports
+		 * 1: Phone
+		 * 2: Tablet
+		 * 4: Desktop
+		 * 8: TV
+		 */
+		deviceFamilies: {
+			type: DataTypes.INTEGER
+		},
+		
+		/**
 		 * The Package creator's Account ID
 		 */
 		accountId: {
