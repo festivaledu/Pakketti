@@ -3,6 +3,16 @@
 </template>
 
 <style lang="less">
+body[data-theme="light"] {
+	--store-background: #F7F3F7;
+	--package-header-background: #FFFFFF;
+}
+body[data-theme="dark"] {
+	--store-background: #292C29;
+	--package-header-background: #292C29;
+}
+
+
 a {
 	color: var(--system-accent-color);
 	
@@ -18,5 +28,9 @@ a {
 		pointer-events: none;
 		color: var(--base-medium-low);
 	}
+}
+
+.page-content {
+	background-color: var(--store-background);
 }
 </style>
