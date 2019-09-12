@@ -57,16 +57,23 @@
 			
 			<MetroPivot>
 				<MetroPivotItem header="Overview">
-					<template v-f="packageData.deviceFamilies">
+					<section v-if="packageData.deviceFamilies">
 						<MetroTextBlock text-style="sub-title" style="font-weight: 600">Available on</MetroTextBlock>
 						
-						<MetroStackPanel orientation="horizontal" horizontal-alignment="left" style="margin-top: 16px">
+						<MetroStackPanel orientation="horizontal" horizontal-alignment="left" style="margin-top: 16px;">
 							<DeviceCompatibility glyph="&#xE8EA;" label="Phone" v-if="packageData.deviceFamilies & 1" />
 							<DeviceCompatibility glyph="&#xE70A;" label="Tablet" v-if="packageData.deviceFamilies & 2" />
 							<DeviceCompatibility glyph="&#xE977;" label="Desktop" v-if="packageData.deviceFamilies & 4" />
 							<DeviceCompatibility glyph="&#xE7F4;" label="TV" v-if="packageData.deviceFamilies & 8" />
 						</MetroStackPanel>
-					</template>
+					</section>
+					
+					<section>
+						<MetroTextBlock text-style="sub-title" style="font-weight: 600">Description</MetroTextBlock>
+						<ExpandableText>
+							<span v-html="packageData.detailedDescription.replace(/\n/g, '<br />')" />
+						</ExpandableText>
+					</section>
 				</MetroPivotItem>
 				
 				<MetroPivotItem header="System Requirements">
@@ -94,11 +101,11 @@
 			margin: 0 -12px;
 			
 			@media all and (min-width: 641px) and (max-width: 1007px) {
-				margin: -40px -24px 0;
+				margin: -48px -24px 0;
 			}
 			
 			@media all and (min-width: 1008px) {
-				margin: -40px -48px 0;
+				margin: -48px -48px 0;
 			}
 			
 			.hero-image {
@@ -133,7 +140,7 @@
 			width: 100%;
 			max-width: 1600px;
 			padding: 24px;
-			background-color: var(--alt-high);
+			background-color: var(--package-header-background);
 			box-shadow: 0 5px 17px 0px rgba(0,0,0,0.6);
 			border-radius: 2px;
 			
@@ -167,6 +174,10 @@
 			}
 		}
 	}
+	
+	section:not(:last-of-type) {
+		margin-bottom: 56px;
+	}
 }
 </style>
 
@@ -175,12 +186,14 @@ import { PackageAPI } from '@/scripts/ApiUtil'
 
 import CurrentRating from '@/components/CurrentRatingComponent'
 import DeviceCompatibility from '@/components/DeviceCompatibilityComponent'
+import ExpandableText from '@/components/ExpandableTextComponent'
 
 export default {
 	name: "PackagePage",
 	components: {
 		CurrentRating,
-		DeviceCompatibility
+		DeviceCompatibility,
+		ExpandableText
 	},
 	data() {
 		return {
