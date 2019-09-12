@@ -40,7 +40,7 @@
 							<MetroTextBlock style="margin-top: 6px">
 								<span v-html="packageData.detailedDescription.match(/.*?(?=\n|$)/g)[0]" />
 							</MetroTextBlock>
-							<MetroHyperlinkButton style="margin-top: 6px" @click="packageDescriptionMoreClicked" v-if="packageData.detailedDescription.match(/.*?(?=\n|$)/g).length > 1">
+							<MetroHyperlinkButton style="margin-top: 6px" @click="packageDescriptionMoreClicked" v-if="packageData.detailedDescription.match(/.*?(?=\n|$)/g).length > 2">
 								<MetroTextBlock text-style="base">More</MetroTextBlock>
 							</MetroHyperlinkButton>
 						</div>
@@ -60,7 +60,7 @@
 					<section v-if="packageData.deviceFamilies">
 						<MetroTextBlock text-style="sub-title" style="font-weight: 600">Available on</MetroTextBlock>
 						
-						<MetroStackPanel orientation="horizontal" horizontal-alignment="left" style="margin-top: 16px;">
+						<MetroStackPanel orientation="horizontal" horizontal-alignment="left">
 							<DeviceCompatibility glyph="&#xE8EA;" label="Phone" v-if="packageData.deviceFamilies & 1" />
 							<DeviceCompatibility glyph="&#xE70A;" label="Tablet" v-if="packageData.deviceFamilies & 2" />
 							<DeviceCompatibility glyph="&#xE977;" label="Desktop" v-if="packageData.deviceFamilies & 4" />
@@ -74,14 +74,78 @@
 							<span v-html="packageData.detailedDescription.replace(/\n/g, '<br />')" />
 						</ExpandableText>
 					</section>
+					
+					<section v-if="packageData.screenshots && packageData.screenshots.length">
+						<MetroTextBlock text-style="sub-title" style="font-weight: 600">Screenshots</MetroTextBlock>
+						
+						<div class="screenshot-wrapper">
+							<div class="screenshot-container" v-for="(screenshotObj, index) in packageData.screenshots" :key="index">
+								<img :src="`http://localhost:3000/media/screenshot/${screenshotObj.id}`" />
+							</div>
+						</div>
+					</section>
+					
+					<section>
+						<MetroTextBlock text-style="sub-title" style="font-weight: 600">Additional information</MetroTextBlock>
+						
+						<div class="row">
+							<div class="col col-12 col-md-3">
+								<div class="info-item">
+									<MetroTextBlock text-style="base">Published by</MetroTextBlock>
+									<MetroHyperlinkButton>
+										<MetroTextBlock text-style="base">Developer</MetroTextBlock>
+									</MetroHyperlinkButton>
+								</div>
+								
+								<div class="info-item">
+									<MetroTextBlock text-style="base">Release date</MetroTextBlock>
+									<MetroTextBlock>{{ packageData.createdAt | date }}</MetroTextBlock>
+								</div>
+								
+								<div class="info-item" v-if="packageData.versions.length">
+									<MetroTextBlock text-style="base">Approximate size</MetroTextBlock>
+									<MetroTextBlock>{{ packageData.versions[0].installedSize * 1024 | filesize }}</MetroTextBlock>
+								</div>
+							</div>
+							
+							<div class="col col-12 col-md-3">
+								<div class="info-item">
+									<MetroTextBlock text-style="base">Category</MetroTextBlock>
+									<MetroHyperlinkButton>
+										<MetroTextBlock text-style="base">{{ packageData.section }}</MetroTextBlock>
+									</MetroHyperlinkButton>
+								</div>
+								
+								<div class="info-item">
+									<MetroTextBlock text-style="base">Publisher Info</MetroTextBlock>
+									<MetroTextBlock>N/A</MetroTextBlock>
+								</div>
+								
+								<div class="info-item" v-if="packageData.issueURL">
+									<MetroTextBlock text-style="base">Report issue</MetroTextBlock>
+									<MetroHyperlinkButton>
+										<MetroTextBlock text-style="base">Report an issue with this product</MetroTextBlock>
+									</MetroHyperlinkButton>
+								</div>
+							</div>
+							
+							<div class="col col-12 col-md-3">
+								<div class="info-item">
+									<MetroHyperlinkButton>
+										<MetroTextBlock text-style="base">Report this product</MetroTextBlock>
+									</MetroHyperlinkButton>
+								</div>
+							</div>
+						</div>
+					</section>
 				</MetroPivotItem>
 				
 				<MetroPivotItem header="System Requirements">
-					
+					<img src="https://media2.giphy.com/media/5wWf7GMbT1ZUGTDdTqM/200.gif?cid=790b761185b1721340b768c41bc77b639b9fadb8e47aa643&rid=200.gif" />
 				</MetroPivotItem>
 				
 				<MetroPivotItem header="Reviews">
-					
+					<img src="https://media2.giphy.com/media/5wWf7GMbT1ZUGTDdTqM/200.gif?cid=790b761185b1721340b768c41bc77b639b9fadb8e47aa643&rid=200.gif" />
 				</MetroPivotItem>
 			</MetroPivot>
 		</template>
@@ -164,19 +228,92 @@
 	.pivot {
 		max-width: 1600px;
 		margin: 48px auto 0;
+		overflow: visible;
 		
-		.header-clipper {
-			justify-content: center;
+		.pivot-header {
+			position: sticky;
+			top: 40px;
+			background-color: var(--store-background);
+			z-index: 5;
 			
-			.pivot-header-item .text-block {
-				font-size: 14px;
-				font-weight: 600;
+			.header-clipper {
+				justify-content: center;
+				
+				.pivot-header-item .text-block {
+					font-size: 14px;
+					font-weight: 600;
+				}
+			}
+		}
+		
+		.pivot-item {
+			@media all and (max-width: 640px) {
+				min-height: calc(~"100vh - (40px + 48px + 12px)");
+			}
+			
+			@media all and (min-width: 641px) and (max-width: 1007px) {
+				min-height: calc(~"100vh - (40px + 48px + 24px)");
+			}
+			
+			@media all and (min-width: 1008px) {
+				min-height: calc(~"100vh - (40px + 48px + 48px)");
 			}
 		}
 	}
 	
-	section:not(:last-of-type) {
-		margin-bottom: 56px;
+	section {
+		& > .text-block.sub-title {
+			margin-bottom: 16px;
+		}
+		
+		&:not(:last-of-type) {
+			margin-bottom: 56px;
+		}
+	}
+	
+	.screenshot-wrapper {
+		display: flex;
+		width: 100%;
+		height: 187px;
+		margin-top: 18px;
+		white-space: nowrap;
+		overflow-y: auto;
+		
+		@media all and (max-width: 768px) {
+			height: 124px;
+		}
+		
+		.screenshot-container {
+			position: relative;
+			flex: 0 0 auto; 
+			height: 100%;
+			overflow: hidden;
+			
+			&:not(:last-child) {
+				margin-right: 18px;
+			}
+			
+			img {
+				display: block ;
+				max-width: 100%;
+				height: 100%;
+				object-fit: contain;
+			}
+		}
+	}
+	
+	.row {
+		margin: 0;
+		
+		.col {
+			padding: 0;
+		}
+	}
+	
+	.info-item {
+		& + .info-item {
+			margin-top: 48px;
+		}
 	}
 }
 </style>
@@ -235,6 +372,23 @@ export default {
 				}]
 			}).show();
 		}
-	}
+	},
+	filters: {
+		date(value) {
+			return new Date(value).toLocaleDateString();
+		},
+		dateTime(value) {
+			return new Date(value).toLocaleString();
+		},
+		time(value) {
+			return new Date(value).toLocaleTimeString();
+		},
+		filesize(size) {
+			if (isNaN(size)) { size = 0 }
+			if (size < 1024) { return size + ' B' }
+			if ((size /= 1024) < 1024) { return size.toFixed(0) + ' KB' }
+			if ((size /= 1024) < 1024) { return size.toFixed(2) + ' MB' }
+		}
+	}	
 }
 </script>
