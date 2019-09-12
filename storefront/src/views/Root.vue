@@ -62,10 +62,18 @@
 		}
 	}
 	@media all and (min-width: 1008px) {
-		.navigation-view .page > .page-content {
-			padding-left: 48px !important;
-			padding-right: 48px !important;
-			padding-bottom: 48px !important;
+		.navigation-view {
+			& > .pane-content {
+				position: absolute;
+				
+				& + .content-root {
+					height: 100vh;
+				}
+			}
+			
+			.page > .page-content {
+				padding: 52px 48px 48px !important;
+			}
 		}
 	}
 	
