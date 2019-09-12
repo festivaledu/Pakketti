@@ -31,14 +31,13 @@
 			height: 340px;
 		}
 	}
-	@media all and (min-width: 641px) and (max-width: 1007px) {		
+	@media all and (min-width: 641px) {
 		.promo-flip-view {
-			height: 300px;
-		}
-	}
-	@media all and (min-width: 1008px) {
-		.promo-flip-view {
-			height: 380px;
+				&:before {
+				content: '';
+				display: block;
+				padding-top: 37.65%;
+			}
 		}
 	}
 	
