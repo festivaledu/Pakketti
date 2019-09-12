@@ -100,6 +100,18 @@ body[data-theme="dark"] {
 	--chrome-black-medium: @chromeBlackMedium;
 	--chrome-black-high: @chromeBlackHigh;
 	
+	.acrylic {
+		&.acrylic-60 {
+			background-color: fade(@altHigh, 60%);
+		}
+		&.acrylic-70 {
+			background-color: fade(@altHigh, 67%);
+		}
+		&.acrylic-80 {
+			background-color: fade(@altHigh, 80%);
+		}
+	}
+	
 	.radio-button {
 		input[type="radio"] {
 			&:checked + label {

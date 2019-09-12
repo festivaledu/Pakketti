@@ -9,7 +9,7 @@
 			</MetroButton>
 		</MetroStackPanel>
 			
-		<div class="pane-content" :class="{'collapsed': collapsed, 'expanded': expanded, 'back-button-visible': backButtonVisible}">
+		<div class="pane-content acrylic acrylic-80" :class="{'collapsed': collapsed, 'expanded': expanded, 'back-button-visible': backButtonVisible}">
 			<MetroStackPanel class="pane-toggle-button-container" horizontal-alignment="left" :class="{'collapsed': collapsed, 'expanded': expanded}">
 				<MetroButton class="toggle-pane-button" :class="{'fill': paneTitle}" @click="togglePane">
 					<MetroSymbolIcon symbol="global-navigation-button" />

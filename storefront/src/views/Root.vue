@@ -83,9 +83,9 @@
 	
 	@media all and (min-width: 641px) {
 		.navigation-view {
-			& > .pane-content {
-				background-color: var(--alt-high);
-			}
+			// & > .pane-content {
+			// 	background-color: var(--alt-high);
+			// }
 			
 			& > .content-root > .header-content {
 				display: none;
