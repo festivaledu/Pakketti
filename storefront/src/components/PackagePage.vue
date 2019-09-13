@@ -144,6 +144,10 @@
 					<img src="https://media2.giphy.com/media/5wWf7GMbT1ZUGTDdTqM/200.gif?cid=790b761185b1721340b768c41bc77b639b9fadb8e47aa643&rid=200.gif" />
 				</MetroPivotItem>
 				
+				<MetroPivotItem header="Version History">
+					<img src="https://media2.giphy.com/media/5wWf7GMbT1ZUGTDdTqM/200.gif?cid=790b761185b1721340b768c41bc77b639b9fadb8e47aa643&rid=200.gif" />
+				</MetroPivotItem>
+				
 				<MetroPivotItem header="Reviews">
 					<img src="https://media2.giphy.com/media/5wWf7GMbT1ZUGTDdTqM/200.gif?cid=790b761185b1721340b768c41bc77b639b9fadb8e47aa643&rid=200.gif" />
 				</MetroPivotItem>
