@@ -666,6 +666,10 @@ body[data-theme="dark"] {
 		
 		.detailed-rating-wrapper {
 			margin-top: 64px;
+			
+			@media all and (max-width: 640px) {
+				margin-top: 24px;
+			}
 		}
 	}
 	
