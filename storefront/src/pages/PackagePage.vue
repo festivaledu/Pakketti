@@ -214,8 +214,19 @@
 					</div>
 				</MetroPivotItem>
 				
-				<MetroPivotItem header="Version History">
-					<img src="https://media2.giphy.com/media/5wWf7GMbT1ZUGTDdTqM/200.gif?cid=790b761185b1721340b768c41bc77b639b9fadb8e47aa643&rid=200.gif" />
+				<MetroPivotItem header="Version History" v-if="packageData.versions.length">
+					<div class="version-history-container">
+						<div class="version-history-item" v-for="(versionObj, index) in packageData.versions" :key="index">
+							<MetroStackPanel orientation="horizontal" vertical-orientation="center">
+								<MetroTextBlock text-style="sub-title">Version {{ versionObj.version }}</MetroTextBlock>
+								<MetroTextBlock text-style="caption">{{ versionObj.createdAt | date }}</MetroTextBlock>
+							</MetroStackPanel>
+							
+							<ExpandableText>
+								<span v-html="versionObj.changeText.replace(/\n/g, '<br />')" />
+							</ExpandableText>
+						</div>
+					</div>
 				</MetroPivotItem>
 				
 				<MetroPivotItem header="Reviews">
@@ -591,6 +602,39 @@ body[data-theme="dark"] {
 			
 			.info-item:not(:last-child) {
 				margin-bottom: 48px;
+			}
+		}
+	}
+	
+	.version-history-container {
+		.version-history-item {
+			position: relative;
+			
+			& > .stack-panel {
+				margin-bottom: 24px;
+				
+				@media all and (min-width: 1008px) {
+					flex-direction: column;
+				}
+				
+				.text-block.caption {
+					color: var(--base-medium);
+					line-height: 27px;
+				}
+			}
+			
+			&:not(:last-child) {
+				margin-bottom: 16px;
+				
+				&:after {
+					content: '';
+					position: absolute;
+					bottom: -20px;
+					left: 0;
+					right: 0;
+					height: 1px;
+					background-color: var(--base-low);
+				}
 			}
 		}
 	}
