@@ -300,7 +300,7 @@ router.get("/", async (req, res) => {
 
 	let accountObj = await Account.findOne({
 		where: query,
-		attributes: ["id", "username", [Sequelize.fn("COUNT", Sequelize.col('profileImage')), "profileImage"], "role", "createdAt"]
+		attributes: ["id", "username", "profileImageMime", "role", "createdAt"]
 	});
 	
 	if (!accountObj || !Object.keys(accountObj).length) return res.status(httpStatus.NOT_FOUND).send({
@@ -353,7 +353,7 @@ router.delete("/", async (req, res) => {
 	
 	let accountObj = await Account.findOne({
 		where: query,
-		attributes: ["id", "username", [Sequelize.fn("COUNT", Sequelize.col('profileImage')), "profileImage"], "role", "createdAt"]
+		attributes: ["id", "username", "profileImageMime", "role", "createdAt"]
 	});
 	
 	if (!accountObj || !Object.keys(accountObj).length) return res.status(httpStatus.NOT_FOUND).send({

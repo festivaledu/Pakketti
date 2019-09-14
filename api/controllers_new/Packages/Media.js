@@ -45,7 +45,7 @@ router.get("/icon", async (req, res) => {
 		}
 	});
 
-	if (!packageObj.icon || !packageObj.imageMime) return res.status(httpStatus.NOT_FOUND).send({
+	if (!packageObj.icon || !packageObj.iconMime) return res.status(httpStatus.NOT_FOUND).send({
 		error: {
 			name: httpStatus[httpStatus.NOT_FOUND],
 			code: httpStatus.NOT_FOUND,

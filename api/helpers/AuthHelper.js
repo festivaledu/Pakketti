@@ -43,7 +43,7 @@ module.exports = (req, res, next) => {
 				where: {
 					id: String(decoded.userId)
 				},
-				attributes: ["id", "username", "email", "role", [Sequelize.fn("COUNT", Sequelize.col("profileImage")), "profileImage"], "lastLogin", "createdAt"]
+				attributes: ["id", "username", "email", "role", "profileImageMime", "lastLogin", "createdAt"]
 			});
 			
 			if (accountObj && accountObj.id) {

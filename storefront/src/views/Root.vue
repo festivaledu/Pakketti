@@ -33,8 +33,8 @@
 						<span v-if="!accountData">Sign in</span>
 						
 						<template slot="icon" v-if="accountData">
-							<MetroPersonPicture v-if="!accountData.profileImage" />
-							<MetroPersonPicture :profile-picture="`http://localhost:3000/media/avatar/${accountData.id}`" v-if="accountData.profileImage" />
+							<MetroPersonPicture v-if="!accountDataMime" />
+							<MetroPersonPicture :profile-picture="`http://localhost:3000/media/avatar/${accountData.id}`" v-if="accountData.profileImageMime" />
 						</template>
 						<span v-if="accountData">{{ accountData.username }}</span>
 					</MetroNavigationViewItem>
