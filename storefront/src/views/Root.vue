@@ -114,8 +114,8 @@
 <script>
 import { AccountAPI, AuthAPI } from '@/scripts/ApiUtil'
 
-import StartPage from'@/components/StartPage.vue'
-import PackagePage from'@/components/PackagePage.vue'
+import StartPage from'@/pages/StartPage.vue'
+import PackagePage from'@/pages/PackagePage.vue'
 import CryptoJS from "crypto-js"
 
 export default {

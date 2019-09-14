@@ -18,8 +18,8 @@
 				</template>
 			</MetroFlipView>
 			
-			<AppPresentation :app-data="mostDownloadedPackages" title="Most Downloaded" />
-			<AppPresentation :app-data="recentlyUpdatedPackages" title="Recently Updated" />
+			<AppPresentationCell :app-data="mostDownloadedPackages" title="Most Downloaded" />
+			<AppPresentationCell :app-data="recentlyUpdatedPackages" title="Recently Updated" />
 		</template>
 	</MetroPage>
 </template>
@@ -74,8 +74,8 @@
 <script>
 import { PackageAPI } from '@/scripts/ApiUtil'
 
-import AppPresentation from '@/components/AppPresentationComponent'
-import CurrentRating from '@/components/CurrentRatingComponent'
+import AppPresentationCell from '@/components/AppPresentationCell'
+import CurrentRating from '@/components/CurrentRating'
 
 var shuffle = function(a) {
 	for (var i = a.length - 1; i > 0; i--) {
@@ -91,7 +91,7 @@ var shuffle = function(a) {
 export default {
 	name: "StartPage",
 	components: {
-		AppPresentation,
+		AppPresentationCell,
 		CurrentRating
 	},
 	data() {

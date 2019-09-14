@@ -84,7 +84,7 @@
 </style>
 
 <script>
-import CurrentRating from '@/components/CurrentRatingComponent'
+import CurrentRating from '@/components/CurrentRating'
 
 export default {
 	name: "AppPresentation",

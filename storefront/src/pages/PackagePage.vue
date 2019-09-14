@@ -72,10 +72,10 @@
 						<MetroTextBlock text-style="sub-title">Available on</MetroTextBlock>
 						
 						<MetroStackPanel class="compatibility-container" orientation="horizontal" horizontal-alignment="left">
-							<DeviceCompatibility glyph="&#xE8EA;" label="Phone" v-if="packageData.deviceFamilies & 1" />
-							<DeviceCompatibility glyph="&#xE70A;" label="Tablet" v-if="packageData.deviceFamilies & 2" />
-							<DeviceCompatibility glyph="&#xE977;" label="Desktop" v-if="packageData.deviceFamilies & 4" />
-							<DeviceCompatibility glyph="&#xE7F4;" label="TV" v-if="packageData.deviceFamilies & 8" />
+							<DeviceCompatibilityItem glyph="&#xE8EA;" label="Phone" v-if="packageData.deviceFamilies & 1" />
+							<DeviceCompatibilityItem glyph="&#xE70A;" label="Tablet" v-if="packageData.deviceFamilies & 2" />
+							<DeviceCompatibilityItem glyph="&#xE977;" label="Desktop" v-if="packageData.deviceFamilies & 4" />
+							<DeviceCompatibilityItem glyph="&#xE7F4;" label="TV" v-if="packageData.deviceFamilies & 8" />
 						</MetroStackPanel>
 					</section>
 					
@@ -219,7 +219,11 @@
 				</MetroPivotItem>
 				
 				<MetroPivotItem header="Reviews">
-					<DetailedRating :rating-data="packageData.ratings" />
+					<MetroTextBlock v-if="!packageData.ratings || !packageData.ratings.length">No one's rated or reviewed this Package yet.</MetroTextBlock>
+					
+					<template v-if="packageData.ratings && packageData.ratings.length">
+						<DetailedRatingCell :rating-data="packageData.ratings" />
+					</template>
 				</MetroPivotItem>
 			</MetroPivot>
 		</template>
@@ -602,8 +606,18 @@
 	}
 	
 	.detailed-rating-container {
+		margin-bottom: 40px;
+		
 		.detailed-rating-wrapper {
 			margin-top: 64px;
+		}
+	}
+	
+	.review-container {
+		margin-top: 34px;
+		
+		.review-cell:not(:last-child) {
+			margin-bottom: 12px;
 		}
 	}
 }
@@ -612,18 +626,18 @@
 <script>
 import { PackageAPI } from '@/scripts/ApiUtil'
 
-import CurrentRating from '@/components/CurrentRatingComponent'
-import DetailedRating from '@/components/DetailedRatingComponent'
-import DeviceCompatibility from '@/components/DeviceCompatibilityComponent'
-import ExpandableText from '@/components/ExpandableTextComponent'
+import CurrentRating from '@/components/CurrentRating'
+import DetailedRatingCell from '@/components/DetailedRatingCell'
+import DeviceCompatibilityItem from '@/components/DeviceCompatibilityItem'
+import ExpandableText from '@/components/ExpandableText'
 
 export default {
 	name: "PackagePage",
 	components: {
 		CurrentRating,
-		DetailedRating,
-		DeviceCompatibility,
-		ExpandableText
+		DetailedRatingCell,
+		DeviceCompatibilityItem,
+		ExpandableText,
 	},
 	data() {
 		return {

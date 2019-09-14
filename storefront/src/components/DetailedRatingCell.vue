@@ -1,32 +1,28 @@
 <template>
 	<div class="detailed-rating-container">
-		<MetroTextBlock v-if="!ratingData || !ratingData.length">No one's rated or reviewed this Package yet.</MetroTextBlock>
-		
-		<template v-if="ratingData && ratingData.length">
-			<div class="detailed-rating-wrapper">
-				<div class="current-rating-container">
-					<p class="current-rating-count">{{ ratingValue.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits:1 }) }}</p>
-					<CurrentRating :rating-data="ratingData" />
-				</div>
-				
-				<div class="overall-rating-container" v-if="detailedRatingData">
-					<div class="overall-rating" v-for="(_, index) in Array(5)" :key="index">
-						<MetroStackPanel orientation="horizontal" vertical-alignment="center">
-							<MetroTextBlock>{{ 5 - index }}</MetroTextBlock>
-							<MetroFontIcon font-size="13px" glyph="&#xE735;" />
-						</MetroStackPanel>
-						
-						<div class="rating-value">
-							<div class="rating-value-fill" :style="{'width': `${(detailedRatingData.ratings[5 - index] / detailedRatingData.total) * 100}%`}" />
-						</div>
-						
-						<MetroTextBlock text-style="caption" text-alignment="right" class="rating-percentage">{{ Math.floor((detailedRatingData.ratings[5 - index] / detailedRatingData.total) * 100) }}%</MetroTextBlock>
-					</div>
-				</div>
+		<div class="detailed-rating-wrapper">
+			<div class="current-rating-container">
+				<p class="current-rating-count">{{ ratingValue.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits:1 }) }}</p>
+				<CurrentRating :rating-data="ratingData" />
 			</div>
 			
-			<MetroButton class="system-accent-color">Rate and review</MetroButton>
-		</template>
+			<div class="overall-rating-container" v-if="detailedRatingData">
+				<div class="overall-rating" v-for="(_, index) in Array(5)" :key="index">
+					<MetroStackPanel orientation="horizontal" vertical-alignment="center">
+						<MetroTextBlock>{{ 5 - index }}</MetroTextBlock>
+						<MetroFontIcon font-size="13px" glyph="&#xE735;" />
+					</MetroStackPanel>
+					
+					<div class="rating-value">
+						<div class="rating-value-fill" :style="{'width': `${(detailedRatingData.ratings[5 - index] / detailedRatingData.total) * 100}%`}" />
+					</div>
+					
+					<MetroTextBlock text-style="caption" text-alignment="right" class="rating-percentage">{{ Math.floor((detailedRatingData.ratings[5 - index] / detailedRatingData.total) * 100) }}%</MetroTextBlock>
+				</div>
+			</div>
+		</div>
+		
+		<MetroButton class="system-accent-color">Rate and review</MetroButton>
 	</div>
 </template>
 
@@ -35,8 +31,16 @@
 	.detailed-rating-wrapper {
 		display: flex;
 		
+		@media all and (max-width: 640px) {
+			flex-direction: column;
+		}
+		
 		.current-rating-container {
 			margin-right: 24px;
+			
+			@media all and (max-width: 640px) {
+				margin-bottom: 24px;
+			}
 			
 			p.current-rating-count {
 				margin-top: -24px; 
@@ -100,10 +104,10 @@
 </style>
 
 <script>
-import CurrentRating from '@/components/CurrentRatingComponent'
+import CurrentRating from '@/components/CurrentRating'
 
 export default {
-	name: "DetailedRating",
+	name: "DetailedRatingCell",
 	components: {
 		CurrentRating
 	},
