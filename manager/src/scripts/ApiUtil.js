@@ -78,13 +78,13 @@ export class AccountAPI {
 	}
 
 	static async getUser(parameters) {
-		const query = parseUrlFromObject(flattenObject({ user: parameters }));
+		const query = parseUrlFromObject(flattenObject(parameters));
 		
 		return await SocketService.get(`/account?${query}`);
 	}
 
 	static async deleteUser(parameters) {
-		const query = parseUrlFromObject(flattenObject({ user: parameters }));
+		const query = parseUrlFromObject(flattenObject(parameters));
 		
 		return await SocketService.delete(`/account?${query}`, {
 			headers: {
@@ -118,7 +118,7 @@ export class AuthAPI {
 
 export class DeviceAPI {
 	static async getDevices(parameters) {
-		const query = parseUrlFromObject(flattenObject({ device: parameters }));
+		const query = parseUrlFromObject(flattenObject(parameters));
 		
 		return await SocketService.get(`/devices?${query}`, {
 			headers: {
@@ -128,7 +128,7 @@ export class DeviceAPI {
 	}
 
 	static async updateDevice(parameters, data) {
-		const query = parseUrlFromObject(flattenObject({ device: parameters }));
+		const query = parseUrlFromObject(flattenObject(parameters));
 		
 		return await SocketService.put(`/devices?${query}`, data, {
 			headers: {
@@ -138,7 +138,7 @@ export class DeviceAPI {
 	}
 
 	static async deleteDevice(parameters) {
-		const query = parseUrlFromObject(flattenObject({ device: parameters }));
+		const query = parseUrlFromObject(flattenObject(parameters));
 		
 		return await SocketService.delete(`/devices?${query}`, {
 			headers: {
@@ -158,7 +158,7 @@ export class DeviceAPI {
 
 export class LogAPI {
 	static async getLogItems(parameters) {
-		const query = parseUrlFromObject(flattenObject({ logitem: parameters }));
+		const query = parseUrlFromObject(flattenObject(parameters));
 		
 		return await SocketService.get(`/log?${query}`, {
 			headers: {
@@ -168,7 +168,7 @@ export class LogAPI {
 	}
 
 	static async updateLogItem(parameters, data) {
-		const query = parseUrlFromObject(flattenObject({ logitem: parameters }));
+		const query = parseUrlFromObject(flattenObject(parameters));
 		
 		return await SocketService.put(`/log?${query}`, data, {
 			headers: {
@@ -178,7 +178,7 @@ export class LogAPI {
 	}
 
 	static async deleteLogItem(parameters) {
-		const query = parseUrlFromObject(flattenObject({ logitem: parameters }));
+		const query = parseUrlFromObject(flattenObject(parameters));
 		
 		return await SocketService.delete(`/log?${query}`, {
 			headers: {
