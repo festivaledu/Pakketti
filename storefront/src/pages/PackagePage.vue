@@ -223,6 +223,11 @@
 					
 					<template v-if="packageData.ratings && packageData.ratings.length">
 						<DetailedRatingCell :rating-data="packageData.ratings" />
+						
+						<MetroTextBlock text-style="sub-title">Showing {{ packageData.ratings.length }} reviews</MetroTextBlock>
+						<div class="review-container">
+							<RatingCell v-for="(reviewObj, index) in packageData.reviews" :review-data="reviewObj" :key="index" />
+						</div>
 					</template>
 				</MetroPivotItem>
 			</MetroPivot>
@@ -231,6 +236,13 @@
 </template>
 
 <style lang="less">
+body[data-theme="light"] {
+	--review-item-background: #FFFBFF;
+}
+body[data-theme="dark"] {
+	--review-item-background: #191C19;
+}
+
 .page[data-page-id="package"] {
 	.page-content {
 		padding-top: 0 !important;
@@ -630,6 +642,7 @@ import CurrentRating from '@/components/CurrentRating'
 import DetailedRatingCell from '@/components/DetailedRatingCell'
 import DeviceCompatibilityItem from '@/components/DeviceCompatibilityItem'
 import ExpandableText from '@/components/ExpandableText'
+import RatingCell from '@/components/RatingCell'
 
 export default {
 	name: "PackagePage",
@@ -638,6 +651,7 @@ export default {
 		DetailedRatingCell,
 		DeviceCompatibilityItem,
 		ExpandableText,
+		RatingCell
 	},
 	data() {
 		return {
