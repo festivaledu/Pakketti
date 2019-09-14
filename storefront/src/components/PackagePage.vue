@@ -6,11 +6,11 @@
 		
 		<template v-if="packageData">
 			<section class="package-header-section">
-			<div class="package-header">
-				<div class="hero-image-container" v-if="packageData.headerImageMime">
-					<div class="hero-image" :style="`background-image: url(http://localhost:3000/media/hero/${packageData.id})`" />
-				</div>
-				
+				<div class="package-header">
+					<div class="hero-image-container" v-if="packageData.headerImageMime">
+						<div class="hero-image" :style="`background-image: url(http://localhost:3000/media/hero/${packageData.id})`" />
+					</div>
+					
 					<div class="package-header-content">
 						<div class="icon-container">
 							<img :src="`http://localhost:3000/media/icon/${packageData.id}`" v-if="packageData.iconMime" />
@@ -38,12 +38,12 @@
 							<CurrentRating :rating-data="packageData.ratings" />
 							
 							<MetroStackPanel class="package-description-container" orientation="vertical" horizontal-alignment="left">
-							<MetroTextBlock style="margin-top: 6px">
-								<span v-html="packageData.detailedDescription.match(/.*?(?=\n|$)/g)[0]" />
-							</MetroTextBlock>
-							<MetroHyperlinkButton style="margin-top: 6px" @click="packageDescriptionMoreClicked" v-if="packageData.detailedDescription.match(/.*?(?=\n|$)/g).length > 2">
-								<MetroTextBlock text-style="base">More</MetroTextBlock>
-							</MetroHyperlinkButton>
+								<MetroTextBlock style="margin-top: 6px">
+									<span v-html="packageData.detailedDescription.match(/.*?(?=\n|$)/g)[0]" />
+								</MetroTextBlock>
+								<MetroHyperlinkButton style="margin-top: 6px" @click="packageDescriptionMoreClicked" v-if="packageData.detailedDescription.match(/.*?(?=\n|$)/g).length > 2">
+									<MetroTextBlock text-style="base">More</MetroTextBlock>
+								</MetroHyperlinkButton>
 							</MetroStackPanel>
 						</div>
 						
@@ -61,9 +61,9 @@
 							<MetroHyperlinkButton style="margin-top: 6px" @click="packageDescriptionMoreClicked" v-if="packageData.detailedDescription.match(/.*?(?=\n|$)/g).length > 2">
 								<MetroTextBlock text-style="base">More</MetroTextBlock>
 							</MetroHyperlinkButton>
-					</MetroStackPanel>
+						</MetroStackPanel>
+					</div>
 				</div>
-			</div>
 			</section>
 			
 			<MetroPivot>
@@ -161,7 +161,57 @@
 				</MetroPivotItem>
 				
 				<MetroPivotItem header="System Requirements">
-					<img src="https://media2.giphy.com/media/5wWf7GMbT1ZUGTDdTqM/200.gif?cid=790b761185b1721340b768c41bc77b639b9fadb8e47aa643&rid=200.gif" />
+					<div class="row">
+						<div class="col-12 col-lg-6">
+							<MetroTextBlock text-style="base">Minimum</MetroTextBlock>
+							<MetroTextBlock>Your device must meet all minimum requirements to use this product</MetroTextBlock>
+							
+							<table class="system-requirements">
+								<tr>
+									<td>OS</td>
+									<td>N/A</td>
+								</tr>
+								<tr>
+									<td>Platform</td>
+									<td>N/A</td>
+								</tr>
+								<tr>
+									<td>Architecture</td>
+									<td>N/A</td>
+								</tr>
+							</table>
+						</div>
+						
+						<div class="col-12 col-lg-6">
+							<template v-if="packageData.versions.length && Object.keys(packageData.versions[0].depends).length">
+								<MetroTextBlock text-style="base">Dependencies</MetroTextBlock>
+								<MetroTextBlock>These additional Packages are required for this Package to work correctly</MetroTextBlock>
+								
+								<table class="system-requirements">
+									<tr v-for="(key, index) in Object.keys(packageData.versions[0].depends)" :key="index">
+										<td>{{ key }}</td>
+										<td v-if="typeof packageData.versions[0].depends[key] === 'string'">{{ packageData.versions[0].depends[key] }}</td>
+									</tr>
+								</table>
+							</template>
+
+							<template v-if="packageData.versions.length && Object.keys(packageData.versions[0].conflicts).length">
+								<MetroTextBlock text-style="base">Conflicts</MetroTextBlock>
+								<MetroTextBlock>These Packages prevent this Package from working correctly</MetroTextBlock>
+								
+								<table class="system-requirements">
+									<tr>
+										<td>OS</td>
+										<td>N/A</td>
+									</tr>
+									<tr v-for="(key, index) in Object.keys(packageData.versions[0].conflicts)" :key="index">
+										<td>{{ key }}</td>
+										<td v-if="typeof packageData.versions[0].conflicts[key] === 'string'">{{ packageData.versions[0].conflicts[key] }}</td>
+									</tr>
+								</table>
+							</template>
+						</div>
+					</div>
 				</MetroPivotItem>
 				
 				<MetroPivotItem header="Version History">
@@ -169,7 +219,7 @@
 				</MetroPivotItem>
 				
 				<MetroPivotItem header="Reviews">
-					<img src="https://media2.giphy.com/media/5wWf7GMbT1ZUGTDdTqM/200.gif?cid=790b761185b1721340b768c41bc77b639b9fadb8e47aa643&rid=200.gif" />
+					<DetailedRating :rating-data="packageData.ratings" />
 				</MetroPivotItem>
 			</MetroPivot>
 		</template>
@@ -183,71 +233,71 @@
 	}
 	
 	.package-header-section {
-	.package-header {
-		position: relative;
-		
-		.hero-image-container {
+		.package-header {
+			position: relative;
+			
+			.hero-image-container {
 				margin: -40px -12px 0;
-			
-			@media all and (min-width: 641px) and (max-width: 1007px) {
-				margin: -48px -24px 0;
-			}
-			
-			@media all and (min-width: 1008px) {
-				margin: -48px -48px 0;
+				
+				@media all and (min-width: 641px) and (max-width: 1007px) {
+					margin: -48px -24px 0;
+				}
+				
+				@media all and (min-width: 1008px) {
+					margin: -48px -48px 0;
 					
 					& + .package-header-content {
 						margin-top: -160px;
 					}
-			}
-			
-			.hero-image {
-				background-size: cover;
-				background-position: center;
-				width: 100%;
-				max-width: 1920px;
-				margin: 0 auto;
+				}
 				
-				&:before {
-					content: '';
-					display: block;
+				.hero-image {
+					background-size: cover;
+					background-position: center;
+					width: 100%;
+					max-width: 1920px;
+					margin: 0 auto;
 					
-					@media all and (max-width: 640px) {
-						padding-top: 56.25%;
-					}
-					
-					@media all and (min-width: 641px) {
-						padding-top: 50%;
+					&:before {
+						content: '';
+						display: block;
+						
+						@media all and (max-width: 640px) {
+							padding-top: 56.25%;
+						}
+						
+						@media all and (min-width: 641px) {
+							padding-top: 50%;
+						}
 					}
 				}
 			}
-		}
-		
-			.package-header-content {
-			position: relative;
-				display: flex;
-			width: 100%;
-			max-width: 1600px;
-				margin: 40px auto 0;
-			padding: 24px;
-			background-color: var(--package-header-background);
-			box-shadow: 0 5px 17px 0px rgba(0,0,0,0.6);
-			border-radius: 2px;
 			
-			.icon-container {
+			.package-header-content {
+				position: relative;
+				display: flex;
+				width: 100%;
+				max-width: 1600px;
+				margin: 40px auto 0;
+				padding: 24px;
+				background-color: var(--package-header-background);
+				box-shadow: 0 5px 17px 0px rgba(0,0,0,0.6);
+				border-radius: 2px;
+				
+				.icon-container {
 					display: flex ;
 					justify-content: center ;
 					align-items: center;
-				width: 200px;
-				height: 200px;
-				background-color: var(--system-accent-color);
-				
-				img {
-					width: 100%;
-					height: 100%;
+					width: 200px;
+					height: 200px;
+					background-color: var(--system-accent-color);
+					
+					img {
+						width: 100%;
+						height: 100%;
+					}
 				}
-			}
-			
+				
 				.package-description-group {
 					flex: 1;
 					padding: 0 24px;
@@ -344,20 +394,20 @@
 						height: 150px;
 						margin: 0 auto -35px;
 						transform: translate3d(0, -50%, 0);
-			}
+					}
 					
 					.package-description-group {
 						padding: 0;
 						
 						.package-name {
 							font-size: 28px;
-		}
+						}
 						
 						.package-description-container {
 							display: none;
-	}
+						}
 					}
-	
+					
 					.button-container {
 						position: relative;
 						padding: 24px 0;
@@ -422,11 +472,11 @@
 					}
 					
 					.text-block {
-					font-size: 14px;
-					font-weight: 600;
+						font-size: 14px;
+						font-weight: 600;
+					}
 				}
 			}
-		}
 		}
 		
 		.pivot-item {
@@ -444,24 +494,24 @@
 				min-height: calc(~"100vh - (40px + 48px + 48px)");
 			}
 		}
-	
-	section {
-		& > .text-block.sub-title {
-			margin-bottom: 16px;
+		
+		section {
+			& > .text-block.sub-title {
+				margin-bottom: 16px;
 				font-weight: 600;
 			}
 			
 			&:not(:last-of-type) {
 				margin-bottom: 56px;
-		}
-		
+			}
+			
 			@media all and (max-width: 1007px) {
 				margin-top: 32px;
 				
-		&:not(:last-of-type) {
-			margin-bottom: 56px;
-		}
-	}
+				&:not(:last-of-type) {
+					margin-bottom: 56px;
+				}
+			}
 		}
 	}
 	
@@ -529,9 +579,31 @@
 		}
 	}
 	
-	.info-item {
-		& + .info-item {
-			margin-top: 48px;
+	table.system-requirements {
+		width: 100%;
+		border-spacing: 0;
+		border-top: 1px solid var(--base-medium-low);
+		margin-top: 12px;
+		margin-bottom: 48px;
+		
+		tr {
+			td {
+				border-bottom: 1px solid var(--base-low);
+				padding: 12px 0;
+			
+				&:nth-child(1) {
+					padding-right: 32px;
+				}
+				&:nth-child(2) {
+					width: 100%;
+				}
+			}
+		}
+	}
+	
+	.detailed-rating-container {
+		.detailed-rating-wrapper {
+			margin-top: 64px;
 		}
 	}
 }
@@ -541,6 +613,7 @@
 import { PackageAPI } from '@/scripts/ApiUtil'
 
 import CurrentRating from '@/components/CurrentRatingComponent'
+import DetailedRating from '@/components/DetailedRatingComponent'
 import DeviceCompatibility from '@/components/DeviceCompatibilityComponent'
 import ExpandableText from '@/components/ExpandableTextComponent'
 
@@ -548,6 +621,7 @@ export default {
 	name: "PackagePage",
 	components: {
 		CurrentRating,
+		DetailedRating,
 		DeviceCompatibility,
 		ExpandableText
 	},
@@ -608,6 +682,6 @@ export default {
 			if ((size /= 1024) < 1024) { return size.toFixed(0) + ' KB' }
 			if ((size /= 1024) < 1024) { return size.toFixed(2) + ' MB' }
 		}
-	}	
+	}
 }
 </script>
