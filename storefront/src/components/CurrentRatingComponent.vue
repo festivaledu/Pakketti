@@ -3,7 +3,7 @@
 		<div class="rating-stars">
 			<div class="rating-value" :style="{'width': `${ratingPercentage}%`}"></div>
 		</div>
-		<MetroTextBlock text-style="caption">{{ ratingValue | number }}</MetroTextBlock>
+		<MetroTextBlock text-style="caption">{{ ratingCount | number }}</MetroTextBlock>
 	</MetroStackPanel>
 </template>
 
@@ -17,20 +17,22 @@
 	margin: 6px 0;
 	
 	.rating-stars {
-		width: 54px;
-		height: 9px;
+		width: 76px;
+		height: 12px;
 		background-color: var(--base-low);
-		margin-right: 4px;
+		margin-right: 8px;
 		
-		.encoded-svg-mask("<svg width='54px' height='9px' viewBox='0 0 54 9' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><polygon id='Path' points='6.22265625 5.51074219 9 3.375 5.5546875 3.375 4.5 0 3.4453125 3.375 0 3.375 2.77734375 5.51074219 1.6875 9 4.5 6.83789062 7.3125 9' /><polygon id='Path' points='17.4726562 5.51074219 20.25 3.375 16.8046875 3.375 15.75 0 14.6953125 3.375 11.25 3.375 14.0273438 5.51074219 12.9375 9 15.75 6.83789062 18.5625 9' /><polygon id='Path' points='28.7226562 5.51074219 31.5 3.375 28.0546875 3.375 27 0 25.9453125 3.375 22.5 3.375 25.2773438 5.51074219 24.1875 9 27 6.83789062 29.8125 9' /><polygon id='Path' points='39.9726562 5.51074219 42.75 3.375 39.3046875 3.375 38.25 0 37.1953125 3.375 33.75 3.375 36.5273438 5.51074219 35.4375 9 38.25 6.83789062 41.0625 9' /><polygon id='Path' points='51.2226562 5.51074219 54 3.375 50.5546875 3.375 49.5 0 48.4453125 3.375 45 3.375 47.7773438 5.51074219 46.6875 9 49.5 6.83789062 52.3125 9' /></svg>");
+		.encoded-svg-mask("<svg width='76px' height='12px' viewBox='0 0 76 12' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'><path d='M8.296875,7.34765625 L12,4.5 L7.40625,4.5 L6,0 L4.59375,4.5 L0,4.5 L3.703125,7.34765625 L2.25,12 L6,9.1171875 L9.75,12 L8.296875,7.34765625 Z M24.296875,7.34765625 L28,4.5 L23.40625,4.5 L22,0 L20.59375,4.5 L16,4.5 L19.703125,7.34765625 L18.25,12 L22,9.1171875 L25.75,12 L24.296875,7.34765625 Z M40.296875,7.34765625 L44,4.5 L39.40625,4.5 L38,0 L36.59375,4.5 L32,4.5 L35.703125,7.34765625 L34.25,12 L38,9.1171875 L41.75,12 L40.296875,7.34765625 Z M56.296875,7.34765625 L60,4.5 L55.40625,4.5 L54,0 L52.59375,4.5 L48,4.5 L51.703125,7.34765625 L50.25,12 L54,9.1171875 L57.75,12 L56.296875,7.34765625 Z M72.296875,7.34765625 L76,4.5 L71.40625,4.5 L70,0 L68.59375,4.5 L64,4.5 L67.703125,7.34765625 L66.25,12 L70,9.1171875 L73.75,12 L72.296875,7.34765625 Z' /></svg>");
 		
 		.rating-value {
 			height: 100%;
 			background-color: var(--base-medium);
+			font-size: 15px;
 		}
 		
 		& + .text-block.caption {
 			color: var(--base-medium-low);
+			font-size: inherit;
 		}
 	}
 }
@@ -56,7 +58,7 @@ export default {
 	},
 	filters: {
 		number(value) {
-			return new Intl.NumberFormat("en-US").format(value)
+			return new Intl.NumberFormat().format(value)
 		}
 	}
 }

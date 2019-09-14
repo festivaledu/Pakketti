@@ -22,7 +22,7 @@
 
 <style lang="less">
 .text-block.expandable-text {
-	max-width: 50%;
+	max-width: 100%;
 	
 	&:not(.expanded) {
 		max-height: 285px;

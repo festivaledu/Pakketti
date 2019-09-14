@@ -12,15 +12,13 @@
 	display: inline-block;
 	height: 30px;
 	padding: 0 15px;
+	margin-right: 16px;
+	margin-bottom: 12px;
 	background-color: var(--list-low);
 	border-radius: 15px;
 	
 	.stack-panel {
 		height: 100%;
-	}
-	
-	& + .device-compat-badge {
-		margin-left: 16px;
 	}
 }
 </style>
