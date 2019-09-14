@@ -1,30 +1,33 @@
 <template>
 	<div class="review-cell">
-		<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="top" class="profile-container">
-			<MetroPersonPicture initials="BW" />
-			
-			<div class="profile-text-container">
-				<MetroTextBlock text-style="base">Bruce Wayne</MetroTextBlock>
-				<MetroTextBlock text-style="base">Device (Platform Version)</MetroTextBlock>
-			</div>
-		</MetroStackPanel>
-		
-		<div class="rating-cell-content">
-			<MetroStackPanel orientation="horizontal" vertical-orientation="center">
-				<div class="rating-stars">
-					<div class="rating-value" :style="{'width': `${(reviewData.rating.value / 5) * 100}%`}" />
+		<template v-if="profileData">
+			<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="top" class="profile-container">
+				<MetroPersonPicture :display-name="profileData.username" v-if="!profileData.profileImageMime" />
+				<MetroPersonPicture :profile-picture="`http://localhost:3000/media/avatar/${profileData.id}`" v-if="profileData.profileImageMime" />
+				
+				<div class="profile-text-container">
+					<MetroTextBlock text-style="base">{{ profileData.username }}</MetroTextBlock>
+					<MetroTextBlock text-style="base" v-if="reviewData.device">Device (Platform Version)</MetroTextBlock>
 				</div>
-				<MetroTextBlock>{{ reviewData.createdAt | date }}</MetroTextBlock>
 			</MetroStackPanel>
 			
-			<MetroTextBlock>
-				<span v-html="reviewData.messages[0].text" />
-			</MetroTextBlock>
-			
-			<MetroHyperlinkButton v-if="reviewData.messages.length > 1">
-				<MetroTextBlock text-style="base">Show {{ reviewData.messages.length }} messages</MetroTextBlock>
-			</MetroHyperlinkButton>
-		</div>
+			<div class="rating-cell-content">
+				<MetroStackPanel orientation="horizontal" vertical-orientation="center">
+					<div class="rating-stars">
+						<div class="rating-value" :style="{'width': `${(reviewData.rating.value / 5) * 100}%`}" />
+					</div>
+					<MetroTextBlock>{{ reviewData.createdAt | date }}</MetroTextBlock>
+				</MetroStackPanel>
+				
+				<MetroTextBlock>
+					<span v-html="reviewData.messages[0].text" />
+				</MetroTextBlock>
+				
+				<MetroHyperlinkButton v-if="reviewData.messages.length > 1">
+					<MetroTextBlock text-style="base">Show {{ reviewData.messages.length }} messages</MetroTextBlock>
+				</MetroHyperlinkButton>
+			</div>
+		</template>
 	</div>
 </template>
 
@@ -117,10 +120,28 @@
 </style>
 
 <script>
+import { AccountAPI } from '@/scripts/ApiUtil'
+
 export default {
 	name: "RatingCell",
 	props: {
-		reviewData: null
+		reviewData: null,
+	},
+	data() {
+		return {
+			profileData: null
+		}
+	},
+	async mounted() {
+		let _profileData = await AccountAPI.getUser({
+			"account.id": this.reviewData.accountId
+		});
+		
+		if (_profileData.error) {
+			console.error(_profileData.error);
+		} else {
+			this.profileData = _profileData;
+		}
 	},
 	filters: {
 		date(value) {
