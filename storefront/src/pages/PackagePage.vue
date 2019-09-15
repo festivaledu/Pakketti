@@ -146,7 +146,7 @@
 							<div class="col col-12 col-md-6 col-lg-3 info-column">
 								<div class="info-item">
 									<MetroTextBlock text-style="base">Report this Package</MetroTextBlock>
-									<MetroHyperlinkButton>
+									<MetroHyperlinkButton @click="reportPackageButtonClicked">
 										<MetroTextBlock text-style="base">Report this Package to Team FESTIVAL</MetroTextBlock>
 									</MetroHyperlinkButton>
 								</div>
@@ -691,7 +691,8 @@ body[data-theme="dark"] {
 </style>
 
 <script>
-import { PackageAPI } from '@/scripts/ApiUtil'
+import { PackageAPI, RequestAPI } from '@/scripts/ApiUtil'
+import { LogItemType } from '@/scripts/Enumerations'
 import Platforms from '../../../platforms.json'
 
 import CurrentRating from '@/components/CurrentRating'
@@ -751,7 +752,44 @@ export default {
 			}).show();
 		},
 		downloadButtonClicked() {},
-		reportPackageButtonClicked() {},
+		async reportPackageButtonClicked() {
+			if (!this.accountId) {
+				this.parent.login();
+			} else {
+				let reportDialog = new metroUI.ContentDialog({
+					title: `Report ${this.packageData.name}`,
+					content: (
+						<div style="min-width: 320px">
+							<MetroTextBox
+								header="Tell us what you would like to report about this package"
+								required={true}
+								textarea={true}
+								name="detailText"
+								style="margin-bottom: 8px"
+							/>
+						</div>
+					),
+					commands: [{ text: this.$t('app.ok'), primary: true }, { text: this.$t('app.cancel') }]
+				});
+				if (await reportDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
+					let requestData = await RequestAPI.createRequest({
+						type: LogItemType.USER_REPORT,
+						detailText: reportDialog.text["detailText"],
+						affectedPackageId: this.packageData.id
+					});
+					
+					if (requestData.error) {
+						console.error(error);
+					} else {
+						new metroUI.ContentDialog({
+							title: "Thank you for your report!",
+							content: "We have forwarded your request to our moderation staff and we'll handle your report soon.",
+							commands: [{ text: this.$t('app.ok'), primary: true }]
+						}).show()
+					}
+				}
+			}
+		},
 		async reviewButtonClicked() {
 			if (!this.accountId) {
 				this.parent.login();
