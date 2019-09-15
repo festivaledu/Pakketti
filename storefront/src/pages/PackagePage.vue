@@ -797,7 +797,7 @@ export default {
 				let reviewDialog = new metroUI.ContentDialog({
 					title: this.packageData.name,
 					content: (
-						<div>
+						<div style="min-width: 320px">
 							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">Rate this item</MetroTextBlock>
 							<MetroRatingControl name="value" />
 							
@@ -820,10 +820,19 @@ export default {
 					commands: [{ text: this.$t('app.ok'), primary: true }, { text: this.$t('app.cancel') }]
 				});
 				if (await reviewDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
-					console.log(reviewDialog.text);
-					await PackageAPI.createPackageReview({
+					let reviewData = await PackageAPI.createPackageReview({
 						"package.id": this.packageData.id
 					}, reviewDialog.text);
+					
+					if (reviewData.error) {
+						console.error(error);
+					} else {
+						new metroUI.ContentDialog({
+							title: "Thank you for your review!",
+							content: "Your review will be visible to everyone soon.",
+							commands: [{ text: this.$t('app.ok'), primary: true }]
+						}).show()
+					}
 				}
 			}
 		}
