@@ -81,7 +81,7 @@ class ContentDialog {
 				commandButton.innerText = command.text;
 				commandButton.className = command.primary ? "system-accent-color primary" : "";
 				commandButton.disabled = (command.primary && [
-					...content.querySelectorAll("input, select")
+					...content.querySelectorAll("input, textarea, select")
 				].some(input => input.minLength > 0 || input.required));
 				
 				commandButton.addEventListener("click", () => {
@@ -105,13 +105,13 @@ class ContentDialog {
 				commands.appendChild(commandButton);
 			});
 			
-			content.querySelectorAll("input, select").forEach(item => {
+			content.querySelectorAll("input, textarea, select").forEach(item => {
 				item.addEventListener("input", () => {
 					let primaryCommand = commands.querySelector(".primary");
 					
 					if (primaryCommand) {
 						primaryCommand.disabled = [
-							...content.querySelectorAll("input, select")
+							...content.querySelectorAll("input, textarea, select")
 						].some(input => {
 							return (input.value.length < input.minLength) || (input.required && !input.value.length)
 						});
@@ -169,8 +169,8 @@ class ContentDialog {
 		const dialog = this;
 		const output = {};
 		
-		if (dialog.container.querySelector("input, select")) {
-			dialog.container.querySelectorAll("input, select").forEach(input => {
+		if (dialog.container.querySelector("input, textarea, select")) {
+			dialog.container.querySelectorAll("input, textarea, select").forEach(input => {
 				if (input.name) output[input.name] = input.value;
 			});
 		}
