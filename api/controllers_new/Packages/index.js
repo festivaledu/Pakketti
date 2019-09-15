@@ -28,7 +28,7 @@ router.get("/", async (req, res) => {
 	const { Package } = req.models;
 
 	let packageList = await Package.findAll({
-		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name"]),
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
 			req.account && req.account.role >= UserRole.MODERATOR ? {} : {
 				[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
 						visible: true,
@@ -79,7 +79,7 @@ router.put("/", async (req, res) => {
 		}
 	});
 
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -159,7 +159,7 @@ router.delete("/", async (req, res) => {
 
 	const { Package, LogItem } = req.models;
 
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],

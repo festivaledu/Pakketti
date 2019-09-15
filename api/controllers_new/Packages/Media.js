@@ -14,7 +14,7 @@ const { UserRole, LogItemType, LogItemStatus } = require("../../helpers/Enumerat
  * Gets the icon file of a specified Package
  */
 router.get("/icon", async (req, res) => {
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -93,7 +93,7 @@ router.put("/icon", async (req, res) => {
 		}
 	});
 
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -180,7 +180,7 @@ router.delete("/icon", async (req, res) => {
 
 	const { Package, LogItem } = req.models;
 
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -240,7 +240,7 @@ router.delete("/icon", async (req, res) => {
  * Gets the hero image file of a specified Package
  */
 router.get("/hero", async (req, res) => {
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -319,7 +319,7 @@ router.put("/hero", async (req, res) => {
 		}
 	});
 
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -406,7 +406,7 @@ router.delete("/hero", async (req, res) => {
 
 	const { Package, LogItem } = req.models;
 
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],

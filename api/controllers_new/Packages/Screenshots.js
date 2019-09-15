@@ -20,7 +20,7 @@ let asyncForEach = async (array, callback) => {
  * Gets a list of Screenshot metadata objects associated to a specified Package
  */
 router.get("/screenshots", async (req, res) => {
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -87,7 +87,7 @@ router.post("/screenshots", async (req, res) => {
 		}
 	});
 	
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -182,7 +182,7 @@ router.post("/screenshots/files", async (req, res) => {
 		}
 	});
 	
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],

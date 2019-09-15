@@ -18,7 +18,7 @@ router.get("/reviews", async (req, res) => {
 	const { Package, PackageReview, PackageReviewMessage, PackageRating, Device } = req.models;
 	
 	let packageList = await Package.findAll({
-		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name"]),
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
 			req.account && req.account.role >= UserRole.MODERATOR ? {} : {
 				visible: true
 			}
@@ -90,7 +90,7 @@ router.post("/reviews/new", async (req, res) => {
 		}
 	});
 	
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -225,7 +225,7 @@ router.delete("/review", async (req, res) => {
 		}
 	});
 	
-	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -246,7 +246,7 @@ router.delete("/review", async (req, res) => {
 	const { Package, PackageReview, LogItem } = req.models;
 	
 	let packageObj = await Package.findOne({
-		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name"]),
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
 			req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
 				visible: true
 			}
@@ -327,7 +327,7 @@ router.post("/review/message", async (req, res) => {
 		}
 	});
 	
-	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -357,7 +357,7 @@ router.post("/review/message", async (req, res) => {
 	});
 	
 	let packageObj = await Package.findOne({
-		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name"]),
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
 			req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
 				visible: true
 			}
@@ -439,7 +439,7 @@ router.put("/review/message", async (req, res) => {
 		}
 	});
 	
-	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -483,7 +483,7 @@ router.put("/review/message", async (req, res) => {
 	});
 	
 	let packageObj = await Package.findOne({
-		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name"]),
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
 			req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
 				visible: true
 			}
@@ -570,7 +570,7 @@ router.delete("/review/message", async (req, res) => {
 		}
 	});
 	
-	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -614,7 +614,7 @@ router.delete("/review/message", async (req, res) => {
 	});
 	
 	let packageObj = await Package.findOne({
-		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name"]),
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
 			req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
 				visible: true
 			}

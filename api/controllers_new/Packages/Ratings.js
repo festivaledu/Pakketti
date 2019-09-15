@@ -51,7 +51,7 @@ const getRatings = (_ratings, rating) => {
  * Gets the Rating values of a specified Package
  */
 router.get("/ratings", async (req, res) => {
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -145,7 +145,7 @@ router.put("/rating", async (req, res) => {
 		}
 	});
 	
-	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],

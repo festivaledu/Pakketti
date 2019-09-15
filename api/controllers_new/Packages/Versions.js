@@ -18,7 +18,7 @@ const ArchiveParser = require("../../helpers/ArchiveParser");
  * Returns a list of Versions associated to a Package, or a specific Version using GET parameters
  */
 router.get("/versions", async (req, res) => {
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -70,7 +70,7 @@ router.get("/versions", async (req, res) => {
  * Retrieves the file of a Version associated to a Package, if existing
  */
 router.get("/versions/file", async (req, res) => {
-	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -193,7 +193,7 @@ router.post("/versions/new", async (req, res) => {
 		}
 	});
 
-	let query = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -321,7 +321,7 @@ router.put("/versions", async (req, res) => {
 		}
 	});
 	
-	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -440,7 +440,7 @@ router.put("/versions/file", async (req, res) => {
 		}
 	});
 	
-	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -590,7 +590,7 @@ router.delete("/versions", async (req, res) => {
 		}
 	});
 	
-	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name"]);
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
 	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
