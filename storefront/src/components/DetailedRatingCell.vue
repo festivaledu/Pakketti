@@ -21,8 +21,6 @@
 				</div>
 			</div>
 		</div>
-		
-		<MetroButton class="system-accent-color">Rate and review</MetroButton>
 	</div>
 </template>
 

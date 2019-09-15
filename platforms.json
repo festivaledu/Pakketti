@@ -1,0 +1,16 @@
+{
+	"platforms": {
+		"win": "Windows",
+		"darwin": "macOS",
+		"iphoneos": "iOS",
+		"debian": "Linux (Debian/Ubuntu)",
+		"universal": "Universal"
+	},
+	"architectures": {
+		"x86": "x86 32-bit",
+		"x86_64": "x86 64-bit",
+		"arm": "ARM",
+		"iphoneos-arm": "ARM",
+		"universal": "Universal"
+	}
+}

@@ -136,11 +136,6 @@
 								</div>
 								
 								<div class="info-item">
-									<MetroTextBlock text-style="base">Publisher Info</MetroTextBlock>
-									<MetroTextBlock>N/A</MetroTextBlock>
-								</div>
-								
-								<div class="info-item">
 									<MetroTextBlock text-style="base">Report an issue</MetroTextBlock>
 									<MetroHyperlinkButton>
 										<MetroTextBlock text-style="base">Report an issue with this Package</MetroTextBlock>
@@ -167,17 +162,17 @@
 							<MetroTextBlock>Your device must meet all minimum requirements to use this product</MetroTextBlock>
 							
 							<table class="system-requirements">
-								<tr>
+								<tr v-if="packageData.minOSVersion">
 									<td>OS</td>
-									<td>N/A</td>
+									<td>{{ Platforms.platforms[packageData.platform] }} {{ packageData.minOSVersion }}</td>
 								</tr>
 								<tr>
 									<td>Platform</td>
-									<td>N/A</td>
+									<td>{{ Platforms.platforms[packageData.platform] }}</td>
 								</tr>
 								<tr>
 									<td>Architecture</td>
-									<td>N/A</td>
+									<td>{{ Platforms.architectures[packageData.architecture] }}</td>
 								</tr>
 							</table>
 						</div>
@@ -191,6 +186,7 @@
 									<tr v-for="(key, index) in Object.keys(packageData.versions[0].depends)" :key="index">
 										<td>{{ key }}</td>
 										<td v-if="typeof packageData.versions[0].depends[key] === 'string'">{{ packageData.versions[0].depends[key] }}</td>
+										<td v-if="typeof packageData.versions[0].depends[key] !== 'string'">Yes</td>
 									</tr>
 								</table>
 							</template>
@@ -200,13 +196,14 @@
 								<MetroTextBlock>These Packages prevent this Package from working correctly</MetroTextBlock>
 								
 								<table class="system-requirements">
-									<tr>
-										<td>OS</td>
-										<td>N/A</td>
+									<tr v-if="packageData.maxOSVersion">
+										<td>Maximum OS</td>
+										<td>{{ Platforms.platforms[packageData.platform] }} {{ packageData.maxOSVersion }}</td>
 									</tr>
 									<tr v-for="(key, index) in Object.keys(packageData.versions[0].conflicts)" :key="index">
 										<td>{{ key }}</td>
 										<td v-if="typeof packageData.versions[0].conflicts[key] === 'string'">{{ packageData.versions[0].conflicts[key] }}</td>
+										<td v-if="typeof packageData.versions[0].conflicts[key] !== 'string'">Yes</td>
 									</tr>
 								</table>
 							</template>
@@ -230,10 +227,20 @@
 				</MetroPivotItem>
 				
 				<MetroPivotItem header="Reviews">
-					<MetroTextBlock v-if="!packageData.ratings || !packageData.ratings.length">No one's rated or reviewed this Package yet.</MetroTextBlock>
+					<template v-if="!packageData.ratings || !packageData.ratings.length">
+						<MetroTextBlock>No one's rated or reviewed this Package yet.</MetroTextBlock>
+						
+						<MetroButton class="system-accent-color" style="margin-bottom: 40px" @click="reviewButtonClicked" :disabled="accountId && accountId === packageData.accountId">Rate and review</MetroButton>
+					</template>
 					
 					<template v-if="packageData.ratings && packageData.ratings.length">
 						<DetailedRatingCell :rating-data="packageData.ratings" />
+						
+						<div style="margin-bottom: 24px">
+							<MetroButton class="system-accent-color" style="margin-bottom: 16px" @click="reviewButtonClicked" :disabled="accountId && (accountId === packageData.accountId || packageData.reviews.filter(_ => _.accountId === accountId).length >= 1)">Rate and review</MetroButton>
+							<MetroTextBlock v-if="accountId && accountId === packageData.accountId">You can't review this Package because you're the developer.</MetroTextBlock>
+							<MetroTextBlock v-if="accountId && packageData.reviews.filter(_ => _.accountId === accountId).length >= 1">You can't review this Package again.</MetroTextBlock>
+						</div>
 						
 						<MetroTextBlock text-style="sub-title">Showing {{ packageData.ratings.length }} reviews</MetroTextBlock>
 						<div class="review-container">
@@ -685,6 +692,7 @@ body[data-theme="dark"] {
 
 <script>
 import { PackageAPI } from '@/scripts/ApiUtil'
+import Platforms from '../../../platforms.json'
 
 import CurrentRating from '@/components/CurrentRating'
 import DetailedRatingCell from '@/components/DetailedRatingCell'
@@ -703,7 +711,8 @@ export default {
 	},
 	data() {
 		return {
-			packageData: null
+			packageData: null,
+			Platforms: Platforms
 		}
 	},
 	methods: {
@@ -740,6 +749,53 @@ export default {
 					primary: true
 				}]
 			}).show();
+		},
+		downloadButtonClicked() {},
+		reportPackageButtonClicked() {},
+		async reviewButtonClicked() {
+			if (!this.accountId) {
+				this.parent.login();
+			} else {
+				let reviewDialog = new metroUI.ContentDialog({
+					title: this.packageData.name,
+					content: (
+						<div>
+							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">Rate this item</MetroTextBlock>
+							<MetroRatingControl name="value" />
+							
+							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">Write a review</MetroTextBlock>
+							<MetroTextBox
+								header="Give it a headline"
+								required={true}
+								name="title"
+								style="margin-bottom: 8px"
+							/>
+							<MetroTextBox
+								header="Tell us what you like and don't like"
+								required={true}
+								textarea={true}
+								name="text"
+								style="margin-bottom: 8px"
+							/>
+						</div>
+					),
+					commands: [{ text: this.$t('app.ok'), primary: true }, { text: this.$t('app.cancel') }]
+				});
+				if (await reviewDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
+					console.log(reviewDialog.text);
+					await PackageAPI.createPackageReview({
+						"package.id": this.packageData.id
+					}, reviewDialog.text);
+				}
+			}
+		}
+	},
+	computed: {
+		accountId() {
+			return this.$store.state.accountId;
+		},
+		parent() {
+			return this.$parent.$parent.$parent.$parent;
 		}
 	},
 	filters: {
