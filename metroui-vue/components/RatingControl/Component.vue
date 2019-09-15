@@ -1,5 +1,6 @@
 <template>
 	<div class="rating-control" @mouseleave="setHoverValue(0)">
+		<input type="number" min="1" max="5" :name="name" :required="required" v-model="$data._value" readonly />
 		<MetroStackPanel orientation="horizontal" horizontal-alignment="left">
 			<div style="width: 22px; height: 22px;" v-for="(_, index) in Array(5)" :key="`bg_${index}`" @mouseenter="setHoverValue(index + 1)" @click="setValue(index + 1)">
 				<MetroSymbolIcon icon="favorite-star-fill" />
@@ -21,10 +22,12 @@
 export default {
 	name: "MetroRatingControl",
 	props: {
+		name: String,
 		value: {
 			type: Number,
 			default: -1
-		}
+		},
+		required: Boolean,
 	},
 	data() {
 		return {
