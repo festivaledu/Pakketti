@@ -64,7 +64,7 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		platform: {
 			type: DataTypes.STRING,
-			// allowNull: false
+			allowNull: false,
 			defaultValue: ""
 		},
 		
@@ -73,7 +73,7 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		architecture: {
 			type: DataTypes.STRING,
-			// allowNull: false
+			allowNull: false,
 			defaultValue: ""
 		},
 		
@@ -81,17 +81,14 @@ module.exports = (sequelize, DataTypes) => {
 		 * The minimum required operating system version
 		 */
 		minOSVersion: {
-			type: DataTypes.STRING,
-			// allowNull: false
-			defaultValue: ""
+			type: DataTypes.STRING
 		},
 		
 		/**
 		 * The maximum supported operating system version
 		 */
 		maxOSVersion: {
-			type: DataTypes.STRING,
-			defaultValue: ""
+			type: DataTypes.STRING
 		},
 		
 		/**
