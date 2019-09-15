@@ -33,7 +33,7 @@
 						<span v-if="!accountData">Sign in</span>
 						
 						<template slot="icon" v-if="accountData">
-							<MetroPersonPicture v-if="!accountDataMime" />
+							<MetroPersonPicture v-if="!accountData.profileImageMime" />
 							<MetroPersonPicture :profile-picture="`http://localhost:3000/media/avatar/${accountData.id}`" v-if="accountData.profileImageMime" />
 						</template>
 						<span v-if="accountData">{{ accountData.username }}</span>
@@ -220,7 +220,7 @@ export default {
 		},
 		async login() {
 			let loginDialog = new metroUI.ContentDialog({
-				title: this.$t('login.register_title'),
+				title: this.$t('login.login_title'),
 				content: (
 					<MetroStackPanel>
 						<MetroTextBox
