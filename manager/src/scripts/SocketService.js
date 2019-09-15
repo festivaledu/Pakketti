@@ -150,21 +150,39 @@ export const SocketService = new Vue({
 		post(path, data = {}, options = {}) {
 			return this.send(Object.assign(options, {
 				method: "POST",
-				path: path,
+				path: path.split("?")[0],
+				query: !path.split("?")[1] ? undefined : path.split("?")[1].split("&").reduce((obj, query, index) => {
+					var pair = query.split('=');
+					obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+					
+					return obj;
+				}, {}),
 				body: data
 			}));
 		},
 		put(path, data = {}, options = {}) {
 			return this.send(Object.assign(options, {
 				method: "PUT",
-				path: path,
+				path: path.split("?")[0],
+				query: !path.split("?")[1] ? undefined : path.split("?")[1].split("&").reduce((obj, query, index) => {
+					var pair = query.split('=');
+					obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+					
+					return obj;
+				}, {}),
 				body: data
 			}));
 		},
 		delete(path, options = {}) {
 			return this.send(Object.assign(options, {
 				method: "DELETE",
-				path: path,
+				path: path.split("?")[0],
+				query: !path.split("?")[1] ? undefined : path.split("?")[1].split("&").reduce((obj, query, index) => {
+					var pair = query.split('=');
+					obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+					
+					return obj;
+				}, {})
 			}));
 		}
 	}
