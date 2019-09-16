@@ -4,7 +4,7 @@ const NodeRenderer = class {
 	constructor(element) {
 		const NodeConstructor = Vue.extend({
 			props: ['node'],
-			render(h, context) {
+			render(h) {
 				return this.node ? this.node : ''
 			}
 		});

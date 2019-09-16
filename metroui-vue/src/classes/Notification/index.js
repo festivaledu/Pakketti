@@ -1,3 +1,35 @@
+import Vue from "vue";
+
+const NodeRenderer = class {
+	constructor(element) {
+		const NodeConstructor = Vue.extend({
+			props: ['node'],
+			render(h) {
+				return this.node ? this.node : ''
+			}
+		});
+
+		const nodeRenderer = new NodeConstructor({
+			propsData: {
+				node: element
+			}
+		});
+		nodeRenderer.$mount();
+
+		return nodeRenderer.$el;
+	}
+}
+
+var findInRow = (node) => {
+	var i = 0;
+	while (node.previousSibling) {
+		node = node.previousSibling;
+		if (node.nodeType === 1) { ++i; }
+	}
+
+	return i;
+};
+
 export default class {
 	constructor(params) {
 		const notification = this;
@@ -120,7 +152,7 @@ export default class {
 		if (params.buttons && params.buttons.length) {
 			notification.container.appendChild(buttons);
 
-			params.buttons.forEach((_button, index) => {
+			params.buttons.forEach(_button => {
 				let button = document.createElement("button");
 				button.innerText = _button.text;
 				button.className = _button.validate ? "validated" : "";
@@ -181,7 +213,7 @@ export default class {
 			notification.notificationCenter.removeChild(notification.wrapper);
 
 			setTimeout(() => {
-				notification.notificationCenter.querySelectorAll(".notification-wrapper").forEach((item, index) => {
+				notification.notificationCenter.querySelectorAll(".notification-wrapper").forEach(item => {
 					var notificationHeight = 0;
 
 					var node = item;
@@ -208,7 +240,7 @@ export default class {
 			notification.notificationCenter = document.querySelector(".notification-center")
 		}
 
-		notification.notificationCenter.querySelectorAll(".notification-wrapper").forEach((item, index) => {
+		notification.notificationCenter.querySelectorAll(".notification-wrapper").forEach(item => {
 			var notificationHeight = 0;
 
 			var node = item;
@@ -242,7 +274,7 @@ export default class {
 
 		notification.show();
 
-		notification._promise = new Promise((resolve, reject) => {
+		notification._promise = new Promise((resolve) => {
 			notification._promiseResolve = resolve;
 		});
 

@@ -1,25 +1,3 @@
-import Vue from "vue";
-
-const NodeRenderer = class {
-	constructor(element) {
-		const NodeConstructor = Vue.extend({
-			props: ['node'],
-			render(h, context) {
-				return this.node ? this.node : ''
-			}
-		});
-
-		const nodeRenderer = new NodeConstructor({
-			propsData: {
-				node: element
-			}
-		});
-		nodeRenderer.$mount();
-
-		return nodeRenderer.$el;
-	}
-}
-
 HTMLElement.prototype.parentNodeOfClass = function(className) {
 	var node = this.parentNode;
 	while (node) {

@@ -4,7 +4,7 @@ const NodeRenderer = class {
 	constructor(element) {
 		const NodeConstructor = Vue.extend({
 			props: ['node'],
-			render(h, context) {
+			render(h) {
 				return this.node ? this.node : ''
 			}
 		});
@@ -144,7 +144,7 @@ class ContentDialog {
 
 		dialog.show();
 
-		let promise = new Promise((resolve, reject) => {
+		let promise = new Promise((resolve) => {
 			dialog._promiseResolve = resolve;
 		});
 		return promise;
