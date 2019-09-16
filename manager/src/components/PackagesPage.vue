@@ -2,7 +2,7 @@
 	<MetroPage page-id="packages" @navigatedTo.native="onNavigatedTo" @navigatedBackTo.native="onNavigatedBackTo">
 		<template slot="bottom-app-bar">
 			<MetroCommandBar>
-				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click="navigate('package-editor')" />
+				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click="navigate('package-creator')" />
 			</MetroCommandBar>
 		</template>
 		
@@ -29,7 +29,7 @@
 								<MetroTextBlock text-style="caption">{{ packageObj.identifier }}</MetroTextBlock>
 							</div>
 							<div class="td cell">
-								<MetroTextBlock>{{ packageObj.latestVersion.version }}</MetroTextBlock>
+								<MetroTextBlock>{{ packageObj.versions && packageObj.versions.length ? packageObj.versions[0].version : "– –" }}</MetroTextBlock>
 							</div>
 							<div class="td cell">
 								<MetroTextBlock>{{ packageObj.downloadCount | number }}</MetroTextBlock>
@@ -118,7 +118,9 @@ export default {
 			this.$parent.setHeader(this.$t('root.item_packages'));
 			
 			if (this.isDeveloper || this.isModerator || this.isAdministrator) {
-				this.packageData = await PackageAPI.getPackages();
+				this.packageData = await PackageAPI.getPackages({
+					include: "versions"
+				});
 			}
 		},
 		onNavigatedBackTo() {

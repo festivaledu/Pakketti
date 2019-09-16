@@ -117,6 +117,8 @@ router.put("/", async (req, res) => {
 		"architecture",
 		"minOSVersion",
 		"maxOSVersion",
+		"section",
+		"deviceFamilies",
 		"visible",
 		"issueURL"
 	])).then(packageObj => {

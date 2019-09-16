@@ -47,6 +47,16 @@
 			}
 		}
 	}
+	
+	&[disabled] {
+		pointer-events: none;
+		
+		.combo-box-content {
+			background-color: var(--base-low);
+			box-shadow: none;
+			color: var(--chrome-disabled-low);
+		}
+	}
 }
 		
 .combo-box-popup {

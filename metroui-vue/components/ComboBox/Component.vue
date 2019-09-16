@@ -57,11 +57,21 @@ export default {
 		}
 	},
 	mounted() {
-		this.$nextTick(function () {
+		this.$nextTick(function () {			
 			Object.assign(this.$refs["popup"].style, {
 				minWidth: `${this.$refs["content"].clientWidth}px`
 			});
 		});
+	},
+	updated() {
+		this.$nextTick(function () {
+			this.$data._value = this.value;
+			if (this.itemsSource instanceof Array) {
+				this.selectedIndex = this.itemsSource.indexOf(this.value);
+			} else {
+				this.selectedIndex = Object.keys(this.itemsSource).indexOf(this.value);
+			}
+		})
 	},
 	methods: {
 		_openDropDown(event) {
@@ -94,7 +104,7 @@ export default {
 				event.preventDefault();
 				event.stopPropagation();
 
-				this._closeDropDown();
+				this._closeDropDown(event);
 			}
 		},
 		_closeDropDown(event, item) {

@@ -132,7 +132,7 @@ module.exports = (sequelize, DataTypes) => {
 			// 0: Submission incomplete
 			// 1: Submission complete
 			type: DataTypes.INTEGER,
-			defaultValue: 1
+			defaultValue: 0
 		},
 		
 		/**

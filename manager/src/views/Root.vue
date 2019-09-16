@@ -59,6 +59,7 @@
 				<PackagesPage />
 				<ReviewThreadsPage />
 				
+				<PackageCreatorPage />
 				<PackageEditorPage />
 			</MetroNavigationView>
 		</MetroPage>
@@ -119,6 +120,7 @@ import DashboardPage from "@/components/DashboardPage"
 import PackagesPage from "@/components/PackagesPage"
 import ReviewThreadsPage from "@/components/ReviewThreadsPage"
 
+import PackageCreatorPage from "@/components/PackageCreatorPage"
 import PackageEditorPage from "@/components/PackageEditorPage"
 
 export default {
@@ -127,6 +129,7 @@ export default {
 		DashboardPage,
 		PackagesPage,
 		ReviewThreadsPage,
+		PackageCreatorPage,
 		PackageEditorPage
 	},
 	mounted() {

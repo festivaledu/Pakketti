@@ -23,10 +23,11 @@
 								:maxlength="50"
 								v-model="packageData.name"
 								@input="$v.packageData.name.$touch()"
+								:disabled="!isOwnedPackage"
 							/>
 							<div class="row mt-2">
 								<div class="col-6">
-									<MetroHyperlinkButton v-if="!isWorking.packageName" :disabled="!packageData.name.length || !$v.packageData.name.$dirty" @click="checkNameAvailability">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
+									<MetroHyperlinkButton v-if="!isWorking.packageName" :disabled="!packageData.name.length || !$v.packageData.name.$dirty || !isOwnedPackage" @click="checkNameAvailability">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
 									<MetroProgressRing v-if="isWorking.packageName" :active="true" />
 								</div>
 								<div class="col-6">
@@ -40,13 +41,13 @@
 							<MetroTextBox
 								:placeholder-text="$t('package_editor.info.bundle_identifier_placeholder')"
 								:maxlength="50"
-								:disabled="existingPackage"
+								:disabled="existingPackage || !isOwnedPackage"
 								v-model="packageData.identifier"
 								@input="$v.packageData.identifier.$touch()"
 							/>
 							<div class="row mt-2">
 								<div class="col-6">
-									<MetroHyperlinkButton :disabled="!packageData.identifier.length || existingPackage">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
+									<MetroHyperlinkButton :disabled="!packageData.identifier.length || existingPackage || !isOwnedPackage">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
 								</div>
 								<div class="col-6">
 									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.identifier.length }} / 50</MetroTextBlock>
@@ -62,6 +63,7 @@
 								v-model="packageData.shortDescription"
 								@input="$v.packageData.shortDescription.$touch()"
 								style="height: 158px"
+								:disabled="!isOwnedPackage"
 							/>
 							<div class="row mt-2">
 								<div class="col-12">
@@ -75,6 +77,8 @@
 							<VueEditor
 								:editorToolbar="editorToolbar"
 								v-model="packageData.detailedDescription"
+								:disabled="!isOwnedPackage"
+								@input="$v.packageData.detailedDescription.$touch()"
 							/>
 							<div class="row mt-2">
 								<div class="col-12">
@@ -87,10 +91,30 @@
 					<div class="col-12 col-md-6">
 						<div class="mb-4">
 							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.device_families_title') }}</MetroTextBlock>
-							<MetroCheckbox :content="$t('package_editor.info.device_family.phone')" />
-							<MetroCheckbox :content="$t('package_editor.info.device_family.tablet')" />
-							<MetroCheckbox :content="$t('package_editor.info.device_family.desktop')" />
-							<MetroCheckbox :content="$t('package_editor.info.device_family.tv')" />
+							<MetroCheckbox
+								:content="$t('package_editor.info.device_family.phone')"
+								@input="deviceFamilyCheckboxChecked(1)"
+								:value="Boolean(packageData.deviceFamilies & 1)"
+								:disabled="!isOwnedPackage"
+							/>
+							<MetroCheckbox
+								:content="$t('package_editor.info.device_family.tablet')"
+								@input="deviceFamilyCheckboxChecked(2)"
+								:value="Boolean(packageData.deviceFamilies & 2)"
+								:disabled="!isOwnedPackage"
+							/>
+							<MetroCheckbox
+								:content="$t('package_editor.info.device_family.desktop')"
+								@input="deviceFamilyCheckboxChecked(4)"
+								:value="Boolean(packageData.deviceFamilies & 4)"
+								:disabled="!isOwnedPackage"
+							/>
+							<MetroCheckbox
+								:content="$t('package_editor.info.device_family.tv')"
+								@input="deviceFamilyCheckboxChecked(8)"
+								:value="Boolean(packageData.deviceFamilies & 8)"
+								:disabled="!isOwnedPackage"
+							/>
 						</div>
 						
 						<div class="mb-4">
@@ -98,17 +122,29 @@
 							<MetroTextBlock>{{ $t('package_editor.info.platform_description') }}</MetroTextBlock>
 							<MetroComboBox
 								:placeholder-text="$t('package_editor.info.platform_placeholder')"
-								:items-source="{'win': 'Windows', 'darwin': 'macOS', 'iphoneos': 'iOS', 'debian': 'Linux (Debian/Ubuntu)', 'universal': 'Universal'}"
+								:items-source="{
+									'win': $t('package_editor.info.platform.win'),
+									'darwin': $t('package_editor.info.platform.darwin'),
+									'iphoneos': $t('package_editor.info.platform.iphoneos'),
+									'debian': $t('package_editor.info.platform.debian'),
+									'universal': $t('package_editor.info.platform.universal')
+								}"
 								v-model="packageData.platform"
 								@input="$v.packageData.platform.$touch()"
+								:disabled="!isOwnedPackage"
 								style="margin-top: 8px"
 							/>
 							
 							<MetroTextBlock style="margin-top: 8px">{{ $t('package_editor.info.architecture_description') }}</MetroTextBlock>
 							<MetroComboBox
 								:placeholder-text="$t('package_editor.info.architecture_placeholder')"
-								:items-source="{'x86': 'x86 32-bit', 'x86_64': 'x86 64-bit', [packageData.platform === 'iphoneos' ? 'iphoneos-arm' : 'arm']: 'ARM', 'universal': 'Universal'}"
-								:disabled="!packageData.platform"
+								:items-source="{
+									'x86': $t('package_editor.info.architecture.x86'),
+									'x86_64': $t('package_editor.info.architecture.x86_64'),
+									[packageData.platform === 'iphoneos' ? 'iphoneos-arm' : 'arm']: $t('package_editor.info.architecture.arm'),
+									'universal': $t('package_editor.info.architecture.universal')
+								}"
+								:disabled="!packageData.platform || !isOwnedPackage"
 								v-model="packageData.architecture"
 								@input="$v.packageData.architecture.$touch()"
 								style="margin-top: 8px"
@@ -118,35 +154,37 @@
 						<div class="mb-4">
 							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.system_requirements_title') }}</MetroTextBlock>
 							<MetroTextBox
-							:header="$t('package_editor.info.system_requirements_min_os')"
+								:header="$t('package_editor.info.system_requirements_min_os')"
 								:placeholder-text="$t('package_editor.info.system_requirements_min_os')"
+								:disabled="!isOwnedPackage"
 								v-model="packageData.minOSVersion"
-								@input="$v.packageData.minOSVersion.$touch()"
+								@input="$v.packageData.$touch()"
 							/>
 							<MetroTextBox
 								:header="$t('package_editor.info.system_requirements_max_os')"
 								:placeholder-text="$t('package_editor.info.system_requirements_max_os')"
+								:disabled="!isOwnedPackage"
 								v-model="packageData.maxOSVersion"
-								@input="$v.packageData.maxOSVersion.$touch()"
+								@input="$v.packageData.$touch()"
 								style="margin-top: 8px"
 							/>
 						</div>
 						
-						<div class="mb-4" v-if="packageData.status == 1">
+						<div class="mb-4" v-if="packageData.status == 0">
 							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.publishing_title') }}</MetroTextBlock>
 							<MetroRadioButton
 								group-name="package-visibility"
 								:name="true"
 								:content="$t('package_editor.info.publishing_now')"
 								v-model="packageData.visible"
-								@input="$v.packageData.visible.$touch()"
+								@input="$v.packageData.$touch()"
 							/>
 							<MetroRadioButton
 								group-name="package-visibility"
 								:name="false"
 								:content="$t('package_editor.info.publishing_later')"
 								v-model="packageData.visible"
-								@input="$v.packageData.visible.$touch()"
+								@input="$v.packageData.$touch()"
 							/>
 						</div>
 					</div>
@@ -481,7 +519,10 @@ export default {
 				// bugsReportURL: null,
 				minOSVersion: null,
 				maxOSVersion: null,
+				section: null,
+				deviceFamilies: 0,
 				visible: true,
+				issueURL: null
 			},
 			existingPackage: false,
 			isWorking: {
@@ -500,15 +541,18 @@ export default {
 			detailedDescription: { required },
 			platform: { required },
 			architecture: { required },
-			minOSVersion: { required }
+			// section: { required },
+			deviceFamilies: { required },
 		}
 	},
 	mounted() {
-		this._packageData = this.packageData;
+		// this._packageData = {...this.packageData};
 	},
 	methods: {
 		onPageShow(event) {
 			this.$parent.setHeader("");
+			
+			this.$v.packageData.$reset();
 
 			if (event.detail.packageData) {
 				this.packageData = event.detail.packageData;
@@ -521,8 +565,8 @@ export default {
 		async checkNameAvailability() {
 			this.isWorking.packageName = true;
 			
-			let packageList = await PackageAPI.getPackage({
-				name: this.packageData.name
+			let packageList = await PackageAPI.getPackages({
+				"package.name": this.packageData.name
 			});
 			this.isWorking.packageName = false;
 			
@@ -540,14 +584,38 @@ export default {
 				}).show();
 			}
 		},
+		deviceFamilyCheckboxChecked(type) {
+			this.packageData.deviceFamilies ^= type;
+			this.$v.packageData.$touch();
+		},
 		async savePackage() {
 			this.isWorking.savePackage = true;
 			
-			let result = await PackageAPI.updatePackage(this.packageData.identifier, this.packageData);
-			console.log(result);
+			let result = await PackageAPI.updatePackage({
+				"package.id": this.packageData.id
+			}, Object.assign(this.packageData, {
+				status: 1
+			}));
+		
+			if (result.error) {
+				console.error(result.error);
+			} else {
+				this.packageData = result;
+			}
+			
+			this.isWorking.savePackage = false;
+			this.$v.packageData.$reset();
 		},
 		decodeText(text) {
 			return HtmlEntities.decode(text.replace(/<[^>]*>/g, ''));
+		}
+	},
+	computed: {
+		accountId() {
+			return this.$store.state.accountId;
+		},
+		isOwnedPackage() {
+			return this.packageData.accountId == this.accountId;
 		}
 	}
 }

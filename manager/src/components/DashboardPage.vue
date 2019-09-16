@@ -55,7 +55,7 @@
 									<MetroTextBlock text-style="caption">{{ packageObj.identifier }}</MetroTextBlock>
 								</div>
 								<div class="td cell">
-									<MetroTextBlock>{{ packageObj.latestVersion.version }}</MetroTextBlock>
+									<MetroTextBlock>{{ packageObj.versions && packageObj.versions.length ? packageObj.versions[0].version : "– –" }}</MetroTextBlock>
 								</div>
 								<div class="td cell">
 									<MetroTextBlock>{{ packageObj.downloadCount | number }}</MetroTextBlock>
@@ -265,14 +265,16 @@ export default {
 			this.$parent.setHeader(this.$t('root.item_dashboard'));
 			
 			// if (this.isDeveloper) {
-				this.packageData = await PackageAPI.getPackages();
+				this.packageData = await PackageAPI.getPackages({
+					include: "versions,reviews"
+				});
 			// }
 			
 			if (this.isModerator || this.isAdministrator) {
 				this.statisticsData = await StatisticAPI.getMonth();
 			}
 			
-			this.reviewData = await PackageAPI.getReviews()
+			this.reviewData = await PackageAPI.getReviews();
 			this.deviceData = await DeviceAPI.getDevices();
 		},
 		onNavigatedBackTo() {

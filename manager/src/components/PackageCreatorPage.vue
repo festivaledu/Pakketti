@@ -85,8 +85,8 @@ export default {
 		async checkNameAvailability() {
 			this.isWorking.packageName = true;
 			
-			let packageList = await PackageAPI.getPackage({
-				name: this.packageData.name
+			let packageList = await PackageAPI.getPackages({
+				"package.name": this.packageData.name
 			});
 			this.isWorking.packageName = false;
 			
@@ -107,8 +107,8 @@ export default {
 		async checkIdentifierAvailability() {
 			this.isWorking.packageIdentifier = true;
 			
-			let packageList = await PackageAPI.getPackage({
-				identifier: this.packageData.identifier
+			let packageList = await PackageAPI.getPackages({
+				"package.identifier": this.packageData.identifier
 			});
 			this.isWorking.packageIdentifier = false;
 			

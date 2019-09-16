@@ -5,5 +5,8 @@ module.exports = {
 				javascriptEnabled: true
 			}
 		}
+	},
+	configureWebpack: (config) => {
+		config.devtool = "source-map"
 	}
 }
