@@ -189,6 +189,15 @@ export default {
 			this.accountData = await AccountAPI.getMe();
 		}
 		
+		this.$refs["navigation-view"].old_navigate = this.$refs["navigation-view"].navigate;
+		this.$refs["navigation-view"].navigate = (pageId, data = {}) => {
+			this.$refs["navigation-view"].old_navigate(pageId, data);
+			
+			let history = (JSON.parse(localStorage.getItem("history")) || []);
+			if ((history.length && history.lastObject().pageId !== pageId) || !history.length) history.push({ fullPath: this.$route.fullPath, pageId: pageId });
+			localStorage.setItem("history", JSON.stringify(history));
+		}
+		
 		this.$refs["navigation-view"].old_goBack = this.$refs["navigation-view"].goBack;
 		this.$refs["navigation-view"].goBack = () => {
 			window.history.back();
@@ -294,7 +303,7 @@ export default {
 		},
 		
 		_matchRoute(route, direction) {
-			this.$refs["navigation-view"].history = JSON.parse(sessionStorage.getItem("navigationViewHistory")) || [];
+			this.$refs["navigation-view"].history = (JSON.parse(localStorage.getItem("history")) || []).map(_ => _.pageId);
 			
 			switch (direction) {
 				case 0:
@@ -322,25 +331,34 @@ export default {
 					
 					break;
 				case -1:
+					let history = (JSON.parse(localStorage.getItem("history")) || []);
+					if (history.length) history.pop();
+					localStorage.setItem("history", JSON.stringify(history));
+					
 					this.$refs["navigation-view"].old_goBack();
 					break;
 				default: break;
 			}
-			
-			sessionStorage.setItem("navigationViewHistory", JSON.stringify(this.$refs["navigation-view"].history));
 		}
 	},
 	watch: {
 		$route(to, from) {
-			const lastPosition = Number(sessionStorage.getItem("lastPosition"));
-			let position = history.state;
+			let history = JSON.parse(localStorage.getItem("history")) || [];
+			let direction = 0;
 			
-			if (!position) position = { key: 0 };
-			
-			sessionStorage.setItem("lastPosition", String(position.key));
-			const direction = Math.sign(position.key - lastPosition);
-			
-			// console.log(`route watchdog, change direction: ${direction}`)
+			if (history.length) {
+				const lastPosition = Number(localStorage.getItem("lastPosition"));
+				let position = window.history.state;
+
+				if (position) {
+					localStorage.setItem("lastPosition", String(position.key));
+					direction = Math.sign(position.key - lastPosition);
+				}
+			} else {
+				localStorage.setItem("lastPosition", String(0));
+				direction = 0;
+			}
+
 			this._matchRoute(to, direction);
 		}
 	}
