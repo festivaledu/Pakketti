@@ -59,7 +59,7 @@
 								<span v-html="packageData.detailedDescription.match(/.*?(?=\n|$)/g)[0]" />
 							</MetroTextBlock>
 							<MetroHyperlinkButton style="margin-top: 6px" @click="packageDescriptionMoreClicked" v-if="packageData.detailedDescription.match(/.*?(?=\n|$)/g).length > 2">
-								<MetroTextBlock text-style="base">More</MetroTextBlock>
+								<MetroTextBlock text-style="base">{{ $t('package.more_button') }}</MetroTextBlock>
 							</MetroHyperlinkButton>
 						</MetroStackPanel>
 					</div>
@@ -211,7 +211,7 @@
 					</div>
 				</MetroPivotItem>
 				
-				<MetroPivotItem :header="$t('package.pivot_titles.version_history')" v-if="packageData.versions.length">
+				<MetroPivotItem :header="$t('package.pivot_titles.version_history')" :disabled="packageData.versions.length <= 1">
 					<div class="version-history-container">
 						<div class="version-history-item" v-for="(versionObj, index) in packageData.versions" :key="index">
 							<MetroStackPanel orientation="horizontal" vertical-orientation="center">
@@ -230,7 +230,7 @@
 					<template v-if="!packageData.ratings || !packageData.ratings.length">
 						<MetroTextBlock>{{ $t('package.reviews.no_reviews') }}</MetroTextBlock>
 						
-						<MetroButton class="system-accent-color" style="margin-bottom: 40px" @click="reviewButtonClicked" :disabled="accountId && accountId === packageData.accountId">{{ $t('package.reviews.rate_and_review') }}</MetroButton>
+						<MetroButton class="system-accent-color" style="margin: 16px 0 40px" @click="reviewButtonClicked" :disabled="accountId && accountId === packageData.accountId">{{ $t('package.reviews.rate_and_review') }}</MetroButton>
 					</template>
 					
 					<template v-if="packageData.ratings && packageData.ratings.length">
@@ -252,11 +252,11 @@
 		</template>
 		
 		<template v-if="packageData && !Object.keys(packageData).length">
-			<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" style="height: calc(100vh - 40px)">
-				<MetroTextBlock text-style="title" style="font-size: 34px; font-weight: 500">
+			<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" style="height: calc(100vh - 64px)">
+				<MetroTextBlock text-style="title" text-alignment="center" style="font-size: 34px; font-weight: 500">
 					{{ $t('app.generic_error_title') }}
 				</MetroTextBlock>
-				<MetroTextBlock text-style="sub-title">
+				<MetroTextBlock text-style="sub-title" text-alignment="center">
 					{{ $t('app.generic_error_message') }}
 				</MetroTextBlock>
 			</MetroStackPanel>
@@ -282,10 +282,22 @@ body[data-theme="dark"] {
 			position: relative;
 			
 			.hero-image-container {
-				margin: -40px -12px 0;
+				@media all and (max-width: 640px) {
+					margin: -40px -12px 0;
+					
+					& + .package-header-content .icon-container {
+						margin-bottom: -20px;
+						transform: translate3d(0, -50%, 0);
+					}
+				}
 				
 				@media all and (min-width: 641px) and (max-width: 1007px) {
 					margin: -48px -24px 0;
+					
+					& + .package-header-content .icon-container {
+						margin-bottom: -35px;
+						transform: translate3d(0, -50%, 0);
+					}
 				}
 				
 				@media all and (min-width: 1008px) {
@@ -380,8 +392,7 @@ body[data-theme="dark"] {
 					.icon-container {
 						width: 120px;
 						height: 120px;
-						margin: 0 auto -20px;
-						transform: translate3d(0, -50%, 0);
+						margin: 0 auto 24px;
 					}
 					
 					.package-description-group {
@@ -437,8 +448,7 @@ body[data-theme="dark"] {
 					.icon-container {
 						width: 150px;
 						height: 150px;
-						margin: 0 auto -35px;
-						transform: translate3d(0, -50%, 0);
+						margin: 0 auto 24px;
 					}
 					
 					.package-description-group {

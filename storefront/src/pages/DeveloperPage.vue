@@ -1,5 +1,5 @@
 <template>
-	<MetroPage page-id="developer" @navigatedTo.native="onNavigatedTo">
+	<MetroPage page-id="developer" @navigatedTo.native="onNavigatedTo" @navigatedBackTo.native="onNavigatedTo">
 		<template v-if="!developerData">
 			<MetroProgressRing :active="true" style="position: absolute; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: 80px; height: 80px" />
 		</template>
@@ -41,6 +41,10 @@
 .page[data-page-id="developer"] {
 	.lockup-collection-view {
 		margin-top: 24px;
+		
+		.lockup-collection-cell {
+			margin-bottom: 12px;
+		}
 	}
 }
 </style>
@@ -62,12 +66,12 @@ export default {
 	}),
 	methods: {
 		async onNavigatedTo(event) {
-			this.usernameFilter = event.detail.username;
+			this.usernameFilter = this.$route.path.split("/")[2];
 			this.developerData = null;
 			this.packageData = null;
 			
 			let _developerData = await AccountAPI.getUser({
-				"account.username": event.detail.username
+				"account.username": this.$route.path.split("/")[2]
 			});
 			
 			if (!Object.keys(_developerData).length || _developerData.error) {

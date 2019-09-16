@@ -101,7 +101,7 @@ export default {
 	},
 	async mounted() {
 		this.packageData = await PackageAPI.getPackages({
-			include: "ratings"
+			include: "ratings,versions"
 		});
 	},
 	methods: {
@@ -120,7 +120,7 @@ export default {
 		},
 		recentlyUpdatedPackages() {
 			let _packageData = [...this.packageData];
-			return _packageData.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).splice(0, 12);
+			return _packageData.sort((a, b) => new Date(b.versions.length ? b.versions[0].createdAt : b.updatedAt).getTime() - new Date(a.versions.length ? a.versions[0].createdAt : a.updatedAt).getTime()).splice(0, 12);
 		}
 	}
 }
