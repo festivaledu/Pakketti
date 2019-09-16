@@ -45,6 +45,7 @@
 							<div class="th column-header-item">{{ $t('packages.version') }}</div>
 							<div class="th column-header-item">{{ $t('packages.downloads') }}</div>
 							<div class="th column-header-item">{{ $t('packages.visible') }}</div>
+							<div class="th column-header-item">Status</div>
 							<div class="th column-header-item">{{ $t('packages.updated') }}</div>
 							<div class="th column-header-item align-right">{{ $t('packages.actions') }}</div>
 						</div>
@@ -66,6 +67,9 @@
 										:onContent="$t('packages.visible_yes')"
 										:readonly="true"
 									/>
+								</div>
+								<div class="td cell">
+									<MetroTextBlock>{{ packageObj.status }}</MetroTextBlock>
 								</div>
 								<div class="td cell">
 									<MetroTextBlock>{{ packageObj.updatedAt | date }}</MetroTextBlock>
@@ -245,10 +249,10 @@
 import { PackageAPI, StatisticAPI, DeviceAPI } from "@/scripts/ApiUtil"
 import { UserRole } from "@/scripts/Enumerations"
 
-import Statcard from "@/components/StatcardComponent"
+import Statcard from "@/components/Statcard"
 
 export default {
-	name: "DashboardPage",
+	name: "Dashboard",
 	components: {
 		Statcard
 	},

@@ -116,12 +116,11 @@
 
 
 <script>
-import DashboardPage from "@/components/DashboardPage"
-import PackagesPage from "@/components/PackagesPage"
-import ReviewThreadsPage from "@/components/ReviewThreadsPage"
-
-import PackageCreatorPage from "@/components/PackageCreatorPage"
-import PackageEditorPage from "@/components/PackageEditorPage"
+import DashboardPage from "@/pages/Dashboard"
+import PackagesPage from "@/pages/PackagesList"
+import ReviewThreadsPage from "@/pages/ReviewThreads"
+import PackageCreatorPage from "@/pages/PackageCreator"
+import PackageEditorPage from "@/pages/PackageEditor"
 
 export default {
 	name: "root",

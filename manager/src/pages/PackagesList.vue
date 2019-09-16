@@ -109,7 +109,7 @@ import { PackageAPI } from "@/scripts/ApiUtil"
 import { UserRole } from "@/scripts/Enumerations"
 
 export default {
-	name: "PackagesPage",
+	name: "Packages",
 	data: () => ({
 		packageData: null
 	}),

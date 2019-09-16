@@ -191,10 +191,14 @@
 				</div>
 			</MetroPivotItem>
 			<MetroPivotItem :header="$t('package_editor.pivot_headers.media')">
+				<MetroTextBlock text-style="sub-title">App Icon</MetroTextBlock>
 				<div class="grid-view">
-					<div class="grid-view-item add-button">
-						<div class="grid-view-item-content" />
-					</div>
+					<MediaSelector v-model="packageData.iconMime" />
+				</div>
+				
+				<MetroTextBlock text-style="sub-title">Header Image</MetroTextBlock>
+				<div class="grid-view">
+					<MediaSelector v-model="packageData.packageHeaderMime" />
 				</div>
 			</MetroPivotItem>
 			<MetroPivotItem :header="$t('package_editor.pivot_headers.versions')">
@@ -450,50 +454,25 @@
 					margin-right: 0;
 				}
 			}
-			
-			&::before {
-				content: '';
-				display: block;
-				padding-top: 100%;
-			}
-			
-			&.add-button {
-				.grid-view-item-content {
-					position: absolute;
-					top: 0;
-					left: 0;
-					width: 100%;
-					height: 100%;
-					pointer-events: none;
-					padding: 0;
-					
-					&:after {
-						content: "\E710";
-						font-family: "Segoe MDL2 Assets";
-						font-size: 48px;
-						position: absolute;
-						top: 50%;
-						left: 50%;
-						transform: translate3d(-50%, -50%, 0);
-					}
-				}
-			}
 		}		
 	}
 }
 </style>
 
 <script>
-import { VueEditor } from "vue2-editor"
 import HtmlEntities from "he"
 import { required } from 'vuelidate/lib/validators'
 
 import { PackageAPI } from "@/scripts/ApiUtil"
 
+import { VueEditor } from "vue2-editor"
+import MediaSelector from "@/components/MediaSelector"
+
 export default {
 	name: "PackageEditor",
 	components: {
-		VueEditor
+		VueEditor,
+		MediaSelector
 	},
 	data() {
 		return {
@@ -551,8 +530,6 @@ export default {
 	methods: {
 		onPageShow(event) {
 			this.$parent.setHeader("");
-			
-			this.$v.packageData.$reset();
 
 			if (event.detail.packageData) {
 				this.packageData = event.detail.packageData;
@@ -561,6 +538,8 @@ export default {
 				this.packageData = this._packageData;
 				this.existingPackage = false;
 			}
+			
+			this.$v.packageData.$reset();
 		},
 		async checkNameAvailability() {
 			this.isWorking.packageName = true;

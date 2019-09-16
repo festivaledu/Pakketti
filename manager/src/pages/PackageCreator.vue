@@ -60,7 +60,7 @@
 import { PackageAPI } from "@/scripts/ApiUtil"
 
 export default {
-	name: "PackageCreatorPage",
+	name: "PackageCreator",
 	data() {
 		return {
 			packageData: {

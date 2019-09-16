@@ -79,13 +79,12 @@
 </style>
 
 <script>
-import { PackageAPI } from "@/scripts/ApiUtil";
-import { AccountAPI } from "@/scripts/ApiUtil";
+import { PackageAPI, AccountAPI } from "@/scripts/ApiUtil";
 
-import MetroListView from '@/components/ListViewComponent'
+import MetroListView from '@/components/ListView'
 
 export default {
-	name: "ReviewThreadsPage",
+	name: "ReviewThreads",
 	components: {
 		MetroListView
 	},
