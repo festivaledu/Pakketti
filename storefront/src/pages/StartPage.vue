@@ -18,8 +18,8 @@
 				</template>
 			</MetroFlipView>
 			
-			<AppPresentationCell :app-data="mostDownloadedPackages" title="Most Downloaded" />
-			<AppPresentationCell :app-data="recentlyUpdatedPackages" title="Recently Updated" />
+			<AppPresentationCell :app-data="mostDownloadedPackages" :title="$t('start.most_downloaded_title')" />
+			<AppPresentationCell :app-data="recentlyUpdatedPackages" :title="$t('start.recently_updated_title')" />
 		</template>
 	</MetroPage>
 </template>

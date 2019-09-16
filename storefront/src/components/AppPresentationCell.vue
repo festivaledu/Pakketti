@@ -3,7 +3,7 @@
 		<MetroStackPanel style="margin-top: 40px; margin-bottom: 16px">
 			<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="center">
 				<MetroTextBlock text-style="sub-title">{{ title }}</MetroTextBlock>
-				<MetroHyperlinkButton style="margin-left: 12px">See All: {{ appData.length >= 100 ? "99+" : appData.length }}</MetroHyperlinkButton>
+				<MetroHyperlinkButton style="margin-left: 12px">{{ $t('start.see_all') }}: {{ appData.length >= 100 ? "99+" : appData.length }}</MetroHyperlinkButton>
 			</MetroStackPanel>
 		</MetroStackPanel>
 		
@@ -23,14 +23,14 @@
 						<CurrentRating :rating-data="packageObj.ratings" />
 					</div>
 					
-					<MetroTextBlock text-style="caption">{{ packageObj.price ? null : "Free" }}</MetroTextBlock>
+					<MetroTextBlock text-style="caption">{{ packageObj.price ? null : $t('package.price_free') }}</MetroTextBlock>
 				</MetroStackPanel>
 			</router-link>
 			
 			<div class="lockup-collection-cell" v-if="appData.length > 12">
 				<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" style="height: 100%">
 					<MetroFontIcon font-size="12px" glyph="&#xE0E3;" style="margin-bottom: 20px" />
-					<MetroTextBlock text-style="base" style="margin-bottom: -39px">See all: {{ appData.length >= 100 ? "99+" : appData.length }}</MetroTextBlock>
+					<MetroTextBlock text-style="base" style="margin-bottom: -39px">{{ $t('start.see_all') }}: {{ appData.length >= 100 ? "99+" : appData.length }}</MetroTextBlock>
 				</MetroStackPanel>
 			</div>
 		</MetroStackPanel>
@@ -39,7 +39,7 @@
 
 <style lang="less">
 .lockup-collection-cell {
-	display: flex;
+	display: inline-block;
 	flex-direction: column;
 	width: 162px;
 	height: 272px;

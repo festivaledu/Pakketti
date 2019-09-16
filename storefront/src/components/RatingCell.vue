@@ -24,7 +24,7 @@
 				</MetroTextBlock>
 				
 				<MetroHyperlinkButton v-if="reviewData.messages.length > 1">
-					<MetroTextBlock text-style="base">Show {{ reviewData.messages.length }} messages</MetroTextBlock>
+					<MetroTextBlock text-style="base">{{ $t('package.reviews.show_messages', { messageCount: reviewData.messages.length }) }}</MetroTextBlock>
 				</MetroHyperlinkButton>
 			</div>
 		</template>

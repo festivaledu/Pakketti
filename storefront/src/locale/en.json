@@ -1,1 +1,132 @@
-{}
+{
+	"app": {
+		"name": "Team FESTIVAL",
+		"ok": "Ok",
+		"cancel": "Cancel",
+		"close": "Close",
+		"connection_interrupted_title": "Connection interrupted",
+		"connection_interrupted_message": "The WebSocket connection has been interrupted. Click here to reconnect.",
+		"connection_failure_title": "Connection failed",
+		"connection_failure_message": "The WebSocket connection could not be established. Click here to try again.",
+		"generic_error_title": "Try that again",
+		"generic_error_message": "Page could not be loaded. Please try again later."
+	},
+	"login": {
+		"login_title": "@:(app.name) – Login",
+		"login_username": "Username or E-Mail Address",
+		"login_username_placeholder": "John Appleseed",
+		"login_password": "Password",
+		"login_password_required": "Required",
+		"login_button": "Sign In",
+		"login_register": "No Account?",
+		"login_error_title": "There was an error signing you in",
+		"login_error_message": "The server responded with the following message:",
+		
+		"register_title": "Register with @:(app.name)",
+		"register_username": "Username",
+		"register_username_placeholder": "John Appleseed",
+		"register_email": "E-Mail Address",
+		"register_email_placeholder": "j.appleseed@festival.ml",
+		"register_password": "Password (8 characters minimum)",
+		"register_password_confirm": "Confirm Password",
+		"register_password_required": "Required",
+		"register_password_match_title": "There was an error creating your Account",
+		"register_password_match_message": "The passwords you've entered do not match.",
+		"register_success_title": "Registration successful",
+		"register_success_message": "<p>Your account has been successfully created.<br>Thank you for registering with @:(app.name)!<p>"
+	},
+	"root": {
+		"header": {
+			"start": "Start",
+			"apps": "Apps",
+			"tweaks": "Tweaks"
+		},
+		"dashboard_title": "Dashboard",
+		"search_placeholder": "Search",
+		"button_sign_in": "Sign in",
+		"button_register": "Register",
+		"button_sign_out": "Sign out"
+	},
+	"start": {
+		"most_downloaded_title": "Most Downloaded",
+		"recently_updated_title": "Recently Updated",
+		"see_all": "See all"
+	},
+	"package": {
+		"more_button": "More",
+		"price_free": "Free",
+		"download_button": "Download",
+		"pivot_titles": {
+			"overview": "Overview",
+			"system_requirements": "System Requirements",
+			"version_history": "Version History",
+			"reviews": "Reviews"
+		},
+		"available_on": {
+			"title": "Available on",
+			"phone": "Phone",
+			"tablet": "Tablet",
+			"desktop": "Desktop",
+			"tv": "TV"
+		},
+		"description_title": "Description",
+		"description_show_more": "Show more",
+		"description_show_less": "Show less",
+		"screenshots_title": "Screenshots",
+		"whats_new_title": "Whats new in this version",
+		"additional_info": {
+			"title": "Additional information",
+			"published_by": "Published by",
+			"release_date": "Release date",
+			"approximate_size": "Approximate size",
+			"category": "Category",
+			"report_issue_title": "Report an issue",
+			"report_issue_link": "Report an issue with this package",
+			"report_package_title": "Report this Package",
+			"report_package_link": "Report this Package to @:(app.name)"
+		},
+		"system_requirements": {
+			"minimum_title": "Minimum",
+			"minimum_description": "Your device must meet all minimum requirements to use this product",
+			"os": "OS",
+			"os_or_higher": "or higher",
+			"platform": "Platform",
+			"architecture": "Architecture",
+			"dependencies_title": "Dependencies",
+			"dependencies_description": "These additional Packages are required for this Package to work correctly",
+			"dependencies_required": "Yes",
+			"conflicts_title": "Conflicts",
+			"conflicts_description": "These Packages prevent this Package from working correctly",
+			"conflicts_max_os": "Maximum OS"
+		},
+		"version_history": {
+			"version": "Version"
+		},
+		"reviews": {
+			"no_reviews": "No one's rated or reviewed this Package yet.",
+			"rate_and_review": "Rate and review",
+			"review_prohibited_developer": "You can't review this Package because you're the developer.",
+			"review_prohibited_again": "You can't review this Package again because you've already reviewed it.",
+			"showing_reviews": "Showing %{reviewCount} reviews",
+			"show_messages": "Show %{messageCount} messages"
+		},
+		"report_compose": {
+			"title": "Review %{packageName}",
+			"message": "Tell us what you would like to report about this package",
+			"success_title": "Thank you for your report!",
+			"success_message": "We have forwarded your request to our moderation staff and we'll handle your report soon."
+		},
+		"review_compose": {
+			"rate": "Rate this item",
+			"write_a_review": "Write a review",
+			"headline_title": "Give it a headline",
+			"body_title": "Tell us what you like and don't like",
+			"success_title": "Thank you for your review!",
+			"success_message": "Your review will be visible to everyone soon."
+		}
+	},
+	"developer": {
+		"published_by": "Published by \"%{username}\"",
+		"no_results": "No results found for this filtering"
+	}
+}

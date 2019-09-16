@@ -1,1 +1,133 @@
-{}
+{
+	"app": {
+		"name": "Team FESTIVAL",
+		"ok": "Ok",
+		"cancel": "Abbrechen",
+		"close": "Schließen",
+		"connection_interrupted_title": "Verbindung unterbrochen",
+		"connection_interrupted_message": "Die WebSocket-Verbindung wurde unterbrochen. Klicke hier, um dich erneut zu verbinden.",
+		"connection_failure_title": "Verbindung fehlgeschlagen",
+		"connection_failure_message": "Die WebSocket-Verbindung konnte nicht hergestellt werden. Klicke hier, um es erneut zu versuchen.",
+		"generic_error_title": "Versuche es noch einmal.",
+		"generic_error_message": "Die Seite konnte nicht geladen werden. Versuche es später noch einmal."
+	},
+	"login": {
+		"login_title": "@:(app.name) – Anmelden",
+		"login_username": "Benutzername oder E-Mail-Adresse",
+		"login_username_placeholder": "Max Mustermann",
+		"login_password": "Passwort",
+		"login_password_required": "Erforderlich",
+		"login_button": "Anmelden",
+		"login_register": "Noch kein Account?",
+		"login_error_title": "Es gab ein Problem beim Anmelden",
+		"login_error_message": "Der Server lieferte folgende Fehlermeldung:",
+		
+		"register_title": "Für @:(app.name) registrieren",
+		"register_username": "Benutzername",
+		"register_username_placeholder": "Max Mustermann",
+		"register_email": "E-Mail-Adresse",
+		"register_email_placeholder": "m.mustermann@festival.ml",
+		"register_password": "Passwort (min. 8 Zeichen)",
+		"register_password_confirm": "Passwort bestätigen",
+		"register_password_required": "Erforderlich",
+		"register_password_match_title": "Es gab ein Problem beim Erstellen deines Accounts",
+		"register_password_match_message": "Die eingegebenen Passwörter stimmen nicht überein.",
+		"register_success_title": "Registrierung erfolgreich",
+		"register_success_message": "<p>Dein Account wurde erfolgreich erstellt.<br>Danke, dass du dich für @:(app.name) angemeldet hast!<p>"
+	},
+	"root": {
+		"header": {
+			"start": "Start",
+			"apps": "Apps",
+			"tweaks": "Erweiterungen"
+		},
+		"dashboard_title": "Dashboard",
+		"search_placeholder": "Suchen",
+		"button_sign_in": "Anmelden",
+		"button_register": "Registrieren",
+		"button_sign_out": "Abmelden"
+	},
+	"start": {
+		"most_downloaded_title": "Am meisten heruntergeladen",
+		"recently_updated_title": "Zuletzt aktualisiert",
+		"see_all": "Alle anzeigen"
+	},
+	"package": {
+		"more_button": "Mehr",
+		"price_free": "Kostenlos",
+		"download_button": "Herunterladen",
+		"pivot_titles": {
+			"overview": "Übersicht",
+			"system_requirements": "Systemanforderungen",
+			"version_history": "Versionsverlauf",
+			"reviews": "Bewertungen"
+		},
+		"available_on": {
+			"title": "Verfügbar auf",
+			"phone": "Smartphone",
+			"tablet": "Tablet",
+			"desktop": "Desktop",
+			"tv": "Fernseher"
+		},
+		"description_title": "Beschreibung",
+		"description_show_more": "Mehr anzeigen",
+		"description_show_less": "Weniger anzeigen",
+		"screenshots_title": "Screenshots",
+		"whats_new_title": "Neuigkeiten in dieser Version",
+		"additional_info": {
+			"title": "Zusätzliche Informationen",
+			"published_by": "Veröffentlicht von",
+			"release_date": "Veröffentlichungsdatum",
+			"approximate_size": "Ungefähre Große",
+			"category": "Kategorie",
+			"report_issue_title": "Ein Problem melden",
+			"report_issue_link": "Melde ein Problem mit diesem Paket",
+			"report_package_title": "Dieses Paket melden",
+			"report_package_link": "Dieses Paket an @:(app.name) melden"
+		},
+		
+		"system_requirements": {
+			"minimum_title": "Minimum",
+			"minimum_description": "Dein Gerät muss alle Mindesanforderungen erfüllen, um dieses Paket nutzen zu können",
+			"os": "Betriebssystem",
+			"os_or_higher": "oder höher",
+			"platform": "Plattform",
+			"architecture": "Architektur",
+			"dependencies_title": "Abhängigkeiten",
+			"dependencies_description": "Diese zusätzlichen Pakete werden benötigt, damit dieses Paket einwandfrei funktioniert",
+			"dependencies_required": "Ja",
+			"conflicts_title": "Konflikte",
+			"conflicts_description": "Diese Pakete verhindern eine korrekte Funktion dieses Pakets",
+			"conflicts_max_os": "Maximales Betriebssystem"
+		},
+		"version_history": {
+			"version": "Version"
+		},
+		"reviews": {
+			"no_reviews": "Dieses Paket wurde bis jetzt noch nicht bewertet.",
+			"rate_and_review": "Bewerten und Rezension schreiben",
+			"review_prohibited_developer": "Du kannst für dieses Paket keine Bewertung oder Rezension abgeben, weil du der Entwickler bist.",
+			"review_prohibited_again": "Du kannst für dieses Paket keine Bewertung oder Rezension abgeben, weil du es bereits bewertet hast.",
+			"showing_reviews": "%{reviewCount} Rezensionen werden angezeigt",
+			"show_messages": "%{messageCount} Nachrichten anzeigen"
+		},
+		"report_compose": {
+			"title": "%{packageName} melden",
+			"message": "Erzähl uns, warum du dieses Paket melden möchtest",
+			"success_title": "Danke für deine Meldung!",
+			"success_message": "Wir haben deine Anfrage an unser Moderations-Team weitergeleitet und werden uns so schnell wie möglich darum kümmern."
+		},
+		"review_compose": {
+			"rate": "Diesen Artikel bewerten",
+			"write_a_review": "Bewertung schreiben",
+			"headline_title": "Titel für deine Bewertung",
+			"body_title": "Teil uns mit, was dir gefällt und was nicht",
+			"success_title": "Danke für deine Rezension!",
+			"success_message": "Deine Bewertung wird bald für alle sichtbar sein."
+		}
+	},
+	"developer": {
+		"published_by": "Veröffentlicht von „%{username}“",
+		"no_results": "Keine Ergebnisse für diese Filterung gefunden"
+	}
+}

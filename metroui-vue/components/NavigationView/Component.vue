@@ -159,7 +159,7 @@ export default {
 			if (this.currentPage === pageId) return;
 			if (!this.pages[pageId]) return;
 			
-			this.history.push(pageId);
+			if (this.history.lastObject() !== pageId) this.history.push(pageId);
 			
 			if (this.menuItems[pageId]) {
 				if (this.menuItems[this.currentPage]) this.menuItems[this.currentPage].classList.remove("selected");
@@ -203,7 +203,7 @@ export default {
 			let lastPage = this.history[this.history.length - 2];
 			this.history.pop();
 
-			if (!this.pages[lastPage]) return;
+			if (!this.pages[lastPage] || this.currentPage === lastPage) return;
 			
 			if (this.menuItems[lastPage]) {
 				if (this.menuItems[this.currentPage]) this.menuItems[this.currentPage].classList.remove("selected");

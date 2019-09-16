@@ -6,13 +6,13 @@
 		<MetroHyperlinkButton @click="toggle" v-if="expandable" style="text-decoration: none; margin-top: 8px">
 			<template v-if="!expanded">
 				<MetroTextBlock text-style="base">
-					<span>Show More</span>
+					<span>{{ $t('package.description_show_more') }}</span>
 					<span style="display: inline-block; font-family: 'Segoe MDL2 Assets'; font-size: 12px; line-height: 19px; padding-left: 8px">&#xE70D;</span>
 				</MetroTextBlock>
 			</template>
 			<template v-if="expanded">
 				<MetroTextBlock text-style="base">
-					<span>Show Less</span>
+					<span>{{ $t('package.description_show_less') }}</span>
 					<span style="display: inline-block; font-family: 'Segoe MDL2 Assets'; font-size: 12px; line-height: 19px; padding-left: 8px">&#xE70E;</span>
 				</MetroTextBlock>
 			</template>

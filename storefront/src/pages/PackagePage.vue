@@ -1,10 +1,10 @@
 <template>
-	<MetroPage page-id="package" @navigatedTo.native="onNavigatedTo" ref="page">
+	<MetroPage page-id="package" @navigatedTo.native="onNavigatedTo" @navigatedBackTo.native="onNavigatedTo" ref="page">
 		<template v-if="!packageData">
 			<MetroProgressRing :active="true" style="position: absolute; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: 80px; height: 80px" />
 		</template>
 		
-		<template v-if="packageData">
+		<template v-if="packageData && developerData">
 			<section class="package-header-section">
 				<div class="package-header">
 					<div class="hero-image-container" v-if="packageData.headerImageMime">
@@ -24,15 +24,15 @@
 							<p class="package-name">{{ packageData.name }}</p>
 							
 							<MetroStackPanel class="package-link-container" orientation="horizontal" horizontal-alignment="left">
-								<MetroHyperlinkButton>
-									<MetroTextBlock text-style="base">Developer</MetroTextBlock>
-								</MetroHyperlinkButton>
+								<router-link :to="`/developer/${developerData.username}`" class="hyperlink-button">
+									<MetroTextBlock text-style="base">{{ developerData.username }}</MetroTextBlock>
+								</router-link>
 								
 								<MetroTextBlock text-style="base" style="padding: 0 8px;">&bull;</MetroTextBlock>
 								
-								<MetroHyperlinkButton>
+								<router-link :to="`/section/${packageData.section}`" class="hyperlink-button">
 									<MetroTextBlock text-style="base">{{ packageData.section }}</MetroTextBlock>
-								</MetroHyperlinkButton>
+								</router-link>
 							</MetroStackPanel>
 							
 							<CurrentRating :rating-data="packageData.ratings" />
@@ -42,15 +42,15 @@
 									<span v-html="packageData.detailedDescription.match(/.*?(?=\n|$)/g)[0]" />
 								</MetroTextBlock>
 								<MetroHyperlinkButton style="margin-top: 6px" @click="packageDescriptionMoreClicked" v-if="packageData.detailedDescription.match(/.*?(?=\n|$)/g).length > 2">
-									<MetroTextBlock text-style="base">More</MetroTextBlock>
+									<MetroTextBlock text-style="base">{{ $t('package.more_button') }}</MetroTextBlock>
 								</MetroHyperlinkButton>
 							</MetroStackPanel>
 						</div>
 						
 						<MetroStackPanel class="button-container">
-							<MetroTextBlock text-style="title">Free</MetroTextBlock>
+							<MetroTextBlock text-style="title">{{ $t('package.price_free') }}</MetroTextBlock>
 							<MetroButton class="system-accent-color">
-								<MetroTextBlock text-style="base" text-alignment="center">Download</MetroTextBlock>
+								<MetroTextBlock text-style="base" text-alignment="center">{{ $t('package.download_button') }}</MetroTextBlock>
 							</MetroButton>
 						</MetroStackPanel>
 						
@@ -67,27 +67,27 @@
 			</section>
 			
 			<MetroPivot>
-				<MetroPivotItem header="Overview">
+				<MetroPivotItem :header="$t('package.pivot_titles.overview')">
 					<section v-if="packageData.deviceFamilies">
-						<MetroTextBlock text-style="sub-title">Available on</MetroTextBlock>
+						<MetroTextBlock text-style="sub-title">{{ $t('package.available_on.title') }}</MetroTextBlock>
 						
 						<MetroStackPanel class="compatibility-container" orientation="horizontal" horizontal-alignment="left">
-							<DeviceCompatibilityItem glyph="&#xE8EA;" label="Phone" v-if="packageData.deviceFamilies & 1" />
-							<DeviceCompatibilityItem glyph="&#xE70A;" label="Tablet" v-if="packageData.deviceFamilies & 2" />
-							<DeviceCompatibilityItem glyph="&#xE977;" label="Desktop" v-if="packageData.deviceFamilies & 4" />
-							<DeviceCompatibilityItem glyph="&#xE7F4;" label="TV" v-if="packageData.deviceFamilies & 8" />
+							<DeviceCompatibilityItem glyph="&#xE8EA;" :label="$t('package.available_on.phone')" v-if="packageData.deviceFamilies & 1" />
+							<DeviceCompatibilityItem glyph="&#xE70A;" :label="$t('package.available_on.tablet')" v-if="packageData.deviceFamilies & 2" />
+							<DeviceCompatibilityItem glyph="&#xE977;" :label="$t('package.available_on.desktop')" v-if="packageData.deviceFamilies & 4" />
+							<DeviceCompatibilityItem glyph="&#xE7F4;" :label="$t('package.available_on.tv')" v-if="packageData.deviceFamilies & 8" />
 						</MetroStackPanel>
 					</section>
 					
 					<section>
-						<MetroTextBlock text-style="sub-title">Description</MetroTextBlock>
+						<MetroTextBlock text-style="sub-title">{{ $t('package.description_title') }}</MetroTextBlock>
 						<ExpandableText>
 							<span v-html="packageData.detailedDescription.replace(/\n/g, '<br />')" />
 						</ExpandableText>
 					</section>
 					
 					<section v-if="packageData.screenshots && packageData.screenshots.length">
-						<MetroTextBlock text-style="sub-title">Screenshots</MetroTextBlock>
+						<MetroTextBlock text-style="sub-title">{{ $t('package.screenshots_title') }}</MetroTextBlock>
 						
 						<div class="screenshot-wrapper">
 							<div class="screenshot-container" v-for="(screenshotObj, index) in packageData.screenshots" :key="index">
@@ -97,7 +97,7 @@
 					</section>
 					
 					<section v-if="packageData.versions.length > 1">
-						<MetroTextBlock text-style="sub-title">What's new in this version</MetroTextBlock>
+						<MetroTextBlock text-style="sub-title">{{ $t('package.whats_new_title') }}</MetroTextBlock>
 						
 						<ExpandableText>
 							<span v-html="packageData.versions[0].changeText.replace(/\n/g, '<br />')" />
@@ -105,49 +105,49 @@
 					</section>
 					
 					<section>
-						<MetroTextBlock text-style="sub-title">Additional information</MetroTextBlock>
+						<MetroTextBlock text-style="sub-title">{{ $t('package.additional_info.title') }}</MetroTextBlock>
 						
 						<div class="row info-group">
 							<div class="col col-12 col-md-6 col-lg-3 info-column">
 								<div class="info-item">
-									<MetroTextBlock text-style="base">Published by</MetroTextBlock>
+									<MetroTextBlock text-style="base">{{ $t('package.additional_info.published_by') }}</MetroTextBlock>
 									<MetroHyperlinkButton>
-										<MetroTextBlock text-style="base">Developer</MetroTextBlock>
+										<MetroTextBlock text-style="base">{{ developerData.username }}</MetroTextBlock>
 									</MetroHyperlinkButton>
 								</div>
 								
 								<div class="info-item">
-									<MetroTextBlock text-style="base">Release date</MetroTextBlock>
+									<MetroTextBlock text-style="base">{{ $t('package.additional_info.release_date') }}</MetroTextBlock>
 									<MetroTextBlock>{{ packageData.createdAt | date }}</MetroTextBlock>
 								</div>
 								
 								<div class="info-item" v-if="packageData.versions.length">
-									<MetroTextBlock text-style="base">Approximate size</MetroTextBlock>
+									<MetroTextBlock text-style="base">{{ $t('package.additional_info.approximate_size') }}</MetroTextBlock>
 									<MetroTextBlock>{{ packageData.versions[0].installedSize * 1024 | filesize }}</MetroTextBlock>
 								</div>
 							</div>
 							
 							<div class="col col-12 col-md-6 col-lg-3 info-column">
 								<div class="info-item">
-									<MetroTextBlock text-style="base">Category</MetroTextBlock>
+									<MetroTextBlock text-style="base">{{ $t('package.additional_info.category') }}</MetroTextBlock>
 									<MetroHyperlinkButton>
 										<MetroTextBlock text-style="base">{{ packageData.section }}</MetroTextBlock>
 									</MetroHyperlinkButton>
 								</div>
 								
-								<div class="info-item">
-									<MetroTextBlock text-style="base">Report an issue</MetroTextBlock>
+								<div class="info-item" v-if="packageData.issueURL">
+									<MetroTextBlock text-style="base">{{ $t('package.additional_info.report_issue_title') }}</MetroTextBlock>
 									<MetroHyperlinkButton>
-										<MetroTextBlock text-style="base">Report an issue with this Package</MetroTextBlock>
+										<MetroTextBlock text-style="base">{{ $t('package.additional_info.report_issue_link') }}</MetroTextBlock>
 									</MetroHyperlinkButton>
 								</div>
 							</div>
 							
 							<div class="col col-12 col-md-6 col-lg-3 info-column">
 								<div class="info-item">
-									<MetroTextBlock text-style="base">Report this Package</MetroTextBlock>
+									<MetroTextBlock text-style="base">{{ $t('package.additional_info.report_package_title') }}</MetroTextBlock>
 									<MetroHyperlinkButton @click="reportPackageButtonClicked">
-										<MetroTextBlock text-style="base">Report this Package to Team FESTIVAL</MetroTextBlock>
+										<MetroTextBlock text-style="base">{{ $t('package.additional_info.report_package_link') }}</MetroTextBlock>
 									</MetroHyperlinkButton>
 								</div>
 							</div>
@@ -155,23 +155,23 @@
 					</section>
 				</MetroPivotItem>
 				
-				<MetroPivotItem header="System Requirements">
+				<MetroPivotItem :header="$t('package.pivot_titles.system_requirements')">
 					<div class="row">
 						<div class="col-12 col-lg-6">
-							<MetroTextBlock text-style="base">Minimum</MetroTextBlock>
-							<MetroTextBlock>Your device must meet all minimum requirements to use this product</MetroTextBlock>
+							<MetroTextBlock text-style="base">{{ $t('package.system_requirements.minimum_title') }}</MetroTextBlock>
+							<MetroTextBlock>{{ $t('package.system_requirements.minimum_description') }}</MetroTextBlock>
 							
 							<table class="system-requirements">
 								<tr v-if="packageData.minOSVersion">
-									<td>OS</td>
-									<td>{{ Platforms.platforms[packageData.platform] }} {{ packageData.minOSVersion }}</td>
+									<td>{{ $t('package.system_requirements.os') }}</td>
+									<td>{{ Platforms.platforms[packageData.platform] }} {{ packageData.minOSVersion }} {{ $t('package.system_requirements.os_or_higher') }}</td>
 								</tr>
 								<tr>
-									<td>Platform</td>
+									<td>{{ $t('package.system_requirements.platform') }}</td>
 									<td>{{ Platforms.platforms[packageData.platform] }}</td>
 								</tr>
 								<tr>
-									<td>Architecture</td>
+									<td>{{ $t('package.system_requirements.architecture') }}</td>
 									<td>{{ Platforms.architectures[packageData.architecture] }}</td>
 								</tr>
 							</table>
@@ -179,31 +179,31 @@
 						
 						<div class="col-12 col-lg-6">
 							<template v-if="packageData.versions.length && Object.keys(packageData.versions[0].depends).length">
-								<MetroTextBlock text-style="base">Dependencies</MetroTextBlock>
-								<MetroTextBlock>These additional Packages are required for this Package to work correctly</MetroTextBlock>
+								<MetroTextBlock text-style="base">{{ $t('package.system_requirements.dependencies_title') }}</MetroTextBlock>
+								<MetroTextBlock>{{ $t('package.system_requirements.dependencies_description') }}</MetroTextBlock>
 								
 								<table class="system-requirements">
 									<tr v-for="(key, index) in Object.keys(packageData.versions[0].depends)" :key="index">
 										<td>{{ key }}</td>
 										<td v-if="typeof packageData.versions[0].depends[key] === 'string'">{{ packageData.versions[0].depends[key] }}</td>
-										<td v-if="typeof packageData.versions[0].depends[key] !== 'string'">Yes</td>
+										<td v-if="typeof packageData.versions[0].depends[key] !== 'string'">{{ $t('package.system_requirements.dependencies_required') }}</td>
 									</tr>
 								</table>
 							</template>
 
 							<template v-if="packageData.versions.length && Object.keys(packageData.versions[0].conflicts).length">
-								<MetroTextBlock text-style="base">Conflicts</MetroTextBlock>
-								<MetroTextBlock>These Packages prevent this Package from working correctly</MetroTextBlock>
+								<MetroTextBlock text-style="base">{{ $t('package.system_requirements.conflicts_title') }}</MetroTextBlock>
+								<MetroTextBlock>{{ $t('package.system_requirements.conflicts_description') }}</MetroTextBlock>
 								
 								<table class="system-requirements">
 									<tr v-if="packageData.maxOSVersion">
-										<td>Maximum OS</td>
+										<td>{{ $t('package.system_requirements.conflicts_max_os') }}</td>
 										<td>{{ Platforms.platforms[packageData.platform] }} {{ packageData.maxOSVersion }}</td>
 									</tr>
 									<tr v-for="(key, index) in Object.keys(packageData.versions[0].conflicts)" :key="index">
 										<td>{{ key }}</td>
 										<td v-if="typeof packageData.versions[0].conflicts[key] === 'string'">{{ packageData.versions[0].conflicts[key] }}</td>
-										<td v-if="typeof packageData.versions[0].conflicts[key] !== 'string'">Yes</td>
+										<td v-if="typeof packageData.versions[0].conflicts[key] !== 'string'">{{ $t('package.system_requirements.dependencies_required') }}</td>
 									</tr>
 								</table>
 							</template>
@@ -211,11 +211,11 @@
 					</div>
 				</MetroPivotItem>
 				
-				<MetroPivotItem header="Version History" v-if="packageData.versions.length">
+				<MetroPivotItem :header="$t('package.pivot_titles.version_history')" v-if="packageData.versions.length">
 					<div class="version-history-container">
 						<div class="version-history-item" v-for="(versionObj, index) in packageData.versions" :key="index">
 							<MetroStackPanel orientation="horizontal" vertical-orientation="center">
-								<MetroTextBlock text-style="sub-title">Version {{ versionObj.version }}</MetroTextBlock>
+								<MetroTextBlock text-style="sub-title">{{ $t('package.version_history.version') }} {{ versionObj.version }}</MetroTextBlock>
 								<MetroTextBlock text-style="caption">{{ versionObj.createdAt | date }}</MetroTextBlock>
 							</MetroStackPanel>
 							
@@ -226,29 +226,40 @@
 					</div>
 				</MetroPivotItem>
 				
-				<MetroPivotItem header="Reviews">
+				<MetroPivotItem :header="$t('package.pivot_titles.reviews')">
 					<template v-if="!packageData.ratings || !packageData.ratings.length">
-						<MetroTextBlock>No one's rated or reviewed this Package yet.</MetroTextBlock>
+						<MetroTextBlock>{{ $t('package.reviews.no_reviews') }}</MetroTextBlock>
 						
-						<MetroButton class="system-accent-color" style="margin-bottom: 40px" @click="reviewButtonClicked" :disabled="accountId && accountId === packageData.accountId">Rate and review</MetroButton>
+						<MetroButton class="system-accent-color" style="margin-bottom: 40px" @click="reviewButtonClicked" :disabled="accountId && accountId === packageData.accountId">{{ $t('package.reviews.rate_and_review') }}</MetroButton>
 					</template>
 					
 					<template v-if="packageData.ratings && packageData.ratings.length">
 						<DetailedRatingCell :rating-data="packageData.ratings" />
 						
 						<div style="margin-bottom: 24px">
-							<MetroButton class="system-accent-color" style="margin-bottom: 16px" @click="reviewButtonClicked" :disabled="accountId && (accountId === packageData.accountId || packageData.reviews.filter(_ => _.accountId === accountId).length >= 1)">Rate and review</MetroButton>
-							<MetroTextBlock v-if="accountId && accountId === packageData.accountId">You can't review this Package because you're the developer.</MetroTextBlock>
-							<MetroTextBlock v-if="accountId && packageData.reviews.filter(_ => _.accountId === accountId).length >= 1">You can't review this Package again.</MetroTextBlock>
+							<MetroButton class="system-accent-color" style="margin-bottom: 16px" @click="reviewButtonClicked" :disabled="accountId && (accountId === packageData.accountId || packageData.reviews.filter(_ => _.accountId === accountId).length >= 1)">{{ $t('package.reviews.rate_and_review') }}</MetroButton>
+							<MetroTextBlock v-if="accountId && accountId === packageData.accountId">{{ $t('package.reviews.review_prohibited_developer') }}</MetroTextBlock>
+							<MetroTextBlock v-if="accountId && packageData.reviews.filter(_ => _.accountId === accountId).length >= 1">{{ $t('package.reviews.review_prohibited_again') }}</MetroTextBlock>
 						</div>
 						
-						<MetroTextBlock text-style="sub-title">Showing {{ packageData.ratings.length }} reviews</MetroTextBlock>
+						<MetroTextBlock text-style="sub-title">{{ $t('package.reviews.showing_reviews', { reviewCount: packageData.reviews.length }) }}</MetroTextBlock>
 						<div class="review-container">
 							<RatingCell v-for="(reviewObj, index) in packageData.reviews" :review-data="reviewObj" :key="index" />
 						</div>
 					</template>
 				</MetroPivotItem>
 			</MetroPivot>
+		</template>
+		
+		<template v-if="packageData && !Object.keys(packageData).length">
+			<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" style="height: calc(100vh - 40px)">
+				<MetroTextBlock text-style="title" style="font-size: 34px; font-weight: 500">
+					{{ $t('app.generic_error_title') }}
+				</MetroTextBlock>
+				<MetroTextBlock text-style="sub-title">
+					{{ $t('app.generic_error_message') }}
+				</MetroTextBlock>
+			</MetroStackPanel>
 		</template>
 	</MetroPage>
 </template>
@@ -691,7 +702,7 @@ body[data-theme="dark"] {
 </style>
 
 <script>
-import { PackageAPI, RequestAPI } from '@/scripts/ApiUtil'
+import { AccountAPI, PackageAPI, RequestAPI } from '@/scripts/ApiUtil'
 import { LogItemType } from '@/scripts/Enumerations'
 import Platforms from '../../../platforms.json'
 
@@ -713,6 +724,7 @@ export default {
 	data() {
 		return {
 			packageData: null,
+			developerData: null,
 			Platforms: Platforms
 		}
 	},
@@ -721,16 +733,29 @@ export default {
 			this.$refs["page"].$el.scrollTop = 0;
 			
 			this.packageData = null;
+			this.developerData = null;
+			
 			let _packageData = await PackageAPI.getPackages({
-				"package.identifier": event.detail.packageId,
+				"package.identifier": this.$route.path.split("/")[2],
 				include: "ratings,reviews,screenshots,versions"
 			});
 			
-			if (_packageData.error) {
-				console.error(_packageData.error);
+			if (!_packageData.length || _packageData.error) {
+				this.packageData = {};
+				return;
 			} else {
 				window.packageData = _packageData[0];
 				this.packageData = _packageData[0];
+			}
+			
+			let _developerData = await AccountAPI.getUser({
+				"account.id": packageData.accountId
+			});
+			
+			if (_developerData.error) {
+				console.error(_developerData.error);
+			} else {
+				this.developerData = _developerData;
 			}
 		},
 		packageDescriptionMoreClicked() {
@@ -746,7 +771,7 @@ export default {
 					);
 				})(),
 				commands: [{
-					text: "Close",
+					text: this.$t('app.close'),
 					primary: true
 				}]
 			}).show();
@@ -757,11 +782,11 @@ export default {
 				this.parent.login();
 			} else {
 				let reportDialog = new metroUI.ContentDialog({
-					title: `Report ${this.packageData.name}`,
+					title: this.$t('package.report_compose.title', { packageName: this.packageData.name }),
 					content: (
 						<div style="min-width: 320px">
 							<MetroTextBox
-								header="Tell us what you would like to report about this package"
+								header={ this.$t('package.report_compose.message') }
 								required={true}
 								textarea={true}
 								name="detailText"
@@ -782,8 +807,8 @@ export default {
 						console.error(error);
 					} else {
 						new metroUI.ContentDialog({
-							title: "Thank you for your report!",
-							content: "We have forwarded your request to our moderation staff and we'll handle your report soon.",
+							title: this.$t('package.report_compose.success_title'),
+							content: this.$t('package.report_compose.success_message'),
 							commands: [{ text: this.$t('app.ok'), primary: true }]
 						}).show()
 					}
@@ -798,18 +823,18 @@ export default {
 					title: this.packageData.name,
 					content: (
 						<div style="min-width: 320px">
-							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">Rate this item</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">{ this.$t('package.review_compose.rate') }</MetroTextBlock>
 							<MetroRatingControl name="value" />
 							
-							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">Write a review</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">{ this.$t('package.review_compose.write_a_review') }</MetroTextBlock>
 							<MetroTextBox
-								header="Give it a headline"
+								header={$t('package.review_compose.headline_title')}
 								required={true}
 								name="title"
 								style="margin-bottom: 8px"
 							/>
 							<MetroTextBox
-								header="Tell us what you like and don't like"
+								header={$t('package.review_compose.body_title')}
 								required={true}
 								textarea={true}
 								name="text"
@@ -828,8 +853,8 @@ export default {
 						console.error(error);
 					} else {
 						new metroUI.ContentDialog({
-							title: "Thank you for your review!",
-							content: "Your review will be visible to everyone soon.",
+							title: this.$t('package.review_compose.success_title'),
+							content: this.$t('package.review_compose.success_message'),
 							commands: [{ text: this.$t('app.ok'), primary: true }]
 						}).show()
 					}
