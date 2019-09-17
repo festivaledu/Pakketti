@@ -92,10 +92,10 @@ class ContentDialog {
 					if (dialog._promiseResolve) {
 						if (command.primary) {
 							dialog._promiseResolve(ContentDialogResult.Primary);
-						} else if (index === params.commands.length - 1) {
-							dialog._promiseResolve(ContentDialogResult.None);
-						} else {
+						} else if (command.secondary) {
 							dialog._promiseResolve(ContentDialogResult.Secondary);
+						} else {
+							dialog._promiseResolve(ContentDialogResult.None);
 						}
 					}
 					
