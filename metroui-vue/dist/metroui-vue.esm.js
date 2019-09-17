@@ -2960,7 +2960,11 @@ var __vue_render__$e = function() {
           _vm._v(" "),
           _c(
             "MetroButton",
-            { staticClass: "send-message", on: { click: _vm._sendMessage } },
+            {
+              staticClass: "send-message",
+              attrs: { disabled: !_vm.messageText.length },
+              on: { click: _vm._sendMessage }
+            },
             [_c("MetroSymbolIcon", { attrs: { symbol: "send" } })],
             1
           )

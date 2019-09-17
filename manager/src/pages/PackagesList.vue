@@ -2,6 +2,8 @@
 	<MetroPage page-id="packages">
 		<template slot="bottom-app-bar">
 			<MetroCommandBar>
+				<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" @click="refresh()" />
+				<MetroAppBarSeparator />
 				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click="navigate('/package/new')" />
 			</MetroCommandBar>
 		</template>
@@ -79,23 +81,33 @@ export default {
 		packageData: null
 	}),
 	beforeRouteEnter: async (to, from, next) => {
-		let _packageData;
-		
-		
-			_packageData = await PackageAPI.getPackages({
-				include: "versions"
-			});
-
+		let _packageData = await PackageAPI.getPackages({
+			include: "versions"
+		});
 		
 		next(vm => {
 			if (vm.isDeveloper || vm.isModerator || vm.isAdministrator) {
 				vm.packageData = _packageData;
+			} else {
+				vm.packageData = [];
 			}
+			
 			vm.$parent.setHeader("Packages");
 			vm.$parent.setSelectedMenuItem("packages");
 		});
 	},
 	methods: {
+		async refresh() {
+			let _packageData = await PackageAPI.getPackages({
+				include: "versions"
+			});
+			
+			if (this.isDeveloper || this.isModerator || this.isAdministrator) {
+				this.packageData = _packageData;
+			} else {
+				this.packageData = [];
+			}
+		},
 		showPackageMenu(event, packageObj) {
 			let packageFlyout = new metroUI.MenuFlyout({
 				items: [{
@@ -118,7 +130,15 @@ export default {
 						});
 						
 						if (await deleteDialog.showAsync() === metroUI.ContentDialogResult.Primary) {
-							console.log("delete");
+							let result = await PackageAPI.deletePackage({
+								"package.id": packageObj.id
+							});
+							
+							if (result.error) {
+								console.error(result.error);
+							} else {
+								this.refresh();
+							}
 						}
 					}
 				}]

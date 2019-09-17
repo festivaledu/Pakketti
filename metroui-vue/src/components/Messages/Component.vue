@@ -34,7 +34,7 @@
 				ref="input"
 			/>
 			
-			<MetroButton class="send-message" @click="_sendMessage">
+			<MetroButton class="send-message" @click="_sendMessage" :disabled="!messageText.length">
 				<MetroSymbolIcon symbol="send" />
 			</MetroButton>
 		</MetroStackPanel>

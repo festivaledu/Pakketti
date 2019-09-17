@@ -6,7 +6,7 @@
 					<div class="list-view-item"
 						:class="{'selected': selectedThread && (selectedThread === reviewObj.id)}"
 						@click="threadSelected(reviewObj.id)"
-						v-for="(reviewObj) in reviewData"
+						v-for="(reviewObj) in sortedReviews"
 						:key="reviewObj.id"
 					>
 						<div class="list-view-item-inner">
@@ -18,7 +18,7 @@
 									</MetroStackPanel>
 									
 									<MetroStackPanel orientation="horizontal" vertical-alignment="center">
-										<span class="detail-text-label align-right">{{ reviewObj.createdAt | dateTime }}</span>
+										<span class="detail-text-label align-right">{{ reviewObj.messages.lastObject().createdAt | dateTime }}</span>
 										<MetroRatingControl :value="reviewObj.rating.value" style="pointer-events: none" />
 									</MetroStackPanel>
 								</MetroStackPanel>
@@ -30,12 +30,12 @@
 			<MetroPage page-id="messages">
 				<template slot="bottom-app-bar">
 					<MetroCommandBar>
-						<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" />
+						<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" @click="refresh()" />
 						<MetroAppBarSeparator />
-						<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" :disabled="!selectedThread" />
+						<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" :disabled="!selectedThread || !isOwnedReview" @click="deleteReview(selectedThread)" />
 					</MetroCommandBar>
 				</template>
-				<MetroMessages :placeholder-text="$t('reviews.messages_placeholder')" ref="messages" v-show="selectedThread" />
+				<MetroMessages :placeholder-text="$t('reviews.messages_placeholder')" ref="messages" v-show="selectedThread" @messageSent="addMessage" :disabled="!isOwnedReview" />
 			</MetroPage>
 		</MetroListView>
 	</MetroPage>
@@ -43,6 +43,7 @@
 
 <script>
 import { PackageAPI, AccountAPI } from "@/scripts/ApiUtil";
+import { UserRole } from "@/scripts/Enumerations"
 
 import MetroListView from '@/components/ListView'
 
@@ -57,10 +58,7 @@ export default {
 		selectedThread: null
 	}),
 	beforeRouteEnter: async (to, from, next) => {
-		let _packageData = await PackageAPI.getPackages({
-			"include": "reviews"
-		});
-		
+		let _packageData = await PackageAPI.getPackages();
 		let _reviewData = await PackageAPI.getReviews();
 		
 		next(vm => {
@@ -77,6 +75,53 @@ export default {
 		});
 	},
 	methods: {
+		async refresh() {
+			this.packageData = await PackageAPI.getPackages();
+			this.reviewData = await PackageAPI.getReviews();
+			
+			this.threadSelected(this.selectedThread);
+		},
+		async deleteReview(reviewId) {
+			let deleteDialog = new metroUI.ContentDialog({
+				title: `Delete this review?`,
+				content: "Are you sure you want to delete this review? This action cannot be undone.",
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+			});
+			
+			if (await deleteDialog.showAsync() === metroUI.ContentDialogResult.Primary) {
+				let reviewObj = this.reviewData.find(reviewObj => reviewObj.id === reviewId);
+				let packageObj = this.packageData.find(packageObj => packageObj.id === reviewObj.packageId);
+				
+				let result = await PackageAPI.deletePackageReview({
+					"package.id": packageObj.id,
+					"review.id": reviewObj.id
+				});
+
+				if (result.error) {
+					console.error(result.error);
+				} else {
+					this.refresh();
+				}
+			}
+		},
+		async addMessage(text) {
+			let reviewObj = this.reviewData.find(reviewObj => reviewObj.id === this.selectedThread);
+			let packageObj = this.packageData.find(packageObj => packageObj.id === reviewObj.packageId);
+			
+			let result = await PackageAPI.addPackageReviewMessage({
+				"package.id": packageObj.id,
+				"review.id": reviewObj.id
+			}, {
+				text: text
+			});
+			
+			if (result.error) {
+				console.error(result.error);
+			} else {
+				this.refresh();
+			}
+		},
+		
 		getPackageInfo(packageId) {
 			return this.packageData.find(packageObj => packageObj.id == packageId);
 		},
@@ -85,7 +130,11 @@ export default {
 		},
 		async threadSelected(threadId) {
 			let thread = this.reviewData.find(reviewObj => reviewObj.id === threadId);
-			if (!thread) return;
+			if (!thread) {
+				this.selectedThread = null;
+				this.$refs["list-view"].setHeader("");
+				return;
+			}
 			
 			// thread.messages.find(messageObj => messageObj.
 			let packageOwnerAccountData = await AccountAPI.getUser({
@@ -113,8 +162,31 @@ export default {
 		}
 	},
 	computed: {
+		sortedReviews() {
+			return this.reviewData.sort((a, b) => new Date(b.messages.lastObject().createdAt).getTime() - new Date(a.messages.lastObject().createdAt).getTime());
+		},
+		
 		accountId() {
 			return this.$store.state.accountId;
+		},
+		isDeveloper() {
+			return this.$store.state.role & UserRole.DEVELOPER;
+		},
+		isModerator() {
+			return this.$store.state.role & UserRole.MODERATOR;
+		},
+		isAdministrator() {
+			return this.$store.state.role & UserRole.ADMINISTRATOR;
+		},
+		isOwnedReview() {
+			if (!this.selectedThread) return false;
+			
+			let review = this.reviewData.find(reviewObj => reviewObj.id === this.selectedThread);
+			if (review.accountId == this.accountId) return true;
+			if (this.getPackageInfo(review.packageId).accountId == this.accountId) return true;
+			if (this.isModerator || this.isAdministrator) return true;
+			
+			return false;
 		}
 	},
 	filters: {
@@ -139,6 +211,7 @@ export default {
 		height: 76px;
 		
 		.list-view-item-content {
+			max-width: 100%;
 			margin-left: 0;
 			margin-right: 0;
 			padding-right: 16px;

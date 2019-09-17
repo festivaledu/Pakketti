@@ -2,44 +2,68 @@
 	<MetroView view-id="main-view">
 		<MetroPage page-id="root">
 			<vue-headful title="Pakketti" />
-			<MinimalNavigationView pane-title="Team FESTIVAL"
-				pane-display-mode="left-compact"
-				:settings-visible="false"
-			>
+			<MinimalNavigationView pane-title="Team FESTIVAL" pane-display-mode="left-compact" :settings-visible="false" v-if="routeName !== '/login'">
 				<template slot="menu-items">
 					<router-link tag="div" to="/">
-						<MetroNavigationViewItem
-							:content="$t('root.item_dashboard')"
-							page-id="dashboard"
-						>
+						<MetroNavigationViewItem :content="$t('root.item_dashboard')" page-id="dashboard">
 							<template slot="icon">
 								<MetroSymbolIcon icon="home" />
 							</template>
 						</MetroNavigationViewItem>
 					</router-link>
 					<router-link tag="div" to="/packages">
-						<MetroNavigationViewItem
-							:content="$t('root.item_packages')"
-							page-id="packages"
-						>
+						<MetroNavigationViewItem :content="$t('root.item_packages')" page-id="packages">
 							<template slot="icon">
 								<MetroSymbolIcon icon="package" />
 							</template>
 						</MetroNavigationViewItem>
 					</router-link>
 					<router-link tag="div" to="/reviews">
-						<MetroNavigationViewItem
-							:content="$t('root.item_reviews')"
-							page-id="reviews"
-						>
+						<MetroNavigationViewItem :content="$t('root.item_reviews')" page-id="reviews">
 							<template slot="icon">
 								<MetroSymbolIcon icon="chat-bubbles" />
 							</template>
 						</MetroNavigationViewItem>
 					</router-link>
+					<MetroNavigationViewItem :content="$t('root.item_devices')" page-id="devices" :disabled="true">
+						<template slot="icon">
+							<MetroSymbolIcon icon="cell-phone" />
+						</template>
+					</MetroNavigationViewItem>
+					<MetroNavigationViewItem :content="$t('root.item_users')" page-id="users" :disabled="true">
+						<template slot="icon">
+							<MetroSymbolIcon icon="people" />
+						</template>
+					</MetroNavigationViewItem>
+					<MetroNavigationViewItem :content="$t('root.item_requests')" page-id="requests" :disabled="true">
+						<template slot="icon">
+							<MetroSymbolIcon icon="report-hacked" />
+						</template>
+					</MetroNavigationViewItem>
+					<MetroNavigationViewItem :content="$t('root.item_moderation_log')" page-id="logs" :disabled="true">
+						<template slot="icon">
+							<MetroSymbolIcon icon="clipboard-list" />
+						</template>
+					</MetroNavigationViewItem>
+					<MetroNavigationViewItem :content="$t('root.item_statistics')" page-id="statistics" :disabled="true">
+						<template slot="icon">
+							<MetroSymbolIcon icon="area-chart" />
+						</template>
+					</MetroNavigationViewItem>
 				</template>
+				
+				<template slot="pane-footer">
+					<MetroNavigationViewItem icon="contact" :content="$t('root.item_profile')" page-id="profile" :disabled="true" />
+					<MetroNavigationViewItem icon="setting" :content="$t('root.item_settings')" page-id="settings" :disabled="true" />
+					<MetroButton class="system-accent-color" @click="signOut">
+						<MetroSymbolIcon icon="ethernet-error" />
+					</MetroButton>
+				</template>
+				
 				<router-view/>
 			</MinimalNavigationView>
+			
+			<router-view v-else />
 		</MetroPage>
 	</MetroView>
 </template>
@@ -51,6 +75,17 @@ export default {
 	name: "App",
 	components: {
 		MinimalNavigationView
+	},
+	methods: {
+		signOut() {
+			window.$cookies.remove("authToken");
+			this.$router.replace("/login");
+		}
+	},
+	computed: {
+		routeName() {
+			return this.$route.path;
+		}
 	}
 }
 </script>

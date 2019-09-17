@@ -127,13 +127,14 @@ export default {
 		async createPackage() {
 			this.isWorking.createPackage = true;
 			
-			let packageObj = await PackageAPI.createPackage(this.packageData);
+			let packageObjResponse = await PackageAPI.createPackage(this.packageData);
 			
 			this.isWorking.createPackage = false;
-			if (packageObj.error) {
-				console.error(error);
+			
+			if (packageObjResponse.data.error) {
+				console.error(packageObjResponse.data.error);
 			} else {
-				this.$parent.navigate(`/package/${packageObj.identifier}`);
+				this.$router.replace(`/package/${packageObjResponse.data.identifier}`);
 			}
 		}
 	}

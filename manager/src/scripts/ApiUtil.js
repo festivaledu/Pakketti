@@ -328,7 +328,7 @@ export class PackageAPI {
 	static async deletePackageReview(parameters) {
 		const query = parseUrlFromObject(flattenObject(parameters)); 
 		
-		return await SocketService.delete(`/packages/review${query}`, {
+		return await SocketService.delete(`/packages/review?${query}`, {
 			headers: {
 				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
 				"x-pakketti-developer": localStorage.getItem("vuex") ? `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}` : undefined

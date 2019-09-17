@@ -67,7 +67,7 @@
 									<MetroTextBlock>{{ packageObj.updatedAt | date }}</MetroTextBlock>
 								</div>
 								<div class="td cell align-right">
-									<MetroButton>
+									<MetroButton @click="showPackageMenu($event, packageObj)">
 										<MetroSymbolIcon icon="more" />
 									</MetroButton>
 								</div>
@@ -222,11 +222,7 @@ export default {
 			include: "versions, reviews, ratings"
 		});
 		
-		let _statisticsData = null;
-		// if (this.isModerator || this.isAdministrator) {
-			_statisticsData = await StatisticsAPI.getMonth();
-		// }
-		
+		let _statisticsData = await StatisticsAPI.getMonth();
 		let _reviewData = await PackageAPI.getReviews();
 		let _deviceData = await DeviceAPI.getDevices();
 		
@@ -243,9 +239,59 @@ export default {
 	methods: {
 		getPackageInfo(packageId) {
 			return this.packageData.find(packageObj => packageObj.id == packageId);
+		},
+		async refresh() {
+			this.packageData = await PackageAPI.getPackages({
+				include: "versions, reviews, ratings"
+			});
+			
+			this.statisticsData = await StatisticsAPI.getMonth();
+			this.reviewData = await PackageAPI.getReviews();
+			this.deviceData = await DeviceAPI.getDevices();
+		},
+		showPackageMenu(event, packageObj) {
+			let packageFlyout = new metroUI.MenuFlyout({
+				items: [{
+					icon: "edit",
+					text: this.$t('app.actions.edit'),
+					action: () => {
+						this.$router.push(`/package/${packageObj.identifier}`)
+					}
+				}, {
+					icon: "delete",
+					text: this.$t('app.actions.delete'),
+					disabled: 
+						(packageObj.accountId != this.accountId) || 
+						(!this.isDeveloper && !this.isModerator && !this. isAdministrator),
+					action: async () => {
+						let deleteDialog = new metroUI.ContentDialog({
+							title: `Delete "${packageObj.name}"?`,
+							content: `Are you sure you want to delete "${packageObj.name}"? This action cannot be undone.\n\nAssociated Reviews will also be deleted.`,
+							commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+						});
+						
+						if (await deleteDialog.showAsync() === metroUI.ContentDialogResult.Primary) {
+							let result = await PackageAPI.deletePackage({
+								"package.id": packageObj.id
+							});
+							
+							if (result.error) {
+								console.error(result.error);
+							} else {
+								this.refresh();
+							}
+						}
+					}
+				}]
+			});
+			
+			packageFlyout.showAt(event.target);
 		}
 	},
 	computed: {
+		accountId() {
+			return this.$store.state.accountId;
+		},
 		isDeveloper() {
 			return this.$store.state.role & UserRole.DEVELOPER;
 		},
