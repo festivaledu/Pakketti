@@ -120,6 +120,7 @@ router.put("/", async (req, res) => {
 		"section",
 		"deviceFamilies",
 		"visible",
+		"status",
 		"issueURL"
 	])).then(packageObj => {
 		LogItem.create({

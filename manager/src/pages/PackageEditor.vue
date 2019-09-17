@@ -1,14 +1,23 @@
 <template>
-	<MetroPage page-id="package-editor" @navigatedTo.native="onPageShow">
+	<MetroPage page-id="package-editor">
 		<template slot="top-app-bar">
+			<template slot="content">
+				<MetroStackPanel vertical-alignment="center" style="height: 40px">
+					<MetroProgressRing :active="true" />
+				</MetroStackPanel>
+			</template>
 			<MetroCommandBar>
-				<template slot="content">
-					<MetroStackPanel vertical-alignment="center" style="height: 40px">
-						<MetroProgressRing :active="isWorking.savePackage || isWorking.deletePackage" />
-					</MetroStackPanel>
-				</template>
-				<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" />
-				<MetroAppBarButton icon="save" :label="$t('app.actions.save')" :disabled="$v.$invalid || !$v.$anyDirty || isWorking.savePackage" @click="savePackage" />
+				<MetroAppBarButton
+					icon="delete"
+					:label="$t('app.actions.delete')"
+					:disabled="isWorking.deletePackage || !isOwnedPackage"
+				/>
+				<MetroAppBarButton
+					icon="save"
+					:label="$t('app.actions.save')"
+					:disabled="$v.$invalid || !$v.$anyDirty || isWorking.savePackage || !isOwnedPackage"
+					@click="savePackage"
+				/>
 			</MetroCommandBar>
 		</template>
 		
@@ -17,7 +26,8 @@
 				<div class="row">
 					<div class="col-12 col-md-6">
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.package_name_title') }}</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.package_name_title') }}</MetroTextBlock>
+							
 							<MetroTextBox
 								:placeholder-text="$t('package_editor.info.package_name_placeholder')"
 								:maxlength="50"
@@ -25,11 +35,17 @@
 								@input="$v.packageData.name.$touch()"
 								:disabled="!isOwnedPackage"
 							/>
+							
 							<div class="row mt-2">
 								<div class="col-6">
-									<MetroHyperlinkButton v-if="!isWorking.packageName" :disabled="!packageData.name.length || !$v.packageData.name.$dirty || !isOwnedPackage" @click="checkNameAvailability">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
+									<MetroHyperlinkButton 
+										v-if="!isWorking.packageName"
+										:disabled="!packageData.name.length || !$v.packageData.name.$dirty || !isOwnedPackage"
+										@click="checkNameAvailability"
+									>{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
 									<MetroProgressRing v-if="isWorking.packageName" :active="true" />
 								</div>
+								
 								<div class="col-6">
 									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.name.length }} / 50</MetroTextBlock>
 								</div>
@@ -37,18 +53,17 @@
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.bundle_identifier_title') }}</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.bundle_identifier_title') }}</MetroTextBlock>
+							
 							<MetroTextBox
 								:placeholder-text="$t('package_editor.info.bundle_identifier_placeholder')"
 								:maxlength="50"
-								:disabled="existingPackage || !isOwnedPackage"
+								:disabled="isExistingPackage"
 								v-model="packageData.identifier"
-								@input="$v.packageData.identifier.$touch()"
 							/>
+							
 							<div class="row mt-2">
-								<div class="col-6">
-									<MetroHyperlinkButton :disabled="!packageData.identifier.length || existingPackage || !isOwnedPackage">{{ $t('package_editor.info.button_check_availability') }}</MetroHyperlinkButton>
-								</div>
+								<div class="col-6" />
 								<div class="col-6">
 									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.identifier.length }} / 50</MetroTextBlock>
 								</div>
@@ -56,7 +71,8 @@
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.short_description_title') }}</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.short_description_title') }}</MetroTextBlock>
+							
 							<MetroTextBox
 								:textarea="true"
 								:maxlength="255"
@@ -65,6 +81,7 @@
 								style="height: 158px"
 								:disabled="!isOwnedPackage"
 							/>
+							
 							<div class="row mt-2">
 								<div class="col-12">
 									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.shortDescription.length || 0 }} / 255</MetroTextBlock>
@@ -73,13 +90,15 @@
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.detailed_description_title') }}</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.detailed_description_title') }}</MetroTextBlock>
+							
 							<VueEditor
 								:editorToolbar="editorToolbar"
 								v-model="packageData.detailedDescription"
 								:disabled="!isOwnedPackage"
 								@input="$v.packageData.detailedDescription.$touch()"
 							/>
+							
 							<div class="row mt-2">
 								<div class="col-12">
 									<MetroTextBlock text-style="caption" text-alignment="right" class="text-muted">{{ packageData.detailedDescription.length }} / 3000</MetroTextBlock>
@@ -90,7 +109,8 @@
 					
 					<div class="col-12 col-md-6">
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.device_families_title') }}</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.device_families_title') }}</MetroTextBlock>
+							
 							<MetroCheckbox
 								:content="$t('package_editor.info.device_family.phone')"
 								@input="deviceFamilyCheckboxChecked(1)"
@@ -118,8 +138,9 @@
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.platform_title') }}</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.platform_title') }}</MetroTextBlock>
 							<MetroTextBlock>{{ $t('package_editor.info.platform_description') }}</MetroTextBlock>
+							
 							<MetroComboBox
 								:placeholder-text="$t('package_editor.info.platform_placeholder')"
 								:items-source="{
@@ -136,6 +157,7 @@
 							/>
 							
 							<MetroTextBlock style="margin-top: 8px">{{ $t('package_editor.info.architecture_description') }}</MetroTextBlock>
+							
 							<MetroComboBox
 								:placeholder-text="$t('package_editor.info.architecture_placeholder')"
 								:items-source="{
@@ -152,7 +174,22 @@
 						</div>
 						
 						<div class="mb-4">
-							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.system_requirements_title') }}</MetroTextBlock>
+							<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.section_title') }}</MetroTextBlock>
+							<MetroTextBlock>{{ $t('package_editor.info.section_description') }}</MetroTextBlock>
+							
+							<MetroComboBox
+								:placeholder-text="$t('package_editor.info.section_placeholder')"
+								:items-source="['Apps', 'Tweaks']"
+								v-model="packageData.section"
+								@input="$v.packageData.section.$touch()"
+								:disabled="!isOwnedPackage || isExistingPackage"
+								style="margin-top: 8px"
+							/>
+						</div>
+						
+						<div class="mb-4">
+							<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.system_requirements_title') }}</MetroTextBlock>
+							
 							<MetroTextBox
 								:header="$t('package_editor.info.system_requirements_min_os')"
 								:placeholder-text="$t('package_editor.info.system_requirements_min_os')"
@@ -160,6 +197,7 @@
 								v-model="packageData.minOSVersion"
 								@input="$v.packageData.$touch()"
 							/>
+							
 							<MetroTextBox
 								:header="$t('package_editor.info.system_requirements_max_os')"
 								:placeholder-text="$t('package_editor.info.system_requirements_max_os')"
@@ -170,22 +208,50 @@
 							/>
 						</div>
 						
-						<div class="mb-4" v-if="packageData.status == 0">
-							<MetroTextBlock text-style="sub-title">{{ $t('package_editor.info.publishing_title') }}</MetroTextBlock>
-							<MetroRadioButton
-								group-name="package-visibility"
-								:name="true"
-								:content="$t('package_editor.info.publishing_now')"
-								v-model="packageData.visible"
-								@input="$v.packageData.$touch()"
-							/>
-							<MetroRadioButton
-								group-name="package-visibility"
-								:name="false"
-								:content="$t('package_editor.info.publishing_later')"
-								v-model="packageData.visible"
-								@input="$v.packageData.$touch()"
-							/>
+						<div class="mb-4">
+							<template v-if="packageData.status == 0">
+								<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.publishing_title') }}</MetroTextBlock>
+								
+								<MetroRadioButton
+									group-name="package-visibility"
+									:name="true"
+									:content="$t('package_editor.info.publishing_now')"
+									:disabled="!isOwnedPackage"
+									v-model="packageData.visible"
+									@input="$v.packageData.$touch()"
+								/>
+								
+								<MetroRadioButton
+									group-name="package-visibility"
+									:name="false"
+									:content="$t('package_editor.info.publishing_later')"
+									:disabled="!isOwnedPackage"
+									v-model="packageData.visible"
+									@input="$v.packageData.$touch()"
+								/>
+							</template>
+							
+							<template v-else>
+								<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.visibility_title') }}</MetroTextBlock>
+								
+								<MetroRadioButton
+									group-name="package-visibility"
+									:name="true"
+									:content="$t('package_editor.info.visibility_visible')"
+									:disabled="!isOwnedPackage"
+									v-model="packageData.visible"
+									@input="$v.packageData.$touch()"
+								/>
+								
+								<MetroRadioButton
+									group-name="package-visibility"
+									:name="false"
+									:content="$t('package_editor.info.visibility_hidden')"
+									:disabled="!isOwnedPackage"
+									v-model="packageData.visible"
+									@input="$v.packageData.$touch()"
+								/>
+							</template>
 						</div>
 					</div>
 				</div>
@@ -210,6 +276,187 @@
 		</MetroPivot>
 	</MetroPage>
 </template>
+
+<script>
+import HtmlEntities from "he"
+import { required, minValue } from 'vuelidate/lib/validators'
+
+import { PackageAPI } from "@/scripts/ApiUtil"
+
+import { VueEditor } from "vue2-editor"
+import MediaItemSelector from "@/components/MediaItemSelector"
+import MediaGroupSelector from "@/components/MediaGroupSelector"
+
+import crypto from "crypto-js"
+
+export default {
+	name: "PackageEditor",
+	components: {
+		VueEditor,
+		MediaItemSelector,
+		MediaGroupSelector
+	},
+	data: () => ({
+		editorToolbar: [
+			['bold', 'italic', 'underline', 'strike'],
+			['blockquote', 'code-block'],
+			[{ 'list': 'ordered'}, { 'list': 'bullet' }],
+			[{ 'script': 'sub'}, { 'script': 'super' }],
+			[{ 'header': [false, 1, 2, 3, 4, 5, 6, ] }],
+			[{'align': ''}, {'align': 'center'}, {'align': 'right'}, {'align': 'justify'}],
+			['link'],
+		],
+		_packageData: {},
+		packageData: {
+			name: "",
+			identifier: "",
+			shortDescription: "",
+			detailedDescription: "",
+			platform: null,
+			architecture: null,
+			// releaseVersion: "1.0",
+			// releaseDescription: "Initial Release",
+			// bugsReportURL: null,
+			minOSVersion: null,
+			maxOSVersion: null,
+			section: null,
+			deviceFamilies: 0,
+			visible: true,
+			issueURL: null
+		},
+		existingPackage: false,
+		isWorking: {
+			packageName: false,
+			packageIdentifier: false,
+			savePackage: false,
+			deletePackage: false
+		}
+	}),
+	validations: {
+		packageData: {
+			name: { required },
+			identifier: { required },
+			shortDescription: { required },
+			detailedDescription: { required },
+			platform: { required },
+			architecture: { required },
+			section: { required },
+			deviceFamilies: { required, minValue: minValue(1) },
+		}
+	},
+	mounted() {
+		
+	},
+	beforeRouteEnter: async (to, from, next) => {
+		let _packageData = await PackageAPI.getPackages({
+			"package.identifier": to.params["packageId"],
+			include: "reviews,screenshots,versions"
+		});
+		
+		next(vm => {
+			vm.$parent.setHeader(null);
+			vm.$parent.setSelectedMenuItem("packages");
+			
+			if (_packageData.length) {
+				vm.packageData = _packageData[0];
+			}
+			
+			vm.$nextTick(() => {
+				setTimeout(() => {
+					vm.$v.$reset();
+				}, 50);
+			});
+		});
+	},
+	async beforeRouteLeave(to, from, next) {
+		if (this.$v.$anyDirty) {
+			let confirmDialog = new metroUI.ContentDialog({
+				title: "Unsaved changes",
+				content: "<p>Do you want to save the changes you've made?<br>Your changes will be lost if you don't save them.</p>",
+				commands: [
+					{ text: "Cancel" },
+					{ text: "Don't Save", secondary: true },
+					{ text: "Save", primary: true }]
+			});
+			
+			switch (await confirmDialog.showAsync()) {
+			case metroUI.ContentDialogResult.Primary:
+				this.savePackage();
+				next();
+				break;
+			case metroUI.ContentDialogResult.Secondary:
+				next();
+				break;
+			case metroUI.ContentDialogResult.None:
+				next(false);
+				break;
+			}
+		} else {
+			next();
+		}
+	},
+	methods: {
+		async checkNameAvailability() {
+			this.isWorking.packageName = true;
+			
+			let packageList = await PackageAPI.getPackages({
+				"package.name": this.packageData.name
+			});
+			this.isWorking.packageName = false;
+			
+			if (packageList.length) {
+				new metroUI.ContentDialog({
+					title: "Package name unavailable",
+					content: "The selected Package name is already in use. Please use a different Package name.",
+					commands: [{ text: "Ok", primary: true }]
+				}).show();
+			} else {
+				new metroUI.ContentDialog({
+					title: "Package name is available",
+					content: "The selected Package name is available for use.",
+					commands: [{ text: "Ok", primary: true }]
+				}).show();
+			}
+		},
+		deviceFamilyCheckboxChecked(type) {
+			this.packageData.deviceFamilies ^= type;
+			this.$v.packageData.deviceFamilies.$touch();
+		},
+		async savePackage() {
+			this.isWorking.savePackage = true;
+			
+			let result = await PackageAPI.updatePackage({
+				"package.id": this.packageData.id
+			}, Object.assign(this.packageData, {
+				status: 1
+			}));
+		
+			if (result.error) {
+				console.error(result.error);
+			} else {
+				this.packageData = result;
+			}
+			
+			this.isWorking.savePackage = false;
+			this.$v.packageData.$reset();
+		},
+		decodeText(text) {
+			return HtmlEntities.decode(text.replace(/<[^>]*>/g, ''));
+		},
+	},
+	computed: {
+		accountId() {
+			return this.$store.state.accountId;
+		},
+		isOwnedPackage() {
+			return this.packageData.accountId == this.accountId;
+		},
+		isExistingPackage() {
+			return this.packageData.status == 1;
+		}
+	}
+}
+</script>
 
 <style lang="less">
 .page[data-page-id="package-editor"] {
@@ -454,148 +701,15 @@
 					margin-right: 0;
 				}
 			}
+			
+			@media all and (min-width: 1366px) {
+				width: calc(~"(100% - (7 * 4px)) / 8");
+				
+				&:nth-child(10n) {
+					margin-right: 0;
+				}
+			}
 		}		
 	}
 }
 </style>
-
-<script>
-import HtmlEntities from "he"
-import { required } from 'vuelidate/lib/validators'
-
-import { PackageAPI } from "@/scripts/ApiUtil"
-
-import { VueEditor } from "vue2-editor"
-import MediaSelector from "@/components/MediaSelector"
-
-export default {
-	name: "PackageEditor",
-	components: {
-		VueEditor,
-		MediaSelector
-	},
-	data() {
-		return {
-			editorToolbar: [
-				['bold', 'italic', 'underline', 'strike'],
-				['blockquote', 'code-block'],
-				[{ 'list': 'ordered'}, { 'list': 'bullet' }],
-				[{ 'script': 'sub'}, { 'script': 'super' }],
-				[{ 'header': [false, 1, 2, 3, 4, 5, 6, ] }],
-				[{'align': ''}, {'align': 'center'}, {'align': 'right'}, {'align': 'justify'}],
-				['link'],
-			],
-			_packageData: {},
-			packageData: {
-				name: "",
-				identifier: "",
-				shortDescription: "",
-				detailedDescription: "",
-				platform: null,
-				architecture: null,
-				// releaseVersion: "1.0",
-				// releaseDescription: "Initial Release",
-				// bugsReportURL: null,
-				minOSVersion: null,
-				maxOSVersion: null,
-				section: null,
-				deviceFamilies: 0,
-				visible: true,
-				issueURL: null
-			},
-			existingPackage: false,
-			isWorking: {
-				packageName: false,
-				packageIdentifier: false,
-				savePackage: false,
-				deletePackage: false
-			}
-		}
-	},
-	validations: {
-		packageData: {
-			name: { required },
-			identifier: { required },
-			shortDescription: { required },
-			detailedDescription: { required },
-			platform: { required },
-			architecture: { required },
-			// section: { required },
-			deviceFamilies: { required },
-		}
-	},
-	mounted() {
-		// this._packageData = {...this.packageData};
-	},
-	methods: {
-		onPageShow(event) {
-			this.$parent.setHeader("");
-
-			if (event.detail.packageData) {
-				this.packageData = event.detail.packageData;
-				this.existingPackage = true;
-			} else {
-				this.packageData = this._packageData;
-				this.existingPackage = false;
-			}
-			
-			this.$v.packageData.$reset();
-		},
-		async checkNameAvailability() {
-			this.isWorking.packageName = true;
-			
-			let packageList = await PackageAPI.getPackages({
-				"package.name": this.packageData.name
-			});
-			this.isWorking.packageName = false;
-			
-			if (packageList.length) {
-				new metroUI.ContentDialog({
-					title: "Package name unavailable",
-					content: "The selected Package name is already in use. Please use a different Package name.",
-					commands: [{ text: "Ok", primary: true }]
-				}).show();
-			} else {
-				new metroUI.ContentDialog({
-					title: "Package name is available",
-					content: "The selected Package name is available for use.",
-					commands: [{ text: "Ok", primary: true }]
-				}).show();
-			}
-		},
-		deviceFamilyCheckboxChecked(type) {
-			this.packageData.deviceFamilies ^= type;
-			this.$v.packageData.$touch();
-		},
-		async savePackage() {
-			this.isWorking.savePackage = true;
-			
-			let result = await PackageAPI.updatePackage({
-				"package.id": this.packageData.id
-			}, Object.assign(this.packageData, {
-				status: 1
-			}));
-		
-			if (result.error) {
-				console.error(result.error);
-			} else {
-				this.packageData = result;
-			}
-			
-			this.isWorking.savePackage = false;
-			this.$v.packageData.$reset();
-		},
-		decodeText(text) {
-			return HtmlEntities.decode(text.replace(/<[^>]*>/g, ''));
-		}
-	},
-	computed: {
-		accountId() {
-			return this.$store.state.accountId;
-		},
-		isOwnedPackage() {
-			return this.packageData.accountId == this.accountId;
-		}
-	}
-}
-</script>

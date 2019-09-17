@@ -1,8 +1,8 @@
 <template>
-	<MetroPage page-id="packages" @navigatedTo.native="onNavigatedTo" @navigatedBackTo.native="onNavigatedBackTo">
+	<MetroPage page-id="packages">
 		<template slot="bottom-app-bar">
 			<MetroCommandBar>
-				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click="navigate('package-creator')" />
+				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click="navigate('/package/new')" />
 			</MetroCommandBar>
 		</template>
 		
@@ -69,6 +69,92 @@
 	</MetroPage>
 </template>
 
+<script>
+import { PackageAPI } from '@/scripts/ApiUtil'
+import { UserRole } from "@/scripts/Enumerations"
+
+export default {
+	name: "Packages",
+	data: () => ({
+		packageData: null
+	}),
+	beforeRouteEnter: async (to, from, next) => {
+		let _packageData;
+		
+		
+			_packageData = await PackageAPI.getPackages({
+				include: "versions"
+			});
+
+		
+		next(vm => {
+			if (vm.isDeveloper || vm.isModerator || vm.isAdministrator) {
+				vm.packageData = _packageData;
+			}
+			vm.$parent.setHeader("Packages");
+			vm.$parent.setSelectedMenuItem("packages");
+		});
+	},
+	methods: {
+		showPackageMenu(event, packageObj) {
+			let packageFlyout = new metroUI.MenuFlyout({
+				items: [{
+					icon: "edit",
+					text: this.$t('app.actions.edit'),
+					action: () => {
+						this.navigate(`/package/${packageObj.identifier}`)
+					}
+				}, {
+					icon: "delete",
+					text: this.$t('app.actions.delete'),
+					disabled: 
+						(packageObj.accountId != this.accountId) || 
+						(!this.isDeveloper && !this.isModerator && !this. isAdministrator),
+					action: async () => {
+						let deleteDialog = new metroUI.ContentDialog({
+							title: `Delete "${packageObj.name}"?`,
+							content: `Are you sure you want to delete "${packageObj.name}"? This action cannot be undone.\n\nAssociated Reviews will also be deleted.`,
+							commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+						});
+						
+						if (await deleteDialog.showAsync() === metroUI.ContentDialogResult.Primary) {
+							console.log("delete");
+						}
+					}
+				}]
+			});
+			
+			packageFlyout.showAt(event.target);
+		},
+		navigate(pageName, packageObj) {
+			this.$router.push(pageName);
+		}
+	},
+	computed: {
+		accountId() {
+			return this.$store.state.accountId;
+		},
+		isDeveloper() {
+			return this.$store.state.role & UserRole.DEVELOPER;
+		},
+		isModerator() {
+			return this.$store.state.role & UserRole.MODERATOR;
+		},
+		isAdministrator() {
+			return this.$store.state.role & UserRole.ADMINISTRATOR;
+		}
+	},
+	filters: {
+		number(value) {
+			return new Intl.NumberFormat().format(value)
+		},
+		date(value) {
+			return new Date(value).toLocaleString();
+		}
+	}
+}
+</script>
+
 <style lang="less">
 .page[data-page-id="packages"] {
 	.data-grid {
@@ -103,72 +189,3 @@
 	}
 }
 </style>
-
-<script>
-import { PackageAPI } from "@/scripts/ApiUtil"
-import { UserRole } from "@/scripts/Enumerations"
-
-export default {
-	name: "Packages",
-	data: () => ({
-		packageData: null
-	}),
-	methods: {
-		async onNavigatedTo() {
-			this.$parent.setHeader(this.$t('root.item_packages'));
-			
-			if (this.isDeveloper || this.isModerator || this.isAdministrator) {
-				this.packageData = await PackageAPI.getPackages({
-					include: "versions"
-				});
-			}
-		},
-		onNavigatedBackTo() {
-			this.$parent.setHeader(this.$t('root.item_packages'));
-		},
-		showPackageMenu(event, packageObj) {
-			let packageFlyout = new metroUI.MenuFlyout({
-				items: [{
-					icon: "edit",
-					text: this.$t('app.actions.edit'),
-					action: () => {
-						this.navigate("package-editor", packageObj)
-					}
-				}, {
-					icon: "delete",
-					text: this.$t('app.actions.delete'),
-					action: () => {
-						console.log("delete")
-					}
-				}]
-			});
-			
-			packageFlyout.showAt(event.target);
-		},
-		navigate(pageName, packageObj) {
-			this.$parent.navigate(pageName, {
-				packageData: packageObj
-			});
-		}
-	},
-	computed: {
-		isDeveloper() {
-			return this.$store.state.role & UserRole.DEVELOPER;
-		},
-		isModerator() {
-			return this.$store.state.role & UserRole.MODERATOR;
-		},
-		isAdministrator() {
-			return this.$store.state.role & UserRole.ADMINISTRATOR;
-		}
-	},
-	filters: {
-		number(value) {
-			return new Intl.NumberFormat().format(value)
-		},
-		date(value) {
-			return new Date(value).toLocaleString();
-		}
-	}
-}
-</script>

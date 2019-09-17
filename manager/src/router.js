@@ -11,15 +11,35 @@ const router = new Router({
 		{
 			path: '/login',
 			name: 'login',
-			component: () => import(/* webpackChunkName: "login" */ './views/Login.vue'),
+			component: () => import(/* webpackChunkName: "Login" */ './pages/Login.vue'),
 			meta: {
 				noAuth: true
 			}
 		},
 		{
 			path: '/',
-			name: 'root',
-			component: () => import(/* webpackChunkName: "root" */ './views/Root.vue'),
+			name: 'dashboard',
+			component: () => import(/* webpackChunkName: "Dashboard" */ './pages/Dashboard.vue')
+		},
+		{
+			path: '/packages',
+			name: 'packages',
+			component: () => import(/* webpackChunkName: "PackagesList" */ './pages/PackagesList.vue')
+		},
+		{
+			path: '/package/new',
+			name: 'package-creator',
+			component: () => import(/* webpackChunkName: "PackageCreator" */ './pages/PackageCreator.vue')
+		},
+		{
+			path: '/package/:packageId',
+			name: 'package-editor',
+			component: () => import(/* webpackChunkName: "PackageEditor" */ './pages/PackageEditor.vue')
+		},
+		{
+			path: '/reviews/:reviewId?',
+			name: 'reviews',
+			component: () => import(/* webpackChunkName: "ReviewThreads" */ './pages/ReviewThreads.vue')
 		}
 	]
 });

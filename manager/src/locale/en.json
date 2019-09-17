@@ -142,13 +142,21 @@
 				"universal": "Universal"
 			},
 			
+			"section_title": "Category",
+			"section_description": "Pick the category that best describes your Package",
+			"section_placeholder": "Pick a category",
+			
 			"system_requirements_title": "System Requirements",
 			"system_requirements_min_os": "Minimum required OS",
 			"system_requirements_max_os": "Maximum supported OS",
 			
 			"publishing_title": "Publishing Options",
 			"publishing_now": "Publish this Package immediately",
-			"publishing_later": "Publish this Package manually"
+			"publishing_later": "Publish this Package manually",
+			
+			"visibility_title": "Visibility",
+			"visibility_visible": "This Package is visible and can be downloaded",
+			"visibility_hidden": "Don't show this Package in the Store"
 		}
 	}
 }

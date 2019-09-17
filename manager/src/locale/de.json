@@ -142,13 +142,21 @@
 				"universal": "Universell"
 			},
 			
+			"section_title": "Kategorie",
+			"section_description": "Wähle eine Kategorie, die am besten zu deinem Paket passt.",
+			"section_placeholder": "Kategorie auswählen",
+			
 			"system_requirements_title": "Systemanforderungen",
 			"system_requirements_min_os": "Erforderliche Systemversion",
 			"system_requirements_max_os": "Maximal unterstütze Systemversion",
 			
 			"publishing_title": "Veröffentlichungsoptionen",
 			"publishing_now": "Das Paket sofort veröffentlichen",
-			"publishing_later": "Das Paket später manuell veröffentlichen"
+			"publishing_later": "Das Paket später manuell veröffentlichen",
+			
+			"visibility_title": "Sichtbarkeit",
+			"visibility_visible": "Das Paket ist sichtbar und kann heruntergeladen werden",
+			"visibility_hidden": "Das Paket nicht im Store anzeigen"
 		}
 	}
 }

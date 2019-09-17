@@ -1,6 +1,5 @@
 <template>
-	<MetroPage page-id="package-creator" @navigatedTo.native="onNavigatedTo" @navigatedBackTo.native="onNavigatedBackTo">
-		<!-- <MetroTextBlock text-style="sub-title">Create a Package</MetroTextBlock> -->
+	<MetroPage page-id="package-creator">
 		<MetroTextBlock>
 			To create your Package, you first need to reserve a name and a bundle identifier.<br>
 			With both of these associated to you, you can start submitting your Package.
@@ -74,14 +73,13 @@ export default {
 			}
 		}
 	},
+	beforeRouteEnter: async (to, from, next) => {
+		next(vm => {
+			vm.$parent.setHeader("Create a Package");
+			vm.$parent.setSelectedMenuItem("packages");
+		});
+	},
 	methods: {
-		onNavigatedTo() {
-			this.$parent.setHeader("Create a Package");
-		},
-		onNavigatedBackTo() {
-			this.$parent.setHeader("Create a Package");
-		},
-		
 		async checkNameAvailability() {
 			this.isWorking.packageName = true;
 			
@@ -135,9 +133,7 @@ export default {
 			if (packageObj.error) {
 				console.error(error);
 			} else {
-				this.$parent.navigate("package-editor", {
-					packageData: packageObj.data
-				});
+				this.$parent.navigate(`/package/${packageObj.identifier}`);
 			}
 		}
 	}

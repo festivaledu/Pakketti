@@ -1,5 +1,5 @@
 <template>
-	<MetroPage page-id="reviews" @navigatedTo.native="onPageShow">
+	<MetroPage page-id="reviews">
 		<MetroListView :pane-title="$t('root.item_reviews')" ref="list-view">
 			<template slot="menu-items">
 				<template v-if="reviewData.length">
@@ -27,7 +27,6 @@
 					</div>
 				</template>
 			</template>
-			
 			<MetroPage page-id="messages">
 				<template slot="bottom-app-bar">
 					<MetroCommandBar>
@@ -41,6 +40,93 @@
 		</MetroListView>
 	</MetroPage>
 </template>
+
+<script>
+import { PackageAPI, AccountAPI } from "@/scripts/ApiUtil";
+
+import MetroListView from '@/components/ListView'
+
+export default {
+	name: "ReviewThreads",
+	components: {
+		MetroListView
+	},
+	data: () => ({
+		packageData: [],
+		reviewData: [],
+		selectedThread: null
+	}),
+	beforeRouteEnter: async (to, from, next) => {
+		let _packageData = await PackageAPI.getPackages({
+			"include": "reviews"
+		});
+		
+		let _reviewData = await PackageAPI.getReviews();
+		
+		next(vm => {
+			vm.$parent.setHeader(null);
+			vm.$parent.setSelectedMenuItem("reviews");
+			
+			vm.packageData = _packageData;
+			vm.reviewData = _reviewData;
+			
+			vm.selectedThread = null;
+			vm.threadSelected(to.params.reviewId || null);
+			
+			vm.$refs["list-view"].navigate("messages");
+		});
+	},
+	methods: {
+		getPackageInfo(packageId) {
+			return this.packageData.find(packageObj => packageObj.id == packageId);
+		},
+		getReviewLastMessage(reviewObj) {
+			return reviewObj.messages[reviewObj.messages.length - 1].text;
+		},
+		async threadSelected(threadId) {
+			let thread = this.reviewData.find(reviewObj => reviewObj.id === threadId);
+			if (!thread) return;
+			
+			// thread.messages.find(messageObj => messageObj.
+			let packageOwnerAccountData = await AccountAPI.getUser({
+				"account.id": this.packageData.find(packageObj => packageObj.id === thread.packageId).accountId
+			});
+			let reviewerAccountData = await AccountAPI.getUser({
+				"account.id": thread.accountId
+			});
+			
+			this.selectedThread = threadId;
+			let messages = thread.messages.map(messageObj => {
+				return {
+					author: messageObj.accountId,
+					displayName: [packageOwnerAccountData, reviewerAccountData].find(accountObj => accountObj.id === messageObj.accountId).username,
+					date: new Date(messageObj.createdAt),
+					text: messageObj.text,
+					type: messageObj.accountId === this.accountId ? "sent" : "received"
+				}
+			});
+			
+			this.$refs["list-view"].setHeader(thread.title);
+			if (this.$refs["messages"]) {
+				this.$refs["messages"].setMessages(messages);
+			}
+		}
+	},
+	computed: {
+		accountId() {
+			return this.$store.state.accountId;
+		}
+	},
+	filters: {
+		date(value) {
+			return new Date(value).toLocaleDateString();
+		},
+		dateTime(value) {
+			return new Date(value).toLocaleString();
+		}
+	}
+}
+</script>
 
 <style lang="less">
 .page[data-page-id="reviews"] {
@@ -77,77 +163,3 @@
 	}
 }
 </style>
-
-<script>
-import { PackageAPI, AccountAPI } from "@/scripts/ApiUtil";
-
-import MetroListView from '@/components/ListView'
-
-export default {
-	name: "ReviewThreads",
-	components: {
-		MetroListView
-	},
-	data() {
-		return {
-			packageData: [],
-			reviewData: [],
-			selectedThread: null
-		}
-	},
-	mounted() {
-		this.$refs["list-view"].navigate("messages");
-	},
-	methods: {
-		async onPageShow(event) {
-			this.$parent.setHeader("");
-			
-			this.packageData = await PackageAPI.getPackages();
-			this.reviewData = await PackageAPI.getReviews();
-		},
-		getPackageInfo(packageId) {
-			return this.packageData.find(packageObj => packageObj.id == packageId);
-		},
-		getReviewLastMessage(reviewObj) {
-			return reviewObj.messages[reviewObj.messages.length - 1].text;
-		},
-		async threadSelected(threadId) {
-			let thread = this.reviewData.find(reviewObj => reviewObj.id === threadId);
-			if (!thread) return;
-			
-			// thread.messages.find(messageObj => messageObj.
-			let packageOwnerAccountData = await AccountAPI.getUser(this.packageData.find(packageObj => packageObj.id === thread.packageId).accountId);
-			let reviewerAccountData = await AccountAPI.getUser(thread.accountId);
-			
-			this.selectedThread = threadId;
-			let messages = thread.messages.map(messageObj => {
-				return {
-					author: messageObj.accountId,
-					displayName: [packageOwnerAccountData, reviewerAccountData].find(accountObj => accountObj.id === messageObj.accountId).username,
-					date: new Date(messageObj.createdAt),
-					text: messageObj.text,
-					type: messageObj.accountId === this.accountId ? "sent" : "received"
-				}
-			});
-			
-			this.$refs["list-view"].setHeader(thread.title);
-			if (this.$refs["messages"]) {
-				this.$refs["messages"].setMessages(messages);
-			}
-		}
-	},
-	computed: {
-		accountId() {
-			return this.$store.state.accountId;
-		}
-	},
-	filters: {
-		date(value) {
-			return new Date(value).toLocaleDateString();
-		},
-		dateTime(value) {
-			return new Date(value).toLocaleString();
-		}
-	}
-}
-</script>

@@ -1,40 +1,32 @@
 <template>
-	<MetroPage page-id="dashboard" @navigatedTo.native="onNavigatedTo" @navigatedBackTo.native="onNavigatedBackTo">		
+	<MetroPage page-id="dashboard">
 		<div class="mb-2" v-if="(isModerator || isAdministrator)">
 			<MetroTextBlock text-style="sub-title">{{ $t('dashboard.overview_header') }}</MetroTextBlock>
-			
-			<MetroStackPanel horizontal-alignment="center" v-if="!statisticsData">
-					<MetroProgressRing :active="true" style="width: 50px; height: 50px" />
-				</MetroStackPanel>
-			
-			<div class="row no-margin" v-if="statisticsData">
-				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard :name="$t('dashboard.overview_downloads')" :dataset="this.statisticsData.items.map(item => item['versionDownloaded'])" />
-				</div>
-				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard :name="$t('dashboard.overview_packages_created')" :dataset="this.statisticsData.items.map(item => item['packageCreated'])" />
-				</div>
-				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard :name="$t('dashboard.overview_packages_updated')" :dataset="this.statisticsData.items.map(item => item['versionCreated'])" />
-				</div>
-				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard :name="$t('dashboard.overview_reviews')" :dataset="this.statisticsData.items.map(item => item['reviewCreated'])" />
-				</div>
-				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard :name="$t('dashboard.overview_registrations')" :dataset="this.statisticsData.items.map(item => item['userRegistration'])" />
-				</div>
-				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-					<Statcard :name="$t('dashboard.overview_logins')" :dataset="this.statisticsData.items.map(item => item['userLogin'])" />
-				</div>
+		</div>
+		
+		<div class="row no-margin" v-if="statisticsData">
+			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+				<Statcard :name="$t('dashboard.overview_downloads')" :dataset="this.statisticsData.items.map(item => item['versionDownloaded'])" />
+			</div>
+			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+				<Statcard :name="$t('dashboard.overview_packages_created')" :dataset="this.statisticsData.items.map(item => item['packageCreated'])" />
+			</div>
+			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+				<Statcard :name="$t('dashboard.overview_packages_updated')" :dataset="this.statisticsData.items.map(item => item['versionCreated'])" />
+			</div>
+			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+				<Statcard :name="$t('dashboard.overview_reviews')" :dataset="this.statisticsData.items.map(item => item['reviewCreated'])" />
+			</div>
+			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+				<Statcard :name="$t('dashboard.overview_registrations')" :dataset="this.statisticsData.items.map(item => item['userRegistration'])" />
+			</div>
+			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+				<Statcard :name="$t('dashboard.overview_logins')" :dataset="this.statisticsData.items.map(item => item['userLogin'])" />
 			</div>
 		</div>
 		
 		<div class="mb-2" v-if="(isDeveloper || isModerator)">
 			<MetroTextBlock text-style="sub-title">{{ $t('packages.header') }}</MetroTextBlock>
-			
-			<MetroStackPanel horizontal-alignment="center" v-if="!packageData">
-				<MetroProgressRing :active="true" style="width: 50px; height: 50px" />
-			</MetroStackPanel>
 			
 			<div class="data-grid package-list" v-if="packageData">
 				<div class="data-grid-wrapper">
@@ -123,7 +115,7 @@
 								<div class="tr row">
 									<div class="td cell">
 										<MetroTextBlock>{{ reviewObj.title }}</MetroTextBlock>
-										<MetroTextBlock text-style="caption">packageName</MetroTextBlock>
+										<MetroTextBlock text-style="caption">{{ getPackageInfo(reviewObj.packageId).name }}</MetroTextBlock>
 									</div>
 									<div class="td cell">
 										<MetroTextBlock>{{ reviewObj.createdAt | date }}</MetroTextBlock>
@@ -208,6 +200,73 @@
 	</MetroPage>
 </template>
 
+<script>
+import { DeviceAPI, PackageAPI, StatisticsAPI } from '@/scripts/ApiUtil'
+import { UserRole } from "@/scripts/Enumerations"
+
+import Statcard from "@/components/Statcard"
+
+export default {
+	name: "dashboard",
+	components: {
+		Statcard
+	},
+	data: () => ({
+		packageData: null,
+		statisticsData: null,
+		reviewData: null,
+		deviceData: null
+	}),
+	beforeRouteEnter: async (to, from, next) => {
+		let _packageData = await PackageAPI.getPackages({
+			include: "versions, reviews, ratings"
+		});
+		
+		let _statisticsData = null;
+		// if (this.isModerator || this.isAdministrator) {
+			_statisticsData = await StatisticsAPI.getMonth();
+		// }
+		
+		let _reviewData = await PackageAPI.getReviews();
+		let _deviceData = await DeviceAPI.getDevices();
+		
+		next(vm => {
+			vm.packageData = _packageData;
+			vm.statisticsData = _statisticsData
+			vm.reviewData = _reviewData;
+			vm.deviceData = _deviceData;
+			
+			vm.$parent.setHeader("Dashboard");
+			vm.$parent.setSelectedMenuItem("dashboard");
+		});
+	},
+	methods: {
+		getPackageInfo(packageId) {
+			return this.packageData.find(packageObj => packageObj.id == packageId);
+		}
+	},
+	computed: {
+		isDeveloper() {
+			return this.$store.state.role & UserRole.DEVELOPER;
+		},
+		isModerator() {
+			return this.$store.state.role & UserRole.MODERATOR;
+		},
+		isAdministrator() {
+			return this.$store.state.role & UserRole.ADMINISTRATOR;
+		}
+	},
+	filters: {
+		number(value) {
+			return new Intl.NumberFormat().format(value)
+		},
+		date(value) {
+			return new Date(value).toLocaleString();
+		}
+	}
+}
+</script>
+
 <style lang="less">
 .page[data-page-id="dashboard"] {
 	.data-grid {
@@ -244,69 +303,3 @@
 	}
 }
 </style>
-
-<script>
-import { PackageAPI, StatisticAPI, DeviceAPI } from "@/scripts/ApiUtil"
-import { UserRole } from "@/scripts/Enumerations"
-
-import Statcard from "@/components/Statcard"
-
-export default {
-	name: "Dashboard",
-	components: {
-		Statcard
-	},
-	data: () => ({
-		packageData: null,
-		statisticsData: null,
-		reviewData: null,
-		deviceData: null,
-		
-		progressRingActive: false
-	}),
-	methods: {
-		async onNavigatedTo() {
-			this.$parent.setHeader(this.$t('root.item_dashboard'));
-			
-			// if (this.isDeveloper) {
-				this.packageData = await PackageAPI.getPackages({
-					include: "versions,reviews"
-				});
-			// }
-			
-			if (this.isModerator || this.isAdministrator) {
-				this.statisticsData = await StatisticAPI.getMonth();
-			}
-			
-			this.reviewData = await PackageAPI.getReviews();
-			this.deviceData = await DeviceAPI.getDevices();
-		},
-		onNavigatedBackTo() {
-			this.$parent.setHeader(this.$t('root.item_dashboard'));
-		},
-		
-		getPackageInfo(packageId) {
-			return this.packageData.find(packageObj => packageObj.id == packageId);
-		}
-	},
-	computed: {
-		isDeveloper() {
-			return this.$store.state.role & UserRole.DEVELOPER;
-		},
-		isModerator() {
-			return this.$store.state.role & UserRole.MODERATOR;
-		},
-		isAdministrator() {
-			return this.$store.state.role & UserRole.ADMINISTRATOR;
-		}
-	},
-	filters: {
-		number(value) {
-			return new Intl.NumberFormat().format(value)
-		},
-		date(value) {
-			return new Date(value).toLocaleString();
-		}
-	}
-}
-</script>

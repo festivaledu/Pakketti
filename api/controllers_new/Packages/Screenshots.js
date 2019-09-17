@@ -237,6 +237,7 @@ router.post("/screenshots/files", async (req, res) => {
 				fileData: screenshotFiles[fileId].data,
 				fileMime: screenshotFiles[fileId].mimetype
 			});
+			didUpdateScreenshot = true;
 		}
 	});
 	

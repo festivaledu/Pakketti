@@ -67,30 +67,6 @@
 	</MetroView>
 </template>
 
-<style lang="less">
-	.container {
-		min-height: 100vh;
-		display: flex;
-		align-items: center;
-		
-		& > .row {
-			flex: 1;
-		}
-		
-		input[type="email"],
-		input[type="number"],
-		input[type="password"],
-		input[type="search"],
-		input[type="tel"],
-		input[type="text"],
-		input[type="url"],
-		.list {
-			max-width: initial;
-		}
-	}
-</style>
-
-
 <script>
 import { SocketService } from "@/scripts/SocketService"
 import { AuthAPI } from "@/scripts/ApiUtil"
@@ -239,3 +215,26 @@ export default {
 	}
 }
 </script>
+
+<style lang="less">
+	.container {
+		min-height: 100vh;
+		display: flex;
+		align-items: center;
+		
+		& > .row {
+			flex: 1;
+		}
+		
+		input[type="email"],
+		input[type="number"],
+		input[type="password"],
+		input[type="search"],
+		input[type="tel"],
+		input[type="text"],
+		input[type="url"],
+		.list {
+			max-width: initial;
+		}
+	}
+</style>
