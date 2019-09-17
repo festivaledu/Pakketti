@@ -61,11 +61,11 @@ router.get("/reviews", async (req, res) => {
 	
 	if (account) {
 		if (account.role < UserRole.DEVELOPER) {
-			packageReviewData = packageReviewList.filter(packageReviewObj => packageReviewObj.accountId == account.id);
+			packageReviewData = packageReviewData.filter(packageReviewObj => packageReviewObj.accountId == account.id);
 		} else if (account.role < UserRole.MODERATOR) {
 			let _packageList = packageList.filter(packageObj => packageObj.accountId == account.id);
 			
-			packageReviewData = packageReviewList.filter(packageReviewObj => {
+			packageReviewData = packageReviewData.filter(packageReviewObj => {
 				return packageReviewObj.accountId == account.id || _packageList.map(packageObj => packageObj.id).includes(packageReviewObj.packageId);
 			});
 		}
