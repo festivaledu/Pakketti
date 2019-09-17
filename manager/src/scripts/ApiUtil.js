@@ -374,8 +374,8 @@ export class PackageAPI {
 		
 		return await SocketService.get(`/packages/screenshots?${query}`);
 	}
-
-	static async createPackageScreenshots(parameters) {
+	
+	static async createPackageScreenshots(parameters, data) {
 		const query = parseUrlFromObject(flattenObject(parameters)); 
 		
 		return await SocketService.post(`/packages/screenshots?${query}`, data, {
@@ -385,7 +385,9 @@ export class PackageAPI {
 		});
 	}
 
-	static async uploadPackageScreenshots(packageId, data) {
+	static async uploadPackageScreenshots(parameters, data) {
+		const query = parseUrlFromObject(flattenObject(parameters)); 
+		
 		const formData = new FormData();
 		Object.keys(data).forEach(key => {
 			formData.append(key, data[key]);
@@ -410,7 +412,7 @@ export class PackageAPI {
 
 	// - Versions
 	
-	static async getPackageVersions(packageId) {
+	static async getPackageVersions(parameters) {
 		const query = parseUrlFromObject(flattenObject(parameters)); 
 		
 		return await SocketService.get(`/packages/versions?${query}`, {
@@ -504,7 +506,7 @@ export class RequestAPI {
 	}
 }
 
-export class StatisticAPI {
+export class StatisticsAPI {
 	static async getDay() {
 		return await SocketService.get("/statistics/day");
 	}

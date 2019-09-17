@@ -257,14 +257,32 @@
 				</div>
 			</MetroPivotItem>
 			<MetroPivotItem :header="$t('package_editor.pivot_headers.media')">
-				<MetroTextBlock text-style="sub-title">App Icon</MetroTextBlock>
-				<div class="grid-view">
-					<MediaSelector v-model="packageData.iconMime" />
+				<div class="mb-4">
+					<MetroTextBlock text-style="sub-title mb-2">App Icon</MetroTextBlock>
+					<MediaItemSelector
+						:defaultImgSrc="`http://localhost:3000/media/icon/${packageData.id}`"
+						v-model="packageData.iconMime"
+						@fileChanged="packageIconChanged"
+					/>
 				</div>
 				
-				<MetroTextBlock text-style="sub-title">Header Image</MetroTextBlock>
-				<div class="grid-view">
-					<MediaSelector v-model="packageData.packageHeaderMime" />
+				<div class="mb-4">
+					<MetroTextBlock text-style="sub-title mb-2">Header Image</MetroTextBlock>
+					<MediaItemSelector
+						:defaultImgSrc="`http://localhost:3000/media/hero/${packageData.id}`"
+						v-model="packageData.headerImageMime"
+						@fileChanged="packageHeaderChanged"
+					/>
+				</div>
+				
+				<div class="mb-4">
+					<MetroTextBlock text-style="sub-title mb-2">Screenshots</MetroTextBlock>
+					<MediaGroupSelector
+						defaultImgSrc="http://localhost:3000/media/screenshot"
+						v-model="packageData.screenshots"
+						@fileChanged="screenshotAdded"
+						@fileDeleted="screenshotDeleted"
+					/>
 				</div>
 			</MetroPivotItem>
 			<MetroPivotItem :header="$t('package_editor.pivot_headers.versions')">
@@ -443,6 +461,78 @@ export default {
 		decodeText(text) {
 			return HtmlEntities.decode(text.replace(/<[^>]*>/g, ''));
 		},
+		
+		async packageIconChanged(iconFile) {
+			if (iconFile) {
+				let result = await PackageAPI.updatePackageIcon({
+					"package.id": this.packageData.id
+				}, iconFile);
+				
+				console.log(result);
+			} else {
+				let result = await PackageAPI.deletePackageIcon({
+					"package.id": this.packageData.id
+				});
+				
+				console.log(result);
+			}
+		},
+		async packageHeaderChanged(headerFile) {
+			if (headerFile) {
+				let result = await PackageAPI.updatePackageHero({
+					"package.id": this.packageData.id
+				}, headerFile);
+				
+				console.log(result);
+			} else {
+				let result = await PackageAPI.deletePackageHero({
+					"package.id": this.packageData.id
+				});
+				
+				console.log(result);
+			}
+		},
+		async screenshotAdded(file) {
+			const reader = new FileReader();
+			reader.onload = (progress) => {
+				let img = new Image();
+				img.onload = async () => {
+					let screenshotList = await PackageAPI.createPackageScreenshots({
+						"package.id": this.packageData.id
+					}, [{
+						screenClass: `${img.width}w-${img.height}h`,
+						width: img.width,
+						height: img.height,
+						sha256: crypto.SHA256(reader.result).toString(crypto.enc.hex)
+					}]);
+					
+					console.log(screenshotList);
+					if (screenshotList.error) {
+						console.error(screenshotList.error);
+					} else {
+						let result = await PackageAPI.uploadPackageScreenshots({
+							"package.id": this.packageData.id
+						}, {
+							[screenshotList[0].id]: file
+						});
+						
+						this.packageData.screenshots = this.packageData.screenshots.concat(screenshotList);
+					}
+				}
+				
+				img.src = reader.result;
+			}
+			
+			reader.readAsDataURL(file);
+		},
+		async screenshotDeleted(screenshotObj) {
+			this.packageData.screenshots.splice(this.packageData.screenshots.indexOf(screenshotObj), 1);
+			
+			let result = await PackageAPI.deletePackageScreenshot({
+				"package.id": this.packageData.id,
+				"screenshot.id": screenshotObj.id
+			});
+		}
 	},
 	computed: {
 		accountId() {
