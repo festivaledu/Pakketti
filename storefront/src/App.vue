@@ -13,8 +13,12 @@
 						<MetroNavigationViewItem :content="$t('root.header.start')" page-id="start" />
 					</router-link>
 					
-					<MetroNavigationViewItem :content="$t('root.header.apps')" page-id="apps" />
-					<MetroNavigationViewItem :content="$t('root.header.tweaks')" page-id="tweaks" />
+					<router-link tag="div" to="/section/Apps">
+						<MetroNavigationViewItem :content="$t('root.header.apps')" page-id="apps" />
+					</router-link>
+					<router-link tag="div" to="/section/Tweaks">
+						<MetroNavigationViewItem :content="$t('root.header.tweaks')" page-id="tweaks" />
+					</router-link>
 					
 					<template v-if="windowWidth <= 640">
 						<MetroNavigationViewItemSeparator />
@@ -50,7 +54,7 @@
 					</template>
 				</template>
 				
-				<router-view/>
+				<router-view />
 			</MinimalNavigationView>
 		</MetroPage>
 	</MetroView>

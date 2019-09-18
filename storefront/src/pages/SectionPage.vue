@@ -1,11 +1,11 @@
 <template>
-	<MetroPage page-id="developer">
-		<template v-if="!developerData">
+	<MetroPage page-id="section">
+		<template v-if="!packageData">
 			<MetroProgressRing :active="true" style="position: absolute; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: 80px; height: 80px" />
 		</template>
 		
-		<template v-if="developerData">
-			<MetroTextBlock text-style="sub-header" style="font-size: 24px; font-weight: 500; margin-top: 12px">{{ $t('developer.published_by', { username: developerData.username }) }}</MetroTextBlock>
+		<template v-if="packageData">
+			<MetroTextBlock text-style="sub-header" style="font-size: 24px; font-weight: 500; margin-top: 12px">{{ $t(`root.header.${$route.params.sectionId.toLowerCase()}`) }}</MetroTextBlock>
 			
 			<template v-if="packageData && !packageData.length">
 				<MetroTextBlock text-style="sub-title" >{{ $t('developer.no_results') }}</MetroTextBlock>
@@ -44,43 +44,43 @@ import AppPresentationCell from '@/components/AppPresentationCell'
 import CurrentRating from '@/components/CurrentRating'
 
 export default {
-	name: "DeveloperPage",
+	name: "SectionPage",
 	components: {
 		AppPresentationCell,
 		CurrentRating,
 	},
 	data: () => ({
-		developerData: null,
 		packageData: null
 	}),
 	beforeRouteEnter: async (to, from, next) => {
-		let _developerData = await AccountAPI.getUser({
-			"account.username": to.params.developerId,
-		});
-		
-		let _packageData = (!Object.keys(_developerData).length || _developerData.error) ? null : await PackageAPI.getPackages({
-			"package.accountId": _developerData.id,
-			include: "ratings"
+		let _packageData = await PackageAPI.getPackages({
+			"package.section": to.params.sectionId,
+			include: "ratings,versions"
 		});
 		
 		next(vm => {
-			if (!Object.keys(_developerData).length || _developerData.error) {
-				vm.developerData = {};
-			} else {
-				vm.developerData = _developerData;
-			}
-			
 			vm.packageData = _packageData;
 			
-			vm.$parent.setHeader(vm.$t('root.header.start'));
-			vm.$parent.setSelectedMenuItem("start");
+			vm.$parent.setHeader(vm.$t(`root.header.${to.params.sectionId.toLowerCase()}`));
+			vm.$parent.setSelectedMenuItem(to.params.sectionId.toLowerCase());
 		});
+	},
+	async beforeRouteUpdate(to, from, next) {
+		this.packageData = await PackageAPI.getPackages({
+			"package.section": to.params.sectionId,
+			include: "ratings,versions"
+		});
+
+		this.$parent.setHeader(this.$t(`root.header.${to.params.sectionId.toLowerCase()}`));
+		this.$parent.setSelectedMenuItem(to.params.sectionId.toLowerCase());
+		
+		next();
 	}
 }
 </script>
 
 <style lang="less">
-.page[data-page-id="developer"] {
+.page[data-page-id="section"] {
 	.lockup-collection-view {
 		display: flex;
 		flex-wrap: wrap;
