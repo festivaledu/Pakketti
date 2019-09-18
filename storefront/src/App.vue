@@ -196,7 +196,83 @@ export default {
 			}
 		},
 		async register() {
-			
+			var registerDialog = new metroUI.ContentDialog({
+				title: this.$t('login.register_title'),
+				content: (
+					<MetroStackPanel>
+						<MetroTextBox
+							header={this.$t('login.register_username')}
+							placeholder-text={this.$t('login.register_username_placeholder')}
+							required={true}
+							name="username"
+							style="margin-bottom: 8px"
+						/>
+						<MetroTextBox
+							header={this.$t('login.register_email')}
+							placeholder-text={this.$t('login.register_email_placeholder')}
+							required={true}
+							name="email"
+							style="margin-bottom: 8px"
+						/>
+						<MetroPasswordBox
+							header={this.$t('login.register_password')}
+							placeholder-text={this.$t('login.register_password_required')}
+							required={true}
+							min-length={8}
+							name="password"
+							style="margin-bottom: 8px"
+						/>
+						<MetroPasswordBox
+							header={this.$t('login.register_password_confirm')}
+							placeholder-text={this.$t('login.register_password_required')}
+							required={true}
+							min-length={8}
+							name="password-confirm"
+						/>
+					</MetroStackPanel>
+				),
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+			});
+			if (await registerDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
+				let texts = registerDialog.text;
+				if (texts["password"].localeCompare(texts["password-confirm"]) != 0) {
+					new metroUI.ContentDialog({
+						title: this.$t('login.register_password_match_title'),
+						content: this.$t('login.register_password_match_message'),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
+					return;
+				}
+				
+				this.isWorking = true;
+				AuthAPI.register({
+					username: texts["username"],
+					email: texts["email"],
+					password: CryptoJS.SHA512(texts["password"]).toString(CryptoJS.enc.Hex)
+				}).then(async authData => {
+					this.isWorking = false;
+
+					if (!authData.auth) {
+						new metroUI.ContentDialog({
+							title: this.$t('login.login_error_title'),
+						content: `<p>${this.$t('login.login_error_message')}<br><span style="font-style: italic">${typeof authData === 'string' ? authData : `${authData.code}: ${authData.message}`}</span></p>`,
+							commands: [{ text: "Ok", primary: true }]
+						}).show();
+						return;
+					} else {
+						await new metroUI.ContentDialog({
+							title: this.$t('login.register_success_title'),
+							content: this.$t('login.register_success_message'),
+							commands: [{ text: "Ok", primary: true }]
+						}).showAsync();
+						
+						this.$store.commit("setAccountId", authData.accountId);
+						this.$store.commit("setRole", authData.role);
+						
+						window.location.reload(true);
+					}
+				});
+			}
 		},
 		logout() {
 			this.$store.commit("setAccountId", null);
