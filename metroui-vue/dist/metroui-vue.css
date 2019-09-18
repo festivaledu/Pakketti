@@ -7895,6 +7895,7 @@ a.hyperlink-button[disabled] {
 .navigation-view > .pane-content > .pane-title .text-block {
   font-weight: 700;
   margin-left: 40px;
+  white-space: nowrap;
 }
 .navigation-view > .pane-content > .pane-title + .auto-suggest-area {
   margin-top: 0 !important;

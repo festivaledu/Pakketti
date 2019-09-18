@@ -16,6 +16,14 @@
 			<MetroStackPanel orientation="horizontal" vertical-alignment="center" class="pane-title" v-if="paneTitle">
 				<MetroTextBlock text-style="base" :text="paneTitle" />
 			</MetroStackPanel>
+			
+			<MetroStackPanel orientation="horizontal" vertical-alignment="center" class="auto-suggest-area" v-if="this.$slots['auto-suggest-box']">
+				<slot name="auto-suggest-box" />
+				
+				<MetroButton class="auto-suggest-button" @click="focusAutoSuggest">
+					<MetroSymbolIcon symbol="find" />
+				</MetroButton>
+			</MetroStackPanel>
 
 			<MetroStackPanel class="menu-items" vertical-alignment="top" ref="menu-items">
 				<slot name="menu-items" />
@@ -64,7 +72,7 @@ export default {
 			
 			collapsed: false,
 			expanded: false,
-			_paneDisplayMode: this.$props.paneDisplayMode,
+			_paneDisplayMode: "",
 			minimal: this.$props.paneDisplayMode === "left-minimal",
 			top: this.$props.paneDisplayMode === "top",
 			
@@ -77,7 +85,7 @@ export default {
 	mounted() {
 		const nav = this;
 		
-		this._paneDisplayMode = this.paneDisplayMode;
+		this.$data._paneDisplayMode = this.paneDisplayMode;
 		
 		this.$refs["content-frame"].querySelectorAll(".page").forEach(item => {
 			if (item.hasAttribute("data-page-id")) {
@@ -105,7 +113,7 @@ export default {
 						isSettingsSelected: item === this.$refs["settings-nav-pane-item"]
 					});
 
-					if ((this._paneDisplayMode === "left-compact" || this._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this._paneDisplayMode !== "left")) {
+					if ((this.$data._paneDisplayMode === "left-compact" || this.$data._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.$data._paneDisplayMode !== "left")) {
 						this.expanded = false
 					}
 				});
@@ -122,7 +130,7 @@ export default {
 					this.menuItems[item.__vue__.$props.pageId] = item;
 					
 					item.addEventListener("click", () => {
-						if ((this._paneDisplayMode === "left-compact" || this._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this._paneDisplayMode !== "left")) {
+						if ((this.$data._paneDisplayMode === "left-compact" || this.$data._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.$data._paneDisplayMode !== "left")) {
 							this.expanded = false
 							
 							setTimeout(() => {
@@ -183,21 +191,35 @@ export default {
 			this.headerText = headerText;
 		},
 		setSelectedMenuItem(pageId) {
-			if (this.menuItems[pageId]) {
-				Object.values(this.menuItems).forEach(menuItem => {
-					menuItem.classList.remove("selected");
-				});
+			Object.values(this.menuItems).forEach(menuItem => {
+				menuItem.classList.remove("selected");
+			});
 				
+			if (this.menuItems[pageId]) {
 				this.menuItems[pageId].classList.add("selected");
 			}
 		},
 		
 		togglePane() {
-			if ((this._paneDisplayMode === "left-compact" || this._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this._paneDisplayMode !== "left")) {
+			if ((this.$data._paneDisplayMode === "left-compact" || this.$data._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.$data._paneDisplayMode !== "left")) {
 				this.expanded = !this.expanded
 			} else {
 				this.collapsed = !this.collapsed
 			}
+		},
+		focusAutoSuggest() {
+			if (!this.$el.querySelector(".auto-suggest-area input")) return;
+			
+			if (window.innerWidth < 1008) {
+				this.expanded = true
+			} else {
+				this.collapsed = false
+			}
+			
+			const nav = this;
+			setTimeout(() => {
+				!this.$el.querySelector(".auto-suggest-area input").focus();
+			}, 0);
 		},
 		setPaneDisplayMode(displayMode) {
 			this.$data._paneDisplayMode = displayMode;

@@ -118,7 +118,7 @@ export default {
 						isSettingsSelected: item === this.$refs["settings-nav-pane-item"]
 					});
 
-					if ((this._paneDisplayMode === "left-compact" || this._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this._paneDisplayMode !== "left")) {
+					if ((this.$data._paneDisplayMode === "left-compact" || this.$data._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.$data._paneDisplayMode !== "left")) {
 						this.expanded = false
 					}
 				});
@@ -135,7 +135,7 @@ export default {
 					this.menuItems[item.__vue__.$props.pageId] = item;
 					
 					item.addEventListener("click", () => {
-						if ((this._paneDisplayMode === "left-compact" || this._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this._paneDisplayMode !== "left")) {
+						if ((this.$data._paneDisplayMode === "left-compact" || this.$data._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.$data._paneDisplayMode !== "left")) {
 							this.expanded = false
 							
 							setTimeout(() => {
@@ -242,9 +242,18 @@ export default {
 		setHeader(headerText) {
 			this.headerText = headerText;
 		},
+		setSelectedMenuItem(pageId) {
+			Object.values(this.menuItems).forEach(menuItem => {
+				menuItem.classList.remove("selected");
+			});
+				
+			if (this.menuItems[pageId]) {
+				this.menuItems[pageId].classList.add("selected");
+			}
+		},
 		
 		togglePane() {
-			if ((this._paneDisplayMode === "left-compact" || this._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this._paneDisplayMode !== "left")) {
+			if ((this.$data._paneDisplayMode === "left-compact" || this.$data._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.$data._paneDisplayMode !== "left")) {
 				this.expanded = !this.expanded
 			} else {
 				this.collapsed = !this.collapsed
