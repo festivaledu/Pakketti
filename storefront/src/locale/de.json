@@ -35,11 +35,23 @@
 		"register_success_title": "Registrierung erfolgreich",
 		"register_success_message": "<p>Dein Account wurde erfolgreich erstellt.<br>Danke, dass du dich für @:(app.name) angemeldet hast!<p>"
 	},
+	"section": {
+		"Administration": "Administration",
+		"Apps": "Apps",
+		"Archiving": "Archivierung",
+		"Development": "Entwicklung",
+		"Fonts": "Schriftarten",
+		"Networking": "Netzwerk",
+		"Packaging": "Paketerstellung",
+		"Security": "Sicherheit",
+		"System": "System",
+		"Tweaks": "Erweiterungen",
+		"Utilities": "Dienstprogramme",
+		"Wallpaper": "Hintergrundbilder"
+	},
 	"root": {
 		"header": {
-			"start": "Start",
-			"apps": "Apps",
-			"tweaks": "Erweiterungen"
+			"start": "Start"
 		},
 		"dashboard_title": "Dashboard",
 		"search_placeholder": "Suchen",

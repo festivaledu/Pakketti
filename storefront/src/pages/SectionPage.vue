@@ -5,7 +5,7 @@
 		</template>
 		
 		<template v-if="packageData">
-			<MetroTextBlock text-style="sub-header" style="font-size: 24px; font-weight: 500; margin-top: 12px">{{ $t(`root.header.${$route.params.sectionId.toLowerCase()}`) }}</MetroTextBlock>
+			<MetroTextBlock text-style="sub-header" style="font-size: 24px; font-weight: 500; margin-top: 12px">{{ $t(`section.${$route.params.sectionId}`) }}</MetroTextBlock>
 			
 			<template v-if="packageData && !packageData.length">
 				<MetroTextBlock text-style="sub-title" >{{ $t('developer.no_results') }}</MetroTextBlock>
@@ -61,7 +61,7 @@ export default {
 		next(vm => {
 			vm.packageData = _packageData;
 			
-			vm.$parent.setHeader(vm.$t(`root.header.${to.params.sectionId.toLowerCase()}`));
+			vm.$parent.setHeader(vm.$t(`section.${to.params.sectionId}`));
 			vm.$parent.setSelectedMenuItem(to.params.sectionId.toLowerCase());
 		});
 	},
@@ -71,7 +71,7 @@ export default {
 			include: "ratings,versions"
 		});
 
-		this.$parent.setHeader(this.$t(`root.header.${to.params.sectionId.toLowerCase()}`));
+		this.$parent.setHeader(this.$t(`section.${to.params.sectionId}`));
 		this.$parent.setSelectedMenuItem(to.params.sectionId.toLowerCase());
 		
 		next();

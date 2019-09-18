@@ -309,7 +309,7 @@ export default {
 			
 			vm.developerData = _developerData;
 			
-			vm.$parent.setHeader(vm.$t(`root.header.${_packageData[0].section.toLowerCase()}`));
+			vm.$parent.setHeader(vm.$t(`section.${_packageData[0].section}`));
 			vm.$parent.setSelectedMenuItem(_packageData[0].section.toLowerCase());
 		});
 	},
