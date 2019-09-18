@@ -2,7 +2,7 @@
 	<div class="messages">
 		<div class="messages-container" ref="container">
 			<MetroStackPanel class="messages-wrapper" vertical-alignment="bottom">
-				<div :class="{'message': messageObj.type != 'system', [`message-${messageObj.type}`]: true, 'message-tail': messageObj.hasTail, 'message-first': messageObj.isFirst}" v-for="(messageObj, index) in messages" :key="index">
+				<div :class="{'message': messageObj.type != 'system', [`message-${messageObj.type}`]: true, 'message-tail': messageObj.hasTail, 'message-first': messageObj.isFirst}" v-for="(messageObj, index) in $data._messages" :key="index">
 					<template v-i="messageObj.type === 'sent' || messageObj.type === 'received'">
 						<div class="message-content">
 							<div class="message-bubble">
@@ -24,7 +24,7 @@
 			</MetroStackPanel>
 		</div>
 		
-		<MetroStackPanel class="messages-input" orientation="horizontal" vertical-alignment="top">
+		<MetroStackPanel class="messages-input" orientation="horizontal" vertical-alignment="top" v-show="showInput">
 			<textarea 
 				:placeholder="placeholderText"
 				v-model="messageText"
@@ -54,16 +54,30 @@ export default {
 	props: {
 		useTextarea: Boolean,
 		disabled: Boolean,
+		showInput: {
+			type: Boolean,
+			default: true
+		},
 		placeholderText: {
 			type: String,
 			default: "Type a text message"
+		},
+		messages: {
+			type: Array,
+			default: []
 		}
 	},
 	data() {
 		return {
-			messages: [],
+			_messages: [],
 			messageText: ""
 		}
+	},
+	mounted() {
+		this.$data._messages = [];
+		this.messages.forEach(messageObj => {
+			this.addMessage(messageObj);
+		});
 	},
 	methods: {
 		_onInput(e) {
@@ -107,8 +121,8 @@ export default {
 		},
 		
 		addMessage(message) {
-			if (this.messages.lastObject()) {
-				const lastMessage = this.messages.lastObject();
+			if (this.$data._messages.lastObject()) {
+				const lastMessage = this.$data._messages.lastObject();
 
 				if (lastMessage.type != "sent" && message.type == "sent") {
 					message.hasTail = true;
@@ -134,17 +148,17 @@ export default {
 			}
 
 			message.text = this._renderMessage(message.text);
-			this.messages.push(message);
+			this.$data._messages.push(message);
 
 			this._scrollToBottom();
 		},
 		addSystemMessage(text) {
-			this.messages.push({ type: "system", text: text });
+			this.$data._messages.push({ type: "system", text: text });
 
 			this._scrollToBottom();
 		},
 		setMessages(messageData) {
-			this.messages = [];
+			this.$data._messages = [];
 			messageData.forEach(messageObj => {
 				this.addMessage(messageObj);
 			});

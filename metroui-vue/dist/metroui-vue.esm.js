@@ -2191,9 +2191,15 @@ __vue_render__$8._withStripped = true;
 
 var script$9 = {
 	name: "MetroFlipView",
+	props: {
+		initialIndex: {
+			type: Number,
+			default: 0
+		}
+	},
 	data() {
 		return {
-			page: 0,
+			page: this.$props.initialIndex,
 			itemCount: -1
 		}
 	},
@@ -2708,16 +2714,30 @@ var script$e = {
 	props: {
 		useTextarea: Boolean,
 		disabled: Boolean,
+		showInput: {
+			type: Boolean,
+			default: true
+		},
 		placeholderText: {
 			type: String,
 			default: "Type a text message"
+		},
+		messages: {
+			type: Array,
+			default: []
 		}
 	},
 	data() {
 		return {
-			messages: [],
+			_messages: [],
 			messageText: ""
 		}
+	},
+	mounted() {
+		this.$data._messages = [];
+		this.messages.forEach(messageObj => {
+			this.addMessage(messageObj);
+		});
 	},
 	methods: {
 		_onInput(e) {
@@ -2761,44 +2781,52 @@ var script$e = {
 		},
 		
 		addMessage(message) {
-			if (this.messages.lastObject()) {
-				const lastMessage = this.messages.lastObject();
+			if (this.$data._messages.lastObject()) {
+				console.log(1);
+				const lastMessage = this.$data._messages.lastObject();
 
 				if (lastMessage.type != "sent" && message.type == "sent") {
+					console.log(2);
 					message.hasTail = true;
 					message.isFirst = true;
 				} else if (lastMessage.type == "sent" && message.type == "sent") {
+					console.log(3);
 					lastMessage.hasTail = false;
 					message.hasTail = true;
 				}
 
 				if (lastMessage.type != "received" && message.type == "received") {
+					console.log(4);
 					message.hasTail = true;
 				} else if (lastMessage.type == "received" && message.type == "received") {
+					console.log(5);
 					if (message.author != lastMessage.author) {
+						console.log(6);
 						message.hasTail = true;
 						message.isFirst = true;
 					} else {
+						console.log(7);
 						message.hasTail = false;
 					}
 				}
 			} else {
+				console.log(8);
 				message.hasTail = true;
 				message.isFirst = true;
 			}
 
 			message.text = this._renderMessage(message.text);
-			this.messages.push(message);
+			this.$data._messages.push(message);
 
 			this._scrollToBottom();
 		},
 		addSystemMessage(text) {
-			this.messages.push({ type: "system", text: text });
+			this.$data._messages.push({ type: "system", text: text });
 
 			this._scrollToBottom();
 		},
 		setMessages(messageData) {
-			this.messages = [];
+			this.$data._messages = [];
 			messageData.forEach(messageObj => {
 				this.addMessage(messageObj);
 			});
@@ -2833,7 +2861,7 @@ var __vue_render__$e = function() {
               staticClass: "messages-wrapper",
               attrs: { "vertical-alignment": "bottom" }
             },
-            _vm._l(_vm.messages, function(messageObj, index) {
+            _vm._l(_vm.$data._messages, function(messageObj, index) {
               var _obj;
               return _c(
                 "div",
@@ -2928,6 +2956,14 @@ var __vue_render__$e = function() {
       _c(
         "MetroStackPanel",
         {
+          directives: [
+            {
+              name: "show",
+              rawName: "v-show",
+              value: _vm.showInput,
+              expression: "showInput"
+            }
+          ],
           staticClass: "messages-input",
           attrs: { orientation: "horizontal", "vertical-alignment": "top" }
         },
@@ -3246,6 +3282,15 @@ var script$f = {
 		},
 		setHeader(headerText) {
 			this.headerText = headerText;
+		},
+		setSelectedMenuItem(pageId) {
+			Object.values(this.menuItems).forEach(menuItem => {
+				menuItem.classList.remove("selected");
+			});
+				
+			if (this.menuItems[pageId]) {
+				this.menuItems[pageId].classList.add("selected");
+			}
 		},
 		
 		togglePane() {

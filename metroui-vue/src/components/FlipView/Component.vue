@@ -17,9 +17,15 @@
 <script>
 export default {
 	name: "MetroFlipView",
+	props: {
+		initialIndex: {
+			type: Number,
+			default: 0
+		}
+	},
 	data() {
 		return {
-			page: 0,
+			page: this.$props.initialIndex,
 			itemCount: -1
 		}
 	},
