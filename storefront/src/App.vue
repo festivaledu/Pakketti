@@ -32,7 +32,7 @@
 				</template>
 				
 				<template slot="auto-suggest-box">
-					<MetroTextBox :placeholder-text="$t('root.search_placeholder')" />
+					<MetroTextBox :placeholder-text="$t('root.search_placeholder')" @keyup.13="showSearchResults" />
 				</template>
 				
 				<template slot="pane-footer">
@@ -100,6 +100,12 @@ export default {
 		}
 	},
 	methods: {
+		showSearchResults(e) {
+			if (e.target.value.length) {
+				this.$router.push(`/search?query=${e.target.value}`);
+				e.target.blur();
+			}
+		},
 		profileButtonClicked(e) {
 			if (!this.accountData) {
 				if (window.innerWidth <= 640) {

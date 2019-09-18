@@ -26,6 +26,11 @@ export default new Router({
 			component: () => import(/* webpackChunkName: "SectionPage" */ './pages/SectionPage.vue')
 		},
 		{
+			path: '/search',
+			name: 'search',
+			component: () => import(/* webpackChunkName: "SearchPage" */ './pages/SearchPage.vue')
+		},
+		{
 			path: '/*',
 			name: 'error',
 			component: () => import(/* webpackChunkName: "ErrorPage" */ './pages/ErrorPage.vue')

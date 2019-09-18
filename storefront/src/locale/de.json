@@ -141,5 +141,8 @@
 	"developer": {
 		"published_by": "Veröffentlicht von „%{username}“",
 		"no_results": "Keine Ergebnisse für diese Filterung gefunden"
+	},
+	"search": {
+		"results_for": "Ergebnisse für: %{query}"
 	}
 }
