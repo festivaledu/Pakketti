@@ -11,7 +11,7 @@ const crypto = require("crypto-js");
 
 //#region Database Setup
 const fs = require('fs');
-const path = require('path');
+const Path = require('path');
 const Sequelize = require('sequelize');
 const models = require("./models");
 const env = process.env.NODE_ENV || 'development';
@@ -76,20 +76,93 @@ db.sequelize.sync({
 //#endregion
 
 const httpServer = express();
-const controllers = require("./controllers");
+const controllers = require("./controllers_new");
+const url = require('url');
+const serveStatic = require("serve-static");
+const httpStatus = require("http-status");
 
+if (env !== "production") {
 httpServer.use(morgan("\x1b[34m[INFO]\x1b[0m [:date[iso]] :remote-addr \":method :url HTTP/:http-version\" :status (:req[Content-Length]/:res[content-length] bytes)"));
+}
 
 httpServer.use(cors());
 httpServer.use(bodyParser.json());
 httpServer.use(cookieParser());
 httpServer.use(fileupload());
 
+// API Route
 httpServer.use("/api", (req, res, next) => {
 	req.models = db.models;
 	return next();
 });
 httpServer.use("/api", controllers);
+
+// Files Route
+httpServer.use("/files", async (req, res, next) => {	
+	const serve = serveStatic(Path.join(__dirname, "../files"));
+	
+	if (fs.existsSync(Path.join(__dirname, "..", req._parsedUrl.path))) {
+		let packageVersionObj = await db.models.PackageVersion.findOne({
+			where: {
+				filename: req._parsedUrl.path
+			}
+		});
+		
+		if (packageVersionObj) {
+			packageVersionObj.increment("downloadCount");
+		}
+		
+		return serve(req, res);
+	} else {
+		return res.status(httpStatus.NOT_FOUND).send({
+			error: {
+				name: httpStatus[httpStatus.NOT_FOUND],
+				code: httpStatus.NOT_FOUND,
+				message: "File not found"
+			}
+		});
+	}
+});
+
+// Media Route
+httpServer.use("/media/:category/:mediaId", (req, res, next) => {
+	switch (req.params.category) {
+		case "avatar":
+			res.redirect(url.format({
+				pathname: "/api/account/avatar",
+				query: {
+					"account.id": req.params.mediaId
+				}
+			}));
+			break;
+		case "icon":
+			res.redirect(url.format({
+				pathname: "/api/packages/icon",
+				query: {
+					"package.id": req.params.mediaId
+				}
+			}));
+			break;
+		case "hero":
+			res.redirect(url.format({
+				pathname: "/api/packages/hero",
+				query: {
+					"package.id": req.params.mediaId
+				}
+			}));
+			break;
+		case "screenshot":
+			res.redirect(url.format({
+				pathname: "/api/packages/screenshot",
+				query: {
+					"screenshot.id": req.params.mediaId
+				}
+			}));
+			break;
+		default: break;
+	}
+	// res.status(200).send("OK");
+});
 
 httpServer.listen(process.env.SERVER_PORT, () => {
 	console.log(`\x1b[34m[INFO]\x1b[0m Server is up on port ${process.env.SERVER_PORT}`);

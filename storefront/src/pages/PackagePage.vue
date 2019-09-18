@@ -60,9 +60,9 @@
 						
 						<MetroStackPanel class="button-container">
 							<MetroTextBlock text-style="title">{{ $t('package.price_free') }}</MetroTextBlock>
-							<MetroButton class="system-accent-color">
-								<MetroTextBlock text-style="base" text-alignment="center">{{ $t('package.download_button') }}</MetroTextBlock>
-							</MetroButton>
+								<MetroButton class="system-accent-color" @click="downloadButtonClicked">
+									<MetroTextBlock text-style="base" text-alignment="center">{{ $t('package.download_button') }}</MetroTextBlock>
+								</MetroButton>
 						</MetroStackPanel>
 						
 						<MetroStackPanel class="package-description-container secondary-description-container" orientation="vertical" horizontal-alignment="left">
@@ -332,7 +332,9 @@ export default {
 				}]
 			}).show();
 		},
-		downloadButtonClicked() {},
+		downloadButtonClicked() {
+			window.location.href = this.packageData.versions.lastObject().filename;
+		},
 		screenshotClicked(screenshotObj) {
 			let initialIndex = this.packageData.screenshots.indexOf(screenshotObj);
 			
@@ -953,9 +955,11 @@ body[data-theme="dark"] {
 			.flip-view {
 				max-height: calc(~"100% - 32px");
 				
-				.flip-view-item img {
-					max-width: 100%;
-					max-height: 100%;
+				.flip-view-item {
+					img {
+						max-width: 100%;
+						max-height: 100%;
+					}
 				}
 			}
 		}
