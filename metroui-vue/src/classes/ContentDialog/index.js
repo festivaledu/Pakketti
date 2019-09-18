@@ -57,6 +57,8 @@ class ContentDialog {
 		if (dialog.params.content) {
 			if (typeof dialog.params.content === "object") {
 				content.appendChild(new NodeRenderer(dialog.params.content));
+			} else if (typeof dialog.params.content === "function") {
+				content.appendChild(new NodeRenderer(dialog.params.content(dialog)));
 			} else {
 				let parsedHTML = (new DOMParser()).parseFromString(dialog.params.content, "text/html");
 				if (parsedHTML.body.children.length) {
