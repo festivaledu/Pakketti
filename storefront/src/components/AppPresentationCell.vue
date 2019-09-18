@@ -1,9 +1,9 @@
 <template>
 	<div>
 		<MetroStackPanel style="margin-top: 40px; margin-bottom: 16px">
-			<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="center">
+			<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="top">
 				<MetroTextBlock text-style="sub-title">{{ title }}</MetroTextBlock>
-				<MetroHyperlinkButton style="margin-left: 12px">{{ $t('start.see_all') }}: {{ appData.length >= 100 ? "99+" : appData.length }}</MetroHyperlinkButton>
+				<MetroHyperlinkButton style="margin-left: 12px; white-space: nowrap; line-height: 27px">{{ $t('start.see_all') }}: {{ appData.length >= 100 ? "99+" : appData.length }}</MetroHyperlinkButton>
 			</MetroStackPanel>
 		</MetroStackPanel>
 		

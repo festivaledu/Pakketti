@@ -19,7 +19,9 @@
 					<template v-if="windowWidth <= 640">
 						<MetroNavigationViewItemSeparator />
 						
-						<MetroNavigationViewItem :content="$t('root.dashboard_title')" />
+						<a href="/dashboard">
+							<MetroNavigationViewItem :content="$t('root.dashboard_title')" />
+						</a>
 						<!-- <MetroNavigationViewItem content="Item" />
 						<MetroNavigationViewItem content="Item" /> -->
 					</template>
@@ -44,7 +46,7 @@
 					</MetroNavigationViewItem>
 					
 					<template v-if="windowWidth > 640">
-						<MetroNavigationViewItem icon="more" />
+						<MetroNavigationViewItem icon="more" @click.native="moreButtonClicked" />
 					</template>
 				</template>
 				
@@ -115,34 +117,29 @@ export default {
 
 				flyout.showAt(e.target);
 			} else {
-				if (window.innerWidth <= 640) {
-						let flyout = new metroUI.MenuFlyout({
-						items: [{
-							icon: "block-contact",
-							text: this.$t('root.button_sign_out'),
-							action: this.logout
-						}]
-					});
-					
-					flyout.showAt(e.target);
-				} else {
-					let flyout = new metroUI.MenuFlyout({
-						items: [{
-							icon: "tiles",
-							text: this.$t('root.dashboard_title'),
-							action: () => {
-								
-							}
-						}, {
-							icon: "block-contact",
-							text: this.$t('root.button_sign_out'),
-							action: this.logout
-						}]
-					});
-					
-					flyout.showAt(e.target);
-				}
+				let flyout = new metroUI.MenuFlyout({
+					items: [{
+						icon: "block-contact",
+						text: this.$t('root.button_sign_out'),
+						action: this.logout
+					}]
+				});
+				
+				flyout.showAt(e.target);
 			}
+		},
+		moreButtonClicked(e) {
+			let flyout = new metroUI.MenuFlyout({
+				items: [{
+					icon: "tiles",
+					text: this.$t('root.dashboard_title'),
+					action: () => {
+						window.location.href = "/dashboard";
+					}
+				}]
+			});
+			
+			flyout.showAt(e.target);
 		},
 		async login() {
 			let loginDialog = new metroUI.ContentDialog({
