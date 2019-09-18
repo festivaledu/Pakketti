@@ -139,6 +139,9 @@ class ContentDialog {
 		
 		dialog.container.classList.add("animate-in");
 		dialog.container.classList.remove("animate-out");
+		
+		dialog.eventListener = this._resize.bind(dialog);
+		window.addEventListener("resize", dialog.eventListener, true);
 	}
 	
 	async showAsync() {
@@ -154,6 +157,8 @@ class ContentDialog {
 	
 	hide() {
 		const dialog = this;
+		
+		window.removeEventListener("resize", dialog.eventListener, true);
 
 		dialog.container.classList.add("animate-out");
 		if (document.querySelectorAll(".content-dialog").length < 2) {
@@ -178,6 +183,18 @@ class ContentDialog {
 		}
 		
 		return output;
+	}
+	
+	_resize() {
+		const dialog = this;
+		
+		dialog.container.style.width = null;
+		dialog.container.style.height = null;
+		
+		setTimeout(() => {
+			dialog.container.style.width = `${Math.round(dialog.container.clientWidth / 2) * 2}px`;
+			dialog.container.style.height = `${Math.round(dialog.container.clientHeight / 2) * 2}px`;
+		});
 	}
 }
 

@@ -58,6 +58,8 @@ class ContentDialog {
 		if (dialog.params.content) {
 			if (typeof dialog.params.content === "object") {
 				content.appendChild(new NodeRenderer(dialog.params.content));
+			} else if (typeof dialog.params.content === "function") {
+				content.appendChild(new NodeRenderer(dialog.params.content(dialog)));
 			} else {
 				let parsedHTML = (new DOMParser()).parseFromString(dialog.params.content, "text/html");
 				if (parsedHTML.body.children.length) {
@@ -138,6 +140,9 @@ class ContentDialog {
 		
 		dialog.container.classList.add("animate-in");
 		dialog.container.classList.remove("animate-out");
+		
+		dialog.eventListener = this._resize.bind(dialog);
+		window.addEventListener("resize", dialog.eventListener, true);
 	}
 	
 	async showAsync() {
@@ -153,6 +158,8 @@ class ContentDialog {
 	
 	hide() {
 		const dialog = this;
+		
+		window.removeEventListener("resize", dialog.eventListener, true);
 
 		dialog.container.classList.add("animate-out");
 		if (document.querySelectorAll(".content-dialog").length < 2) {
@@ -177,6 +184,18 @@ class ContentDialog {
 		}
 		
 		return output;
+	}
+	
+	_resize() {
+		const dialog = this;
+		
+		dialog.container.style.width = null;
+		dialog.container.style.height = null;
+		
+		setTimeout(() => {
+			dialog.container.style.width = `${Math.round(dialog.container.clientWidth / 2) * 2}px`;
+			dialog.container.style.height = `${Math.round(dialog.container.clientHeight / 2) * 2}px`;
+		});
 	}
 }
 
@@ -2782,35 +2801,27 @@ var script$e = {
 		
 		addMessage(message) {
 			if (this.$data._messages.lastObject()) {
-				console.log(1);
 				const lastMessage = this.$data._messages.lastObject();
 
 				if (lastMessage.type != "sent" && message.type == "sent") {
-					console.log(2);
 					message.hasTail = true;
 					message.isFirst = true;
 				} else if (lastMessage.type == "sent" && message.type == "sent") {
-					console.log(3);
 					lastMessage.hasTail = false;
 					message.hasTail = true;
 				}
 
 				if (lastMessage.type != "received" && message.type == "received") {
-					console.log(4);
 					message.hasTail = true;
 				} else if (lastMessage.type == "received" && message.type == "received") {
-					console.log(5);
 					if (message.author != lastMessage.author) {
-						console.log(6);
 						message.hasTail = true;
 						message.isFirst = true;
 					} else {
-						console.log(7);
 						message.hasTail = false;
 					}
 				}
 			} else {
-				console.log(8);
 				message.hasTail = true;
 				message.isFirst = true;
 			}
