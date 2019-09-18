@@ -315,6 +315,94 @@ router.get("/", async (req, res) => {
 });
 
 /**
+ * PUT /account
+ * 
+ * Updates a specified user
+ * Restricted to Moderators and Administrators
+ * Restricted to Users with a role lower than the own role
+ */
+router.put("/account", async (req, res) => {
+	const { account } = req;
+
+	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
+		}
+	});
+	
+	if (account.role < UserRole.MODERATOR) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+	
+	let query = (req.query.account || {}).filter(["id", "username", "email"]);
+	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No account specified"
+		}
+	});
+	
+	const { Account, LogItem } = req.models;
+	
+	let accountObj = await Account.findOne({
+		where: query,
+		attributes: ["id", "username", "profileImageMime", "role", "createdAt"]
+	});
+	
+	if (!accountObj || !Object.keys(accountObj).length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "User not found"
+		}
+	});
+	
+	if (accountObj.id == account.id) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You cannot edit your acount via PUT /account. Please update your account using PUT /account/me"
+		}
+	});
+	
+	if (accountObj.role > account.role || accountObj.role == UserRole.MIGRATE) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+	
+	return account.update((req.body || {}).filter([
+		"role"
+	])).then(accountObj => {
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.USER_EDITED,
+			accountId: account.id,
+			affectedAccountId: accountObj.id,
+			detailText: `User ${accountObj.username} <${accountObj.email}> has been edited by ${account.username}`,
+			status: LogItemStatus.LOG_USAGE
+		});
+		return res.status(httpStatus.OK).send({
+			id: accountObj.id,
+			username: accountObj.username,
+			email: accountObj.email,
+			role: accountObj.role,
+			lastLogin: accountObj.lastLogin,
+			createdAt: accountObj.createdAt
+		});
+	}).catch(error => ErrorHandler(req, res, error));
+});
+
+/**
  * DELETE /account
  * 
  * Deletes a specified User
