@@ -7,6 +7,32 @@
 	</MetroStackPanel>
 </template>
 
+<script>
+export default {
+	name: "CurrentRatingComponent",
+	props: {
+		ratingData: null
+	},
+	computed: {
+		ratingCount() {
+			return this.ratingData.length;
+			// return 1337;
+		},
+		ratingValue() {
+			return this.ratingData.map(ratingObj => ratingObj.value).reduce((t, c) => t += c) / this.ratingCount;
+		},
+		ratingPercentage() {
+			return (this.ratingValue / 5) * 100;
+		}
+	},
+	filters: {
+		number(value) {
+			return new Intl.NumberFormat().format(value)
+		}
+	}
+}
+</script>
+
 <style lang="less">
 .encoded-svg-mask(@svg) {
 	@url: `encodeURIComponent(@{svg})`;
@@ -37,29 +63,3 @@
 	}
 }
 </style>
-
-<script>
-export default {
-	name: "CurrentRatingComponent",
-	props: {
-		ratingData: null
-	},
-	computed: {
-		ratingCount() {
-			return this.ratingData.length;
-			// return 1337;
-		},
-		ratingValue() {
-			return this.ratingData.map(ratingObj => ratingObj.value).reduce((t, c) => t += c) / this.ratingCount;
-		},
-		ratingPercentage() {
-			return (this.ratingValue / 5) * 100;
-		}
-	},
-	filters: {
-		number(value) {
-			return new Intl.NumberFormat().format(value)
-		}
-	}
-}
-</script>

@@ -1,0 +1,1 @@
+../../../manager/src/components/MinimalNavigationView.vue

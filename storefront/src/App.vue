@@ -1,16 +1,20 @@
 <template>
 	<MetroView view-id="main-view">
 		<MetroPage page-id="root">
-			<MetroNavigationView pane-display-mode="top" pane-title="Team FESTIVAL" ref="navigation-view" :settings-visible="false">
+			<MinimalNavigationView pane-display-mode="top" pane-title="Team FESTIVAL" :settings-visible="false" ref="navigation-view">
 				<template slot="header" slot-scope="{ local }">
 					<MetroStackPanel orientation="vertical" vertical-alignment="center" style="height: 40px; margin-top: -5px">
 						<MetroTextBlock text-style="base" :text="local" />
 					</MetroStackPanel>
 				</template>
+				
 				<template slot="menu-items">
-					<MetroNavigationViewItem :content="$t('root.header.start')" page-id="start" />
-					<MetroNavigationViewItem :content="$t('root.header.apps')" />
-					<MetroNavigationViewItem :content="$t('root.header.tweaks')" />
+					<router-link tag="div" to="/">
+						<MetroNavigationViewItem :content="$t('root.header.start')" page-id="start" />
+					</router-link>
+					
+					<MetroNavigationViewItem :content="$t('root.header.apps')" page-id="apps" />
+					<MetroNavigationViewItem :content="$t('root.header.tweaks')" page-id="tweaks" />
 					
 					<template v-if="windowWidth <= 640">
 						<MetroNavigationViewItemSeparator />
@@ -44,127 +48,27 @@
 					</template>
 				</template>
 				
-				<ErrorPage />
-				<StartPage />
-				<PackagePage />
-				
-				<DeveloperPage />
-			</MetroNavigationView>
+				<router-view/>
+			</MinimalNavigationView>
 		</MetroPage>
 	</MetroView>
 </template>
 
-<style lang="less">
-body[data-theme="light"] {
-	--store-background: #F7F3F7;
-	--package-header-background: #FFFFFF;
-}
-body[data-theme="dark"] {
-	--store-background: #292C29;
-	--package-header-background: #292C29;
-}
-
-
-a {
-	color: var(--system-accent-color);
-	
-	&:hover:not(:active) {
-		color: var(--base-medium);
-	}
-	
-	&:active {
-		color: var(--base-medium-low);
-	}
-	
-	&[disabled] {
-		pointer-events: none;
-		color: var(--base-medium-low);
-	}
-}
-
-.page-content {
-	background-color: var(--store-background);
-}
-
-@media all and (min-width: 641px) and (max-width: 1007px) {
-	.navigation-view .page > .page-content {
-		padding-left: 24px !important;
-		padding-right: 24px !important;
-		padding-bottom: 24px !important;
-	}
-}
-@media all and (min-width: 1008px) {
-	.navigation-view {
-		& > .pane-content {
-			position: absolute;
-			
-			& + .content-root {
-				height: 100vh !important;
-			}
-		}
-		
-		.page > .page-content {
-			padding: 52px 48px 48px !important;
-		}
-	}
-}
-
-@media all and (max-width: 640px) {
-	.navigation-view {
-		& > .content-root > .header-content {
-			p.text-block.base {
-				font-weight: 700;
-				font-size: 14px;
-				text-transform: uppercase;
-			}
-		}
-	}
-}
-
-@media all and (min-width: 641px) {
-	.navigation-view {
-		& > .pane-content {
-			height: 100vh;
-		}
-		
-		& > .content-root > .header-content {
-			display: none;
-		}
-	}
-}
-
-.navigation-view-item-icon {
-	.person-picture {
-		width: 20px;
-		height: 20px;
-		margin: 10px;
-	}
-}
-</style>
-
 <script>
 import { AccountAPI, AuthAPI } from '@/scripts/ApiUtil'
-
 import CryptoJS from "crypto-js"
 
-import DeveloperPage from '@/pages/DeveloperPage'
-import ErrorPage from '@/pages/ErrorPage'
-import StartPage from '@/pages/StartPage'
-import PackagePage from '@/pages/PackagePage'
+import MinimalNavigationView from '@/components/MinimalNavigationView'
 
 export default {
 	name: "App",
 	components: {
-		DeveloperPage,
-		ErrorPage,
-		StartPage,
-		PackagePage
+		MinimalNavigationView
 	},
 	data: () => ({
 		resizeEventListener: null,
 		windowWidth: 0,
 		accountData: null,
-		allowRouteMatching: true
 	}),
 	async mounted() {
 		if (!this.resizeEventListener) {
@@ -188,20 +92,6 @@ export default {
 		if (this.$store.state.accountId) {
 			this.accountData = await AccountAPI.getMe();
 		}
-		
-		this.$refs["navigation-view"].old_navigate = this.$refs["navigation-view"].navigate;
-		this.$refs["navigation-view"].navigate = (pageId, data = {}) => {
-			this.$refs["navigation-view"].old_navigate(pageId, data);
-			
-			let history = (JSON.parse(localStorage.getItem("history")) || []);
-			if ((history.length && history.lastObject().pageId !== pageId) || !history.length) history.push({ fullPath: this.$route.fullPath, pageId: pageId });
-			localStorage.setItem("history", JSON.stringify(history));
-		}
-		
-		this.$refs["navigation-view"].old_goBack = this.$refs["navigation-view"].goBack;
-		this.$refs["navigation-view"].goBack = () => {
-			window.history.back();
-		}
 	},
 	methods: {
 		profileButtonClicked(e) {
@@ -218,7 +108,8 @@ export default {
 						action: this.login
 					}, {
 						icon: "add-friend",
-						text: this.$t('root.button_register')
+						text: this.$t('root.button_register'),
+						action: this.register
 					}]
 				});
 
@@ -297,70 +188,112 @@ export default {
 				});
 			}
 		},
+		async register() {
+			
+		},
 		logout() {
 			this.$store.commit("setAccountId", null);
 			window.location.reload("true");
 		},
-		
-		_matchRoute(route, direction) {
-			this.$refs["navigation-view"].history = (JSON.parse(localStorage.getItem("history")) || []).map(_ => _.pageId);
-			
-			switch (direction) {
-				case 0:
-				case 1:
-					var match = route.path.match(/((?:[^\/]+)).+$/i);
-					if (match) {
-						switch (match[1]) {
-							case "package":
-								match = this.$route.path.match(/^\/package\/((?:[^\/]+?)?)(?:\/(?=$))?$/i);
-								if (match) this.$refs["navigation-view"].navigate("package", { packageId: match[1] });
-								break;
-							// case "section":
-							// 	break;
-							case "developer":
-								match = this.$route.path.match(/^\/developer\/((?:[^\/]+?)?)(?:\/(?=$))?$/i);
-								if (match) this.$refs["navigation-view"].navigate("developer", { username: match[1] });
-								break;
-							default: 
-								this.$refs["navigation-view"].navigate("error");
-								break;
-						}
-					} else {
-						this.$refs["navigation-view"].navigate("start");
-					}
-					
-					break;
-				case -1:
-					let history = (JSON.parse(localStorage.getItem("history")) || []);
-					if (history.length) history.pop();
-					localStorage.setItem("history", JSON.stringify(history));
-					
-					this.$refs["navigation-view"].old_goBack();
-					break;
-				default: break;
-			}
-		}
-	},
-	watch: {
-		$route(to, from) {
-			let history = JSON.parse(localStorage.getItem("history")) || [];
-			let direction = 0;
-			
-			if (history.length) {
-				const lastPosition = Number(localStorage.getItem("lastPosition"));
-				let position = window.history.state;
-
-				if (position) {
-					localStorage.setItem("lastPosition", String(position.key));
-					direction = Math.sign(position.key - lastPosition);
-				}
-			} else {
-				localStorage.setItem("lastPosition", String(0));
-				direction = 0;
-			}
-
-			this._matchRoute(to, direction);
-		}
 	}
 }
 </script>
+
+<style lang="less">
+body[data-theme="light"] {
+	--store-background: #F7F3F7;
+	--package-header-background: #FFFFFF;
+}
+body[data-theme="dark"] {
+	--store-background: #292C29;
+	--package-header-background: #292C29;
+}
+
+
+a {
+	color: var(--system-accent-color);
+	
+	&:hover:not(:active) {
+		color: var(--base-medium);
+	}
+	
+	&:active {
+		color: var(--base-medium-low);
+	}
+	
+	&[disabled] {
+		pointer-events: none;
+		color: var(--base-medium-low);
+	}
+}
+
+.page-content {
+	background-color: var(--store-background);
+}
+
+.navigation-view.minimal {
+	& > .content-root > .content-frame > .page:not(.page-active) {
+		display: block;
+		
+		&.flex-container {
+			display: flex;
+		}
+	}
+}
+
+@media all and (min-width: 641px) and (max-width: 1007px) {
+	.navigation-view .page > .page-content {
+		padding-left: 24px !important;
+		padding-right: 24px !important;
+		padding-bottom: 24px !important;
+	}
+}
+@media all and (min-width: 1008px) {
+	.navigation-view {
+		& > .pane-content {
+			position: absolute;
+			
+			& + .content-root {
+				height: 100vh !important;
+			}
+		}
+		
+		.page > .page-content {
+			min-height: calc(~"100% - 40px") !important;
+			padding: 52px 48px 48px !important;
+		}
+	}
+}
+
+@media all and (max-width: 640px) {
+	.navigation-view {
+		& > .content-root > .header-content {
+			p.text-block.base {
+				font-weight: 700;
+				font-size: 14px;
+				text-transform: uppercase;
+			}
+		}
+	}
+}
+
+@media all and (min-width: 641px) {
+	.navigation-view {
+		& > .pane-content {
+			height: 100vh;
+		}
+		
+		& > .content-root > .header-content {
+			display: none;
+		}
+	}
+}
+
+.navigation-view-item-icon {
+	.person-picture {
+		width: 20px;
+		height: 20px;
+		margin: 10px;
+	}
+}
+</style>

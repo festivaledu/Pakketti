@@ -24,6 +24,49 @@
 	</div>
 </template>
 
+<script>
+import CurrentRating from '@/components/CurrentRating'
+
+export default {
+	name: "DetailedRatingCell",
+	components: {
+		CurrentRating
+	},
+	props: {
+		ratingData: null
+	},
+	data() {
+		return {
+			detailedRatingData: null
+		}
+	},
+	mounted() {
+		this.detailedRatingData = {
+			ratings: Array(5).fill(null).map((_, index) => {
+				return this.ratingData.filter(_ => _.value == index + 1).length
+			}).reduce((t, c, i) => ({
+				...t,
+				[i + 1]: c
+			}), {}),
+			total: this.ratingData.length
+		}
+	},
+	computed: {
+		ratingValue() {
+			return this.ratingData.map(ratingObj => ratingObj.value).reduce((t, c) => t += c) / this.ratingData.length;
+		},
+		locale() {
+			return window.navigator.language;
+		}
+	},
+	filters: {
+		number(value) {
+			return new Intl.NumberFormat().format(value)
+		}
+	}
+}
+</script>
+
 <style lang="less">
 .detailed-rating-container {
 	.detailed-rating-wrapper {
@@ -100,46 +143,3 @@
 	}
 }
 </style>
-
-<script>
-import CurrentRating from '@/components/CurrentRating'
-
-export default {
-	name: "DetailedRatingCell",
-	components: {
-		CurrentRating
-	},
-	props: {
-		ratingData: null
-	},
-	data() {
-		return {
-			detailedRatingData: null
-		}
-	},
-	mounted() {
-		this.detailedRatingData = {
-			ratings: Array(5).fill(null).map((_, index) => {
-				return this.ratingData.filter(_ => _.value == index + 1).length
-			}).reduce((t, c, i) => ({
-				...t,
-				[i + 1]: c
-			}), {}),
-			total: this.ratingData.length
-		}
-	},
-	computed: {
-		ratingValue() {
-			return this.ratingData.map(ratingObj => ratingObj.value).reduce((t, c) => t += c) / this.ratingData.length;
-		},
-		locale() {
-			return window.navigator.language;
-		}
-	},
-	filters: {
-		number(value) {
-			return new Intl.NumberFormat().format(value)
-		}
-	}
-}
-</script>

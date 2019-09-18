@@ -37,9 +37,26 @@
 	</div>
 </template>
 
+<script>
+import CurrentRating from '@/components/CurrentRating'
+
+export default {
+	name: "AppPresentation",
+	components: {
+		CurrentRating
+	},
+	props: ["appData", "title", "sectionUrl"],
+	computed: {
+		limitedData() {
+			return [...this.appData].splice(0,12);
+		}
+	}
+}
+</script>
+
 <style lang="less">
 .lockup-collection-cell {
-	display: inline-block;
+	display: flex;
 	flex-direction: column;
 	width: 162px;
 	height: 272px;
@@ -82,20 +99,3 @@
 	}
 }
 </style>
-
-<script>
-import CurrentRating from '@/components/CurrentRating'
-
-export default {
-	name: "AppPresentation",
-	components: {
-		CurrentRating
-	},
-	props: ["appData", "title"],
-	computed: {
-		limitedData() {
-			return [...this.appData].splice(0,12);
-		}
-	}
-}
-</script>

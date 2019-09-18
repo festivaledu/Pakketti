@@ -1,7 +1,18 @@
 <template>
-	<MetroPage page-id="package" @navigatedTo.native="onNavigatedTo" @navigatedBackTo.native="onNavigatedTo" ref="page">
+	<MetroPage page-id="package" ref="page">
 		<template v-if="!packageData">
 			<MetroProgressRing :active="true" style="position: absolute; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: 80px; height: 80px" />
+		</template>
+		
+		<template v-if="packageData && !Object.keys(packageData).length">
+			<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" style="height: calc(100vh - 64px)">
+				<MetroTextBlock text-style="title" text-alignment="center" style="font-size: 34px; font-weight: 500">
+					{{ $t('app.generic_error_title') }}
+				</MetroTextBlock>
+				<MetroTextBlock text-style="sub-title" text-alignment="center">
+					{{ $t('app.generic_error_message') }}
+				</MetroTextBlock>
+			</MetroStackPanel>
 		</template>
 		
 		<template v-if="packageData && developerData">
@@ -111,9 +122,9 @@
 							<div class="col col-12 col-md-6 col-lg-3 info-column">
 								<div class="info-item">
 									<MetroTextBlock text-style="base">{{ $t('package.additional_info.published_by') }}</MetroTextBlock>
-									<MetroHyperlinkButton>
+									<router-link :to="`/developer/${developerData.username}`" class="hyperlink-button">
 										<MetroTextBlock text-style="base">{{ developerData.username }}</MetroTextBlock>
-									</MetroHyperlinkButton>
+									</router-link>
 								</div>
 								
 								<div class="info-item">
@@ -130,16 +141,16 @@
 							<div class="col col-12 col-md-6 col-lg-3 info-column">
 								<div class="info-item">
 									<MetroTextBlock text-style="base">{{ $t('package.additional_info.category') }}</MetroTextBlock>
-									<MetroHyperlinkButton>
+									<router-link :to="`/section/${packageData.section}`" class="hyperlink-button">
 										<MetroTextBlock text-style="base">{{ packageData.section }}</MetroTextBlock>
-									</MetroHyperlinkButton>
+									</router-link>
 								</div>
 								
 								<div class="info-item" v-if="packageData.issueURL">
 									<MetroTextBlock text-style="base">{{ $t('package.additional_info.report_issue_title') }}</MetroTextBlock>
-									<MetroHyperlinkButton>
+									<a class="hyperlink-button" :href="packageData.issueURL" target="_blank">
 										<MetroTextBlock text-style="base">{{ $t('package.additional_info.report_issue_link') }}</MetroTextBlock>
-									</MetroHyperlinkButton>
+									</a>
 								</div>
 							</div>
 							
@@ -230,14 +241,14 @@
 					<template v-if="!packageData.ratings || !packageData.ratings.length">
 						<MetroTextBlock>{{ $t('package.reviews.no_reviews') }}</MetroTextBlock>
 						
-						<MetroButton class="system-accent-color" style="margin: 16px 0 40px" @click="reviewButtonClicked" :disabled="accountId && accountId === packageData.accountId">{{ $t('package.reviews.rate_and_review') }}</MetroButton>
+						<MetroButton class="system-accent-color" style="margin: 16px 0 40px" @click="reviewButtonClicked" :disabled="accountId && accountId === packageData.accountId || !packageData.versions.length">{{ $t('package.reviews.rate_and_review') }}</MetroButton>
 					</template>
 					
 					<template v-if="packageData.ratings && packageData.ratings.length">
 						<DetailedRatingCell :rating-data="packageData.ratings" />
 						
 						<div style="margin-bottom: 24px">
-							<MetroButton class="system-accent-color" style="margin-bottom: 16px" @click="reviewButtonClicked" :disabled="accountId && (accountId === packageData.accountId || packageData.reviews.filter(_ => _.accountId === accountId).length >= 1)">{{ $t('package.reviews.rate_and_review') }}</MetroButton>
+							<MetroButton class="system-accent-color" style="margin-bottom: 16px" @click="reviewButtonClicked" :disabled="accountId && (accountId === packageData.accountId || packageData.reviews.filter(_ => _.accountId === accountId).length >= 1) || !packageData.versions.length">{{ $t('package.reviews.rate_and_review') }}</MetroButton>
 							<MetroTextBlock v-if="accountId && accountId === packageData.accountId">{{ $t('package.reviews.review_prohibited_developer') }}</MetroTextBlock>
 							<MetroTextBlock v-if="accountId && packageData.reviews.filter(_ => _.accountId === accountId).length >= 1">{{ $t('package.reviews.review_prohibited_again') }}</MetroTextBlock>
 						</div>
@@ -250,19 +261,190 @@
 				</MetroPivotItem>
 			</MetroPivot>
 		</template>
-		
-		<template v-if="packageData && !Object.keys(packageData).length">
-			<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" style="height: calc(100vh - 64px)">
-				<MetroTextBlock text-style="title" text-alignment="center" style="font-size: 34px; font-weight: 500">
-					{{ $t('app.generic_error_title') }}
-				</MetroTextBlock>
-				<MetroTextBlock text-style="sub-title" text-alignment="center">
-					{{ $t('app.generic_error_message') }}
-				</MetroTextBlock>
-			</MetroStackPanel>
-		</template>
 	</MetroPage>
 </template>
+
+<script>
+import { AccountAPI, PackageAPI, RequestAPI } from '@/scripts/ApiUtil'
+import { LogItemType } from '@/scripts/Enumerations'
+import Platforms from '../../../platforms.json'
+
+import CurrentRating from '@/components/CurrentRating'
+import DetailedRatingCell from '@/components/DetailedRatingCell'
+import DeviceCompatibilityItem from '@/components/DeviceCompatibilityItem'
+import ExpandableText from '@/components/ExpandableText'
+import RatingCell from '@/components/RatingCell'
+
+export default {
+	name: "PackagePage",
+	components: {
+		CurrentRating,
+		DetailedRatingCell,
+		DeviceCompatibilityItem,
+		ExpandableText,
+		RatingCell
+	},
+	data: () => ({
+		packageData: null,
+		developerData: null,
+		Platforms: Platforms
+	}),
+	beforeRouteEnter: async (to, from, next) => {
+		let _packageData = await PackageAPI.getPackages({
+			"package.identifier": to.params.packageId,
+			include: "ratings,reviews,screenshots,versions"
+		});
+		
+		let _developerData = (!Object.keys(_packageData[0]).length || _packageData[0].error) ? null : await AccountAPI.getUser({
+			"account.id": _packageData[0].accountId
+		});
+		
+		next(vm => {
+			if (!_packageData.length || _packageData.error) {
+				vm.packageData = {};
+			} else {
+				window.packageData = _packageData[0];
+				vm.packageData = _packageData[0];
+			}
+			
+			vm.developerData = _developerData;
+			
+			// vm.$parent.setHeader(vm.$t('root.header.start'));
+			// vm.$parent.setSelectedMenuItem("start");
+		});
+	},
+	methods: {
+		packageDescriptionMoreClicked() {
+			new metroUI.ContentDialog({
+				content: (() => {
+					return (
+						<div>
+							<MetroTextBlock text-style="title" style="font-weight: 600; margin-bottom: 8px">{packageData.name}</MetroTextBlock>
+							<MetroTextBlock >
+								<span domPropsInnerHTML={packageData.detailedDescription.replace(/\n/g, "<br />")} />
+							</MetroTextBlock>
+						</div>
+					);
+				})(),
+				commands: [{
+					text: this.$t('app.close'),
+					primary: true
+				}]
+			}).show();
+		},
+		downloadButtonClicked() {},
+		async reportPackageButtonClicked() {
+			if (!this.accountId) {
+				this.parent.login();
+			} else {
+				let reportDialog = new metroUI.ContentDialog({
+					title: this.$t('package.report_compose.title', { packageName: this.packageData.name }),
+					content: (
+						<div style="min-width: 320px">
+							<MetroTextBox
+								header={ this.$t('package.report_compose.message') }
+								required={true}
+								textarea={true}
+								name="detailText"
+								style="margin-bottom: 8px"
+							/>
+						</div>
+					),
+					commands: [{ text: this.$t('app.ok'), primary: true }, { text: this.$t('app.cancel') }]
+				});
+				if (await reportDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
+					let requestData = await RequestAPI.createRequest({
+						type: LogItemType.USER_REPORT,
+						detailText: reportDialog.text["detailText"],
+						affectedPackageId: this.packageData.id
+					});
+					
+					if (requestData.error) {
+						console.error(requestData.error);
+					} else {
+						new metroUI.ContentDialog({
+							title: this.$t('package.report_compose.success_title'),
+							content: this.$t('package.report_compose.success_message'),
+							commands: [{ text: this.$t('app.ok'), primary: true }]
+						}).show()
+					}
+				}
+			}
+		},
+		async reviewButtonClicked() {
+			if (!this.accountId) {
+				this.parent.login();
+			} else {
+				let reviewDialog = new metroUI.ContentDialog({
+					title: this.packageData.name,
+					content: (
+						<div style="min-width: 320px">
+							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">{ this.$t('package.review_compose.rate') }</MetroTextBlock>
+							<MetroRatingControl name="value" />
+							
+							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">{ this.$t('package.review_compose.write_a_review') }</MetroTextBlock>
+							<MetroTextBox
+								header={ this.$t('package.review_compose.headline_title') }
+								required={true}
+								name="title"
+								style="margin-bottom: 8px"
+							/>
+							<MetroTextBox
+								header={ this.$t('package.review_compose.body_title') }
+								required={true}
+								textarea={true}
+								name="text"
+								style="margin-bottom: 8px"
+							/>
+						</div>
+					),
+					commands: [{ text: this.$t('app.ok'), primary: true }, { text: this.$t('app.cancel') }]
+				});
+				if (await reviewDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
+					let reviewData = await PackageAPI.createPackageReview({
+						"package.id": this.packageData.id
+					}, reviewDialog.text);
+					
+					if (reviewData.error) {
+						console.error(reviewData.error);
+					} else {
+						new metroUI.ContentDialog({
+							title: this.$t('package.review_compose.success_title'),
+							content: this.$t('package.review_compose.success_message'),
+							commands: [{ text: this.$t('app.ok'), primary: true }]
+						}).show()
+					}
+				}
+			}
+		}
+	},
+	computed: {
+		accountId() {
+			return this.$store.state.accountId;
+		},
+		parent() {
+			return this.$parent.$parent.$parent.$parent;
+		}
+	},
+	filters: {
+		date(value) {
+			return new Date(value).toLocaleDateString();
+		},
+		dateTime(value) {
+			return new Date(value).toLocaleString();
+		},
+		time(value) {
+			return new Date(value).toLocaleTimeString();
+		},
+		filesize(size) {
+			if (isNaN(size)) { size = 0 }
+			if (size < 1024) { return size + ' B' }
+			if ((size /= 1024) < 1024) { return size.toFixed(0) + ' KB' }
+			if ((size /= 1024) < 1024) { return size.toFixed(2) + ' MB' }
+		}
+	}
+}
+</script>
 
 <style lang="less">
 body[data-theme="light"] {
@@ -710,192 +892,3 @@ body[data-theme="dark"] {
 	}
 }
 </style>
-
-<script>
-import { AccountAPI, PackageAPI, RequestAPI } from '@/scripts/ApiUtil'
-import { LogItemType } from '@/scripts/Enumerations'
-import Platforms from '../../../platforms.json'
-
-import CurrentRating from '@/components/CurrentRating'
-import DetailedRatingCell from '@/components/DetailedRatingCell'
-import DeviceCompatibilityItem from '@/components/DeviceCompatibilityItem'
-import ExpandableText from '@/components/ExpandableText'
-import RatingCell from '@/components/RatingCell'
-
-export default {
-	name: "PackagePage",
-	components: {
-		CurrentRating,
-		DetailedRatingCell,
-		DeviceCompatibilityItem,
-		ExpandableText,
-		RatingCell
-	},
-	data() {
-		return {
-			packageData: null,
-			developerData: null,
-			Platforms: Platforms
-		}
-	},
-	methods: {
-		async onNavigatedTo(event) {
-			this.$refs["page"].$el.scrollTop = 0;
-			
-			this.packageData = null;
-			this.developerData = null;
-			
-			let _packageData = await PackageAPI.getPackages({
-				"package.identifier": this.$route.path.split("/")[2],
-				include: "ratings,reviews,screenshots,versions"
-			});
-			
-			if (!_packageData.length || _packageData.error) {
-				this.packageData = {};
-				return;
-			} else {
-				window.packageData = _packageData[0];
-				this.packageData = _packageData[0];
-			}
-			
-			let _developerData = await AccountAPI.getUser({
-				"account.id": packageData.accountId
-			});
-			
-			if (_developerData.error) {
-				console.error(_developerData.error);
-			} else {
-				this.developerData = _developerData;
-			}
-		},
-		packageDescriptionMoreClicked() {
-			new metroUI.ContentDialog({
-				content: (() => {
-					return (
-						<div>
-							<MetroTextBlock text-style="title" style="font-weight: 600; margin-bottom: 8px">{packageData.name}</MetroTextBlock>
-							<MetroTextBlock >
-								<span domPropsInnerHTML={packageData.detailedDescription.replace(/\n/g, "<br />")} />
-							</MetroTextBlock>
-						</div>
-					);
-				})(),
-				commands: [{
-					text: this.$t('app.close'),
-					primary: true
-				}]
-			}).show();
-		},
-		downloadButtonClicked() {},
-		async reportPackageButtonClicked() {
-			if (!this.accountId) {
-				this.parent.login();
-			} else {
-				let reportDialog = new metroUI.ContentDialog({
-					title: this.$t('package.report_compose.title', { packageName: this.packageData.name }),
-					content: (
-						<div style="min-width: 320px">
-							<MetroTextBox
-								header={ this.$t('package.report_compose.message') }
-								required={true}
-								textarea={true}
-								name="detailText"
-								style="margin-bottom: 8px"
-							/>
-						</div>
-					),
-					commands: [{ text: this.$t('app.ok'), primary: true }, { text: this.$t('app.cancel') }]
-				});
-				if (await reportDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
-					let requestData = await RequestAPI.createRequest({
-						type: LogItemType.USER_REPORT,
-						detailText: reportDialog.text["detailText"],
-						affectedPackageId: this.packageData.id
-					});
-					
-					if (requestData.error) {
-						console.error(error);
-					} else {
-						new metroUI.ContentDialog({
-							title: this.$t('package.report_compose.success_title'),
-							content: this.$t('package.report_compose.success_message'),
-							commands: [{ text: this.$t('app.ok'), primary: true }]
-						}).show()
-					}
-				}
-			}
-		},
-		async reviewButtonClicked() {
-			if (!this.accountId) {
-				this.parent.login();
-			} else {
-				let reviewDialog = new metroUI.ContentDialog({
-					title: this.packageData.name,
-					content: (
-						<div style="min-width: 320px">
-							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">{ this.$t('package.review_compose.rate') }</MetroTextBlock>
-							<MetroRatingControl name="value" />
-							
-							<MetroTextBlock text-style="sub-title" style="font-size: 16px; margin-bottom: 8px">{ this.$t('package.review_compose.write_a_review') }</MetroTextBlock>
-							<MetroTextBox
-								header={$t('package.review_compose.headline_title')}
-								required={true}
-								name="title"
-								style="margin-bottom: 8px"
-							/>
-							<MetroTextBox
-								header={$t('package.review_compose.body_title')}
-								required={true}
-								textarea={true}
-								name="text"
-								style="margin-bottom: 8px"
-							/>
-						</div>
-					),
-					commands: [{ text: this.$t('app.ok'), primary: true }, { text: this.$t('app.cancel') }]
-				});
-				if (await reviewDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
-					let reviewData = await PackageAPI.createPackageReview({
-						"package.id": this.packageData.id
-					}, reviewDialog.text);
-					
-					if (reviewData.error) {
-						console.error(error);
-					} else {
-						new metroUI.ContentDialog({
-							title: this.$t('package.review_compose.success_title'),
-							content: this.$t('package.review_compose.success_message'),
-							commands: [{ text: this.$t('app.ok'), primary: true }]
-						}).show()
-					}
-				}
-			}
-		}
-	},
-	computed: {
-		accountId() {
-			return this.$store.state.accountId;
-		},
-		parent() {
-			return this.$parent.$parent.$parent.$parent;
-		}
-	},
-	filters: {
-		date(value) {
-			return new Date(value).toLocaleDateString();
-		},
-		dateTime(value) {
-			return new Date(value).toLocaleString();
-		},
-		time(value) {
-			return new Date(value).toLocaleTimeString();
-		},
-		filesize(size) {
-			if (isNaN(size)) { size = 0 }
-			if (size < 1024) { return size + ' B' }
-			if ((size /= 1024) < 1024) { return size.toFixed(0) + ' KB' }
-			if ((size /= 1024) < 1024) { return size.toFixed(2) + ' MB' }
-		}
-	}
-}
-</script>

@@ -20,25 +20,6 @@
 	</MetroStackPanel>
 </template>
 
-<style lang="less">
-.text-block.expandable-text {
-	max-width: 100%;
-	
-	&:not(.expanded) {
-		max-height: 285px;
-		overflow: hidden;
-	}
-	
-	& + .hyperlink-button .text-block {
-		display: inline-block;
-		
-		span {
-			font-weight: inherit;
-		}
-	}
-}
-</style>
-
 <script>
 export default {
 	name: "ExpandableText",
@@ -63,3 +44,22 @@ export default {
 	}
 }
 </script>
+
+<style lang="less">
+.text-block.expandable-text {
+	max-width: 100%;
+	
+	&:not(.expanded) {
+		max-height: 285px;
+		overflow: hidden;
+	}
+	
+	& + .hyperlink-button .text-block {
+		display: inline-block;
+		
+		span {
+			font-weight: inherit;
+		}
+	}
+}
+</style>

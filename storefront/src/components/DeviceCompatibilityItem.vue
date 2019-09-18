@@ -7,6 +7,16 @@
 	</div>
 </template>
 
+<script>
+export default {
+	name: "DeviceCompatibility",
+	props: {
+		glyph: String,
+		label: String
+	}
+}
+</script>
+
 <style lang="less">
 .device-compat-badge {
 	display: inline-block;
@@ -22,13 +32,3 @@
 	}
 }
 </style>
-
-<script>
-export default {
-	name: "DeviceCompatibility",
-	props: {
-		glyph: String,
-		label: String
-	}
-}
-</script>

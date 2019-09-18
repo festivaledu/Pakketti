@@ -13,6 +13,13 @@
 
 <script>
 export default {
-	name: "ErrorPage"
+	name: "ErrorPage",
+	beforeRouteEnter: async (to, from, next) => {
+
+		next(vm => {
+			vm.$parent.setHeader("");
+			vm.$parent.setSelectedMenuItem(null);
+		});
+	},
 }
 </script>

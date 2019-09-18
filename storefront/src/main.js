@@ -7,6 +7,7 @@ import VueCookies from "vue-cookies";
 Vue.use(VueCookies);
 
 import metroUI from "metroui-vue";
+import "metroui-vue/dist/metroui-vue.css"
 Vue.use(metroUI);
 
 import Vuelidate from "vuelidate";
@@ -17,6 +18,7 @@ Vue.component("vue-headful", vueHeadful);
 
 import VueI18n from 'vue-i18n';
 Vue.use(VueI18n);
+
 const i18n = new VueI18n({
 	locale: navigator.language,
 	fallbackLocale: "en",
@@ -30,7 +32,8 @@ const i18n = new VueI18n({
 
 Vue.config.productionTip = false
 
-import { SocketService } from "@/scripts/SocketService";
+import { SocketService } from '@/scripts/SocketService'
+
 (async () => {
 	await SocketService.connect(`ws://${window.location.hostname}:62486`);
 	

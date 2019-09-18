@@ -31,6 +31,38 @@
 	</div>
 </template>
 
+<script>
+import { AccountAPI } from '@/scripts/ApiUtil'
+
+export default {
+	name: "ReviewCell",
+	props: {
+		reviewData: null,
+	},
+	data() {
+		return {
+			profileData: null
+		}
+	},
+	async mounted() {
+		let _profileData = await AccountAPI.getUser({
+			"account.id": this.reviewData.accountId
+		});
+		
+		if (_profileData.error) {
+			console.error(_profileData.error);
+		} else {
+			this.profileData = _profileData;
+		}
+	},
+	filters: {
+		date(value) {
+			return new Date(value).toLocaleDateString();
+		}
+	}
+}
+</script>
+
 <style lang="less">
 .encoded-svg-mask(@svg) {
 	@url: `encodeURIComponent(@{svg})`;
@@ -118,35 +150,3 @@
 	}
 }
 </style>
-
-<script>
-import { AccountAPI } from '@/scripts/ApiUtil'
-
-export default {
-	name: "RatingCell",
-	props: {
-		reviewData: null,
-	},
-	data() {
-		return {
-			profileData: null
-		}
-	},
-	async mounted() {
-		let _profileData = await AccountAPI.getUser({
-			"account.id": this.reviewData.accountId
-		});
-		
-		if (_profileData.error) {
-			console.error(_profileData.error);
-		} else {
-			this.profileData = _profileData;
-		}
-	},
-	filters: {
-		date(value) {
-			return new Date(value).toLocaleDateString();
-		}
-	}
-}
-</script>
