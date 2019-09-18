@@ -101,7 +101,7 @@
 						<MetroTextBlock text-style="sub-title">{{ $t('package.screenshots_title') }}</MetroTextBlock>
 						
 						<div class="screenshot-wrapper">
-							<div class="screenshot-container" v-for="(screenshotObj, index) in packageData.screenshots" :key="index">
+							<div class="screenshot-container" v-for="(screenshotObj, index) in packageData.screenshots" :key="index" @click="screenshotClicked(screenshotObj)">
 								<img :src="`http://localhost:3000/media/screenshot/${screenshotObj.id}`" />
 							</div>
 						</div>
@@ -255,7 +255,7 @@
 						
 						<MetroTextBlock text-style="sub-title">{{ $t('package.reviews.showing_reviews', { reviewCount: packageData.reviews.length }) }}</MetroTextBlock>
 						<div class="review-container">
-							<RatingCell v-for="(reviewObj, index) in packageData.reviews" :review-data="reviewObj" :key="index" />
+							<ReviewCell v-for="(reviewObj, index) in packageData.reviews" :review-data="reviewObj" :key="index" />
 						</div>
 					</template>
 				</MetroPivotItem>
@@ -273,7 +273,7 @@ import CurrentRating from '@/components/CurrentRating'
 import DetailedRatingCell from '@/components/DetailedRatingCell'
 import DeviceCompatibilityItem from '@/components/DeviceCompatibilityItem'
 import ExpandableText from '@/components/ExpandableText'
-import RatingCell from '@/components/RatingCell'
+import ReviewCell from '@/components/ReviewCell'
 
 export default {
 	name: "PackagePage",
@@ -282,7 +282,7 @@ export default {
 		DetailedRatingCell,
 		DeviceCompatibilityItem,
 		ExpandableText,
-		RatingCell
+		ReviewCell
 	},
 	data: () => ({
 		packageData: null,
@@ -333,6 +333,34 @@ export default {
 			}).show();
 		},
 		downloadButtonClicked() {},
+		screenshotClicked(screenshotObj) {
+			let initialIndex = this.packageData.screenshots.indexOf(screenshotObj);
+			
+			new metroUI.ContentDialog({
+				content: (dialog) => {
+					console.log(dialog);
+					return (
+						<div class="screenshot-viewer">
+							<MetroStackPanel orientation="horizontal" class="screenshot-viewer-chrome">
+								<MetroTextBlock>{this.$t('package.screenshots_title')}</MetroTextBlock>
+								<MetroButton onclick={() => dialog.hide.apply(dialog)}>
+									<MetroSymbolIcon symbol="cancel" />
+								</MetroButton>
+							</MetroStackPanel>
+							<MetroFlipView initial-index={initialIndex}>
+								{this.packageData.screenshots.map((screenshotObj, index) => {
+									return (
+										<MetroFlipViewItem>
+											<img src={`http://localhost:3000/media/screenshot/${screenshotObj.id}`} />
+										</MetroFlipViewItem>
+									)
+								})}
+							</MetroFlipView>
+						</div>
+					)
+				}
+			}).show();
+		},
 		async reportPackageButtonClicked() {
 			if (!this.accountId) {
 				this.parent.login();
@@ -888,6 +916,83 @@ body[data-theme="dark"] {
 		
 		.review-cell:not(:last-child) {
 			margin-bottom: 12px;
+		}
+	}
+}
+
+.content-dialog {
+	max-width: initial;
+	
+	.content-dialog-content {
+		position: relative;
+		overflow-x: visible;
+		
+		& > .screenshot-viewer {
+			margin: -18px -24px;
+			width: 100vw;
+			height: 100vh;
+			max-width: 1366px;
+			max-height: 800px;
+			
+			.screenshot-viewer-chrome {
+				& > .text-block {
+					line-height: 32px;
+					padding: 0 8px;
+				}
+				
+				& > button {
+					&:not(:hover):not(:active) {
+						background-color: transparent;
+					}
+					&:hover:not(:active) {
+						box-shadow: none;
+					}
+				}
+			}
+			
+			.flip-view {
+				max-height: calc(~"100% - 32px");
+				
+				.flip-view-item img {
+					max-width: 100%;
+					max-height: 100%;
+				}
+			}
+		}
+		
+		& > .review-viewer {
+			margin: -18px -24px;
+			width: 100vw;
+			height: 100vh;
+			max-width: 640px;
+			max-height: 800px;
+			display: flex;
+			flex-direction: column;
+			
+			.review-viewer-chrome {
+				& > .text-block {
+					line-height: 32px;
+					padding: 0 8px;
+				}
+				
+				& > button {
+					&:not(:hover):not(:active) {
+						background-color: transparent;
+					}
+					&:hover:not(:active) {
+						box-shadow: none;
+					}
+				}
+			}
+			
+			.review-viewer-header {
+				padding: 12px;
+			}
+			
+			.messages {
+				flex: 1;
+				min-height: 0;
+			}
 		}
 	}
 }
