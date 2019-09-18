@@ -19,8 +19,10 @@
 					<MetroTextBlock>{{ reviewData.createdAt | date }}</MetroTextBlock>
 				</MetroStackPanel>
 				
+				<MetroTextBlock text-style="sub-title" style="font-weight: 500; margin-bottom: 16px">{{ reviewData.title }}</MetroTextBlock>
+				
 				<MetroTextBlock>
-					<span v-html="reviewData.messages[0].text" />
+					<span v-html="reviewData.messages[0].text.replace(/\n/g, '<br>')" />
 				</MetroTextBlock>
 				
 				<MetroHyperlinkButton v-if="reviewData.messages.length > 1" @click="showAllMessages">
