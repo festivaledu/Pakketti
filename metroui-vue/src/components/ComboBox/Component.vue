@@ -47,6 +47,10 @@ export default {
 		itemsSource: null,
 		disabled: Boolean,
 		value: null,
+		noUpdate: {
+			type: Boolean,
+			default: false
+		}
 	},
 	data() {
 		return {
@@ -64,14 +68,16 @@ export default {
 		});
 	},
 	updated() {
-		this.$nextTick(function () {
-			this.$data._value = this.value;
-			if (this.itemsSource instanceof Array) {
-				this.selectedIndex = this.itemsSource.indexOf(this.value);
-			} else {
-				this.selectedIndex = Object.keys(this.itemsSource).indexOf(this.value);
-			}
-		})
+		if (!this.noUpdate) {
+			this.$nextTick(function () {
+				this.$data._value = this.value;
+				if (this.itemsSource instanceof Array) {
+					this.selectedIndex = this.itemsSource.indexOf(this.value);
+				} else {
+					this.selectedIndex = Object.keys(this.itemsSource).indexOf(this.value);
+				}
+			});
+		}
 	},
 	methods: {
 		_openDropDown(event) {

@@ -64,7 +64,7 @@ export default {
 		},
 		messages: {
 			type: Array,
-			default: []
+			default: () => ([])
 		}
 	},
 	data() {
