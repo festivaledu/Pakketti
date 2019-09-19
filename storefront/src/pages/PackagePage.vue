@@ -265,7 +265,7 @@
 </template>
 
 <script>
-import { AccountAPI, PackageAPI, RequestAPI } from '@/scripts/ApiUtil'
+import { AccountAPI, DeviceAPI, PackageAPI, RequestAPI } from '@/scripts/ApiUtil'
 import { LogItemType } from '@/scripts/Enumerations'
 import Platforms from '../../../platforms.json'
 
@@ -405,6 +405,11 @@ export default {
 			if (!this.accountId) {
 				this.parent.login();
 			} else {
+				let devices = (await DeviceAPI.getDevices()).reduce((obj, item) => ({
+					...obj,
+					[item.id]: `${item.name || this.$t('devices.unnamed_device')} (${item.product})`
+				}), {});
+				
 				let reviewDialog = new metroUI.ContentDialog({
 					title: this.packageData.name,
 					content: (
@@ -425,6 +430,15 @@ export default {
 								textarea={true}
 								name="text"
 								style="margin-bottom: 8px"
+							/>
+							
+							<MetroComboBox
+								header={this.$t('package.review_compose.select_device_title')}
+								placeholer-text={this.$t('package.review_compose.select_device_placeholder')}
+								items-source={devices}
+								name="deviceId"
+								no-update={true}
+								disabled={!Object.keys(devices).length}
 							/>
 						</div>
 					),

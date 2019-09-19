@@ -7,7 +7,13 @@
 				
 				<div class="profile-text-container">
 					<MetroTextBlock text-style="base">{{ profileData.username }}</MetroTextBlock>
-					<MetroTextBlock text-style="base" v-if="reviewData.device">Device (Platform Version)</MetroTextBlock>
+					
+					<template v-if="reviewData.device">
+						<MetroTextBlock text-style="base" style="margin-bottom: 0" v-if="reviewData.device.platform == 'iphoneos'">{{ DeviceStrings[reviewData.device.product] || $t('device.unknown_type') }}</MetroTextBlock>
+						<MetroTextBlock text-style="base" style="margin-bottom: 0" v-else>{{ reviewData.device.product }}</MetroTextBlock>
+						
+						<MetroTextBlock text-style="base">{{ Platforms.platforms[reviewData.device.platform] || $t('device.unknown_platform') }} {{ reviewData.device.version }}</MetroTextBlock>
+					</template>
 				</div>
 			</MetroStackPanel>
 			
@@ -34,8 +40,11 @@
 </template>
 
 <script>
-import { AccountAPI, PackageAPI } from '@/scripts/ApiUtil'
+import { AccountAPI, DeviceAPI, PackageAPI } from '@/scripts/ApiUtil'
 import CurrentRating from './CurrentRating';
+
+import Platforms from '../../../platforms.json'
+import DeviceStrings from '../../../deviceStrings.json'
 
 export default {
 	name: "ReviewCell",
@@ -45,11 +54,13 @@ export default {
 	props: {
 		reviewData: null,
 	},
-	data() {
-		return {
-			profileData: null
-		}
-	},
+	data: () => ({
+		profileData: null,
+		deviceData: null,
+		
+		Platforms: Platforms,
+		DeviceStrings: DeviceStrings
+	}),
 	async mounted() {
 		let _profileData = await AccountAPI.getUser({
 			"account.id": this.reviewData.accountId
