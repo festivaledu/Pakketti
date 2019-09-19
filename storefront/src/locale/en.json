@@ -119,7 +119,7 @@
 			"rate_and_review": "Rate and review",
 			"review_prohibited_developer": "You can't review this Package because you're the developer.",
 			"review_prohibited_again": "You can't review this Package again because you've already reviewed it.",
-			"showing_reviews": "Showing %{reviewCount} reviews",
+			"showing_reviews": "Showing %{reviewCount} review(s)",
 			"show_messages": "Show %{messageCount} messages"
 		},
 		"report_compose": {
@@ -133,6 +133,8 @@
 			"write_a_review": "Write a review",
 			"headline_title": "Give it a headline",
 			"body_title": "Tell us what you like and don't like",
+			"select_device_title": "Select the device you've used",
+			"select_device_placeholder": "Select a device",
 			"success_title": "Thank you for your review!",
 			"success_message": "Your review will be visible to everyone soon."
 		}

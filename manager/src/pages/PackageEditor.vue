@@ -362,9 +362,6 @@ export default {
 			deviceFamilies: { required, minValue: minValue(1) },
 		}
 	},
-	mounted() {
-		
-	},
 	beforeRouteEnter: async (to, from, next) => {
 		let _packageData = await PackageAPI.getPackages({
 			"package.identifier": to.params["packageId"],
@@ -372,9 +369,6 @@ export default {
 		});
 		
 		next(vm => {
-			vm.$parent.setHeader(null);
-			vm.$parent.setSelectedMenuItem("packages");
-			
 			if (_packageData.length) {
 				vm.packageData = _packageData[0];
 			}
@@ -384,6 +378,9 @@ export default {
 					vm.$v.$reset();
 				}, 50);
 			});
+			
+			vm.$parent.setHeader(null);
+			vm.$parent.setSelectedMenuItem("packages");
 		});
 	},
 	async beforeRouteLeave(to, from, next) {

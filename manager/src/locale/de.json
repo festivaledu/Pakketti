@@ -90,10 +90,46 @@
 		"see_all": "Alle Pakete anzeigen",
 		
 		"visible_yes": "Ja",
-		"visible_no": "Nein"
+		"visible_no": "Nein",
+		
+		"delete_package_confirm_title": "„%{name}“ löschen?",
+			"delete_package_confirm_body": "Möchtest du „%{name}“ wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.\n\nZugewiesene Rezensionen werden dadurch ebenfalls gelöscht."
 	},
 	"reviews": {
 		"messages_placeholder": "Eine Nachricht eingeben"
+	},
+	"devices": {
+		"unnamed_device": "Unbenanntes Gerät",
+		"unknown_product": "Unbekanntes Modell",
+		"unknown_platform": "Unbekannte Plattform",
+		
+		"add_device": "Gerät hinzufügen",
+		"add_device_iphoneos": "iOS-Gerät hinzufügen",
+		"edit_device": {
+			"add_title": "Gerät hinzufügen",
+			"edit_title": "Gerät bearbeiten",
+			"device_name_header": "Geräte-Name",
+			"product_header": "Produkt-ID / Modellnummer",
+			"product_placeholder": "z.B. iPhone8,1",
+			"os_header": "Betriebssystemversion",
+			"os_placeholder": "z.B. 12.2",
+			"udid_header": "UDID / Seriennummer",
+			"variant_header": "Variante",
+			"variant_placeholder": "Variante auswählen",
+			"capacity_header": "Kapazität (GB)",
+			
+			"required": "Erforderlich",
+			"optional": "Optional"
+		},
+		
+		"delete_device_confirm_title": "Dieses Gerät löschen?",
+		"delete_device_confirm_body": "Möchtest du dieses Gerät wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.\n\nZugewiesene Rezensionen werden dadurch ebenfalls gelöscht."
+	},
+	
+	"package_creator": {
+		"title": "Paket erstellen",
+		"create_package_disclaimer": "Um ein Paket zu erstellen, musst du zunächst einen Namen und eine Bundle-ID reservieren.\nSobald dir diese zugewiesen sind, kannst du mit dem Einreichen deines Pakets beginnen.",
+		"button_reserve": "Paket-Namen reservieren"
 	},
 	
 	"package_editor": {
@@ -101,8 +137,7 @@
 		"pivot_headers": {
 			"info": "Informationen",
 			"media": "Medien",
-			"versions": "Versionen",
-			"reviews": "Rezensionen"
+			"versions": "Versionen"
 		},
 		
 		"info": {
@@ -156,7 +191,24 @@
 			
 			"visibility_title": "Sichtbarkeit",
 			"visibility_visible": "Das Paket ist sichtbar und kann heruntergeladen werden",
-			"visibility_hidden": "Das Paket nicht im Store anzeigen"
+			"visibility_hidden": "Das Paket nicht im Store anzeigen",
+			
+			"package_name_availability": {
+				"available_title": "Paket-Name ist verfügbar",
+				"available_body": "Der ausgewählte Paket-Name ist verfügbar und kann genutzt werden.",
+				"unavailable_title": "Paket-Name nicht verfügbar",
+				"unavailable_body": "Der ausgewählte Paket-Name wird bereits verwendet. Bitte wähle einen anderen Namen."
+			},
+			"bundle_id_availability": {
+				"available_title":"Bundle-ID ist verfügbar",
+				"available_body":"Die ausgewählte Bundle-ID ist verfügbar und kann genutzt werden.",
+				"unavailable_title":"Bundle-ID nicht verfügbar",
+				"unavailable_body":"TDie ausgewählte Bundle-ID wird bereits verwendet. Bitte wähle eine andere Bundle-ID."
+			}
+		},
+		"media": {
+			"delete_item_title": "Dieses Objekt löschen?",
+			"delete_item_body": "<p>Möchtest du dieses Objekt wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>"
 		}
 	}
 }

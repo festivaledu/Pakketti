@@ -1,9 +1,8 @@
 <template>
 	<MetroPage page-id="package-creator">
-		<MetroTextBlock>
-			To create your Package, you first need to reserve a name and a bundle identifier.<br>
-			With both of these associated to you, you can start submitting your Package.
-		</MetroTextBlock>
+		<vue-headful :title="$t('package_creator.title')" />
+		
+		<MetroTextBlock>{{ $t('package_creator.create_package_disclaimer') }}</MetroTextBlock>
 		
 		<div class="row">
 			<div class="col-12 col-md-6">
@@ -47,8 +46,8 @@
 		</div>
 		
 		<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="center">
-			<MetroButton class="system-accent-color" :disabled="!packageData.name.length || !packageData.identifier.length || isWorking.createPackage" @click="createPackage">Reserve Package name</MetroButton>
-			<MetroButton style="margin: 0 4px">Cancel</MetroButton>
+			<MetroButton class="system-accent-color" :disabled="!packageData.name.length || !packageData.identifier.length || isWorking.createPackage" @click="createPackage">{{ $t('package_creator.button_reserve') }}</MetroButton>
+			<MetroButton style="margin: 0 4px">{{ $t('app.cancel') }}</MetroButton>
 			
 			<MetroProgressRing :active="isWorking.createPackage" />
 		</MetroStackPanel>
@@ -75,7 +74,7 @@ export default {
 	},
 	beforeRouteEnter: async (to, from, next) => {
 		next(vm => {
-			vm.$parent.setHeader("Create a Package");
+			vm.$parent.setHeader(vm.$t('package_creator.title'));
 			vm.$parent.setSelectedMenuItem("packages");
 		});
 	},
@@ -90,14 +89,14 @@ export default {
 			
 			if (packageList.length) {
 				new metroUI.ContentDialog({
-					title: "Package name unavailable",
-					content: "The selected Package name is already in use. Please use a different Package name.",
+					title: this.$t('package_editor.package_name_availability.unavailable_title'),
+					content: this.$t('package_editor.package_name_availability.unavailable_body'),
 					commands: [{ text: "Ok", primary: true }]
 				}).show();
 			} else {
 				new metroUI.ContentDialog({
-					title: "Package name is available",
-					content: "The selected Package name is available for use.",
+					title: this.$t('package_editor.package_name_availability.available_title'),
+					content: this.$t('package_editor.package_name_availability.available_body'),
 					commands: [{ text: "Ok", primary: true }]
 				}).show();
 			}
@@ -112,14 +111,14 @@ export default {
 			
 			if (packageList.length) {
 				new metroUI.ContentDialog({
-					title: "Bundle ID unavailable",
-					content: "The selected Bundle ID is already in use. Please use a different Bundle ID.",
+					title: this.$t('package_editor.bundle_id_availability.unavailable_title'),
+					content: this.$t('package_editor.bundle_id_availability.unavailable_body'),
 					commands: [{ text: "Ok", primary: true }]
 				}).show();
 			} else {
 				new metroUI.ContentDialog({
-					title: "Bundle ID is available",
-					content: "The selected Bundle ID is available for use.",
+					title: this.$t('package_editor.bundle_id_availability.available_title'),
+					content: this.$t('package_editor.bundle_id_availability.available_body'),
 					commands: [{ text: "Ok", primary: true }]
 				}).show();
 			}

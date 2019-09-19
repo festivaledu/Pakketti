@@ -1,5 +1,7 @@
 <template>
 	<MetroPage page-id="dashboard">
+		<vue-headful :title="$t('root.item_dashboard')" />
+		
 		<div class="mb-2" v-if="(isModerator || isAdministrator)">
 			<MetroTextBlock text-style="sub-title">{{ $t('dashboard.overview_header') }}</MetroTextBlock>
 		</div>
@@ -232,7 +234,7 @@ export default {
 			vm.reviewData = _reviewData;
 			vm.deviceData = _deviceData;
 			
-			vm.$parent.setHeader("Dashboard");
+			vm.$parent.setHeader(vm.$t('root.item_dashboard'));
 			vm.$parent.setSelectedMenuItem("dashboard");
 		});
 	},
@@ -265,8 +267,8 @@ export default {
 						(!this.isDeveloper && !this.isModerator && !this. isAdministrator),
 					action: async () => {
 						let deleteDialog = new metroUI.ContentDialog({
-							title: `Delete "${packageObj.name}"?`,
-							content: `Are you sure you want to delete "${packageObj.name}"? This action cannot be undone.\n\nAssociated Reviews will also be deleted.`,
+							title: this.$t('packages.delete_package_confirm_title', { name: packageObj.name }),
+							content: this.$t('packages.delete_package_confirm_body', { name: packageObj.name }),
 							commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 						});
 						

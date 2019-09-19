@@ -120,7 +120,7 @@
 			"rate_and_review": "Bewerten und Rezension schreiben",
 			"review_prohibited_developer": "Du kannst für dieses Paket keine Bewertung oder Rezension abgeben, weil du der Entwickler bist.",
 			"review_prohibited_again": "Du kannst für dieses Paket keine Bewertung oder Rezension abgeben, weil du es bereits bewertet hast.",
-			"showing_reviews": "%{reviewCount} Rezensionen werden angezeigt",
+			"showing_reviews": "%{reviewCount} Rezension(en) werden angezeigt",
 			"show_messages": "%{messageCount} Nachrichten anzeigen"
 		},
 		"report_compose": {
@@ -134,6 +134,8 @@
 			"write_a_review": "Bewertung schreiben",
 			"headline_title": "Titel für deine Bewertung",
 			"body_title": "Teil uns mit, was dir gefällt und was nicht",
+			"select_device_title": "Wähle das Gerät, das du benutzt hast",
+			"select_device_placeholder": "Gerät auswählen",
 			"success_title": "Danke für deine Rezension!",
 			"success_message": "Deine Bewertung wird bald für alle sichtbar sein."
 		}

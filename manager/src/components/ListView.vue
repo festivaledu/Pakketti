@@ -27,6 +27,157 @@
 	</div>
 </template>
 
+<script>
+export default {
+	name: "MetroListView",
+	props: {
+		paneTitle: String,
+		header: null,
+		paneDisplayMode: {
+			type: String,
+			default: "",
+			validator: value => {
+				return ["left", "left-compact", "left-minimal", ""].indexOf(value) >= 0
+			}
+		}
+	},
+	data() {
+		return {
+			headerText: this.$props.header,
+			
+			collapsed: false,
+			expanded: false,
+			minimal: this.$props.paneDisplayMode === "left-minimal",
+			top: this.$props.paneDisplayMode === "top",
+			
+			menuItems: {},
+			pages: {},
+			currentPage: null,
+			history: []
+		}
+	},
+	mounted() {
+		const nav = this;
+		
+		this.$refs["content-frame"].querySelectorAll(".page").forEach(item => {
+			if (item.hasAttribute("data-page-id")) {
+				if (this.pages[item.getAttribute("data-page-id")]) {
+					throw new Error("ListView pages must have unique identifiers!");
+				}
+				
+				this.pages[item.getAttribute("data-page-id")] = item;
+			}
+		});
+		
+		this.$refs["menu-items"].$el.querySelectorAll(".list-view-item").forEach(item => {
+			if (item.hasAttribute("data-page-id")) {
+				if (this.menuItems[item.getAttribute("data-page-id")]) {
+					throw new Error("ListView menu items must have unique identifiers!");
+				}
+				
+				this.menuItems[item.getAttribute("data-page-id")] = item;
+				
+				item.addEventListener("click", () => {
+					this.navigate(item.getAttribute("data-page-id"));
+					
+					this.$emit("selectionChanged", item, {
+						selectedItem: item,
+						isSettingsSelected: item === this.$refs["settings-nav-pane-item"]
+					});
+
+					if ((this.paneDisplayMode === "left-compact" || this.paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.paneDisplayMode !== "left")) {
+						this.expanded = false
+					}
+				});
+			}
+		});
+		
+		if (this.$refs["footer-content"]) {
+			this.$refs["footer-content"].$el.querySelectorAll(".list-view-item").forEach(item => {
+				if (item.__vue__.$props.pageId) {
+					if (this.menuItems[item.__vue__.$props.pageId]) {
+						throw new Error("ListView menu items must have unique identifiers!");
+					}
+					
+					this.menuItems[item.__vue__.$props.pageId] = item;
+					
+					item.addEventListener("click", () => {
+						if ((this.paneDisplayMode === "left-compact" || this.paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.paneDisplayMode !== "left")) {
+							this.expanded = false
+							
+							setTimeout(() => {
+								this.navigate(item.__vue__.$props.pageId);
+							}, 350)
+						} else {
+							this.navigate(item.__vue__.$props.pageId);
+						}
+						
+						nav.$emit("selectionChanged", item, {
+							selectedItem: item,
+							isSettingsSelected: item === this.$refs["settings-nav-pane-item"].$el
+						});
+					});
+				}
+			});
+		}
+	},
+	methods: {
+		async navigate(pageId, data = {}) {
+			if (this.currentPage === pageId) return;
+			if (!this.pages[pageId]) return;
+			
+			if (this.menuItems[pageId]) {
+				if (this.menuItems[this.currentPage]) this.menuItems[this.currentPage].classList.remove("selected");
+				
+				this.menuItems[pageId].classList.add("selected");
+			}
+			
+			if (this.currentPage) {
+				this.pages[this.currentPage].dispatchEvent(new CustomEvent("navigatingFrom"));
+				this.pages[this.currentPage].classList.add("page-fade-out");
+				
+				await new Promise(resolve => setTimeout(() => {
+					this.pages[this.currentPage].classList.remove("page-fade-out");
+					this.pages[this.currentPage].classList.remove("page-active");
+					
+					resolve();
+				}, 150));
+				this.pages[this.currentPage].dispatchEvent(new CustomEvent("navigatedFrom"));
+			}
+			
+			this.pages[pageId].dispatchEvent(new CustomEvent("navigatingTo"));
+			this.currentPage = pageId;
+			
+			this.pages[pageId].classList.add("page-active");
+			this.pages[pageId].classList.add("page-slide-in");
+			
+			setTimeout(() => {
+				this.pages[pageId].classList.remove("page-slide-in");
+			}, 400);
+			
+			this.pages[pageId].dispatchEvent(new CustomEvent("navigatedTo", {
+				detail: {
+					...data,
+					pageId: pageId
+				}
+			}));
+		},
+		
+		setHeader(headerText) {
+			this.headerText = headerText;
+		},
+		
+		togglePane() {
+			if ((this.paneDisplayMode === "left-compact" || this.paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.paneDisplayMode !== "left")) {
+				this.expanded = !this.expanded
+			} else {
+				this.collapsed = !this.collapsed
+			}
+		}
+	},
+}
+</script>
+
 <style lang="less">
 @keyframes page-fade-out {
 	0% { opacity: 1; }
@@ -603,155 +754,3 @@
 	}
 }
 </style>
-
-
-<script>
-export default {
-	name: "MetroListView",
-	props: {
-		paneTitle: String,
-		header: null,
-		paneDisplayMode: {
-			type: String,
-			default: "",
-			validator: value => {
-				return ["left", "left-compact", "left-minimal", ""].indexOf(value) >= 0
-			}
-		}
-	},
-	data() {
-		return {
-			headerText: this.$props.header,
-			
-			collapsed: false,
-			expanded: false,
-			minimal: this.$props.paneDisplayMode === "left-minimal",
-			top: this.$props.paneDisplayMode === "top",
-			
-			menuItems: {},
-			pages: {},
-			currentPage: null,
-			history: []
-		}
-	},
-	mounted() {
-		const nav = this;
-		
-		this.$refs["content-frame"].querySelectorAll(".page").forEach(item => {
-			if (item.hasAttribute("data-page-id")) {
-				if (this.pages[item.getAttribute("data-page-id")]) {
-					throw new Error("ListView pages must have unique identifiers!");
-				}
-				
-				this.pages[item.getAttribute("data-page-id")] = item;
-			}
-		});
-		
-		this.$refs["menu-items"].$el.querySelectorAll(".list-view-item").forEach(item => {
-			if (item.hasAttribute("data-page-id")) {
-				if (this.menuItems[item.getAttribute("data-page-id")]) {
-					throw new Error("ListView menu items must have unique identifiers!");
-				}
-				
-				this.menuItems[item.getAttribute("data-page-id")] = item;
-				
-				item.addEventListener("click", () => {
-					this.navigate(item.getAttribute("data-page-id"));
-					
-					this.$emit("selectionChanged", item, {
-						selectedItem: item,
-						isSettingsSelected: item === this.$refs["settings-nav-pane-item"]
-					});
-
-					if ((this.paneDisplayMode === "left-compact" || this.paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.paneDisplayMode !== "left")) {
-						this.expanded = false
-					}
-				});
-			}
-		});
-		
-		if (this.$refs["footer-content"]) {
-			this.$refs["footer-content"].$el.querySelectorAll(".list-view-item").forEach(item => {
-				if (item.__vue__.$props.pageId) {
-					if (this.menuItems[item.__vue__.$props.pageId]) {
-						throw new Error("ListView menu items must have unique identifiers!");
-					}
-					
-					this.menuItems[item.__vue__.$props.pageId] = item;
-					
-					item.addEventListener("click", () => {
-						if ((this.paneDisplayMode === "left-compact" || this.paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.paneDisplayMode !== "left")) {
-							this.expanded = false
-							
-							setTimeout(() => {
-								this.navigate(item.__vue__.$props.pageId);
-							}, 350)
-						} else {
-							this.navigate(item.__vue__.$props.pageId);
-						}
-						
-						nav.$emit("selectionChanged", item, {
-							selectedItem: item,
-							isSettingsSelected: item === this.$refs["settings-nav-pane-item"].$el
-						});
-					});
-				}
-			});
-		}
-	},
-	methods: {
-		async navigate(pageId, data = {}) {
-			if (this.currentPage === pageId) return;
-			if (!this.pages[pageId]) return;
-			
-			if (this.menuItems[pageId]) {
-				if (this.menuItems[this.currentPage]) this.menuItems[this.currentPage].classList.remove("selected");
-				
-				this.menuItems[pageId].classList.add("selected");
-			}
-			
-			if (this.currentPage) {
-				this.pages[this.currentPage].dispatchEvent(new CustomEvent("navigatingFrom"));
-				this.pages[this.currentPage].classList.add("page-fade-out");
-				
-				await new Promise(resolve => setTimeout(() => {
-					this.pages[this.currentPage].classList.remove("page-fade-out");
-					this.pages[this.currentPage].classList.remove("page-active");
-					
-					resolve();
-				}, 150));
-				this.pages[this.currentPage].dispatchEvent(new CustomEvent("navigatedFrom"));
-			}
-			
-			this.pages[pageId].dispatchEvent(new CustomEvent("navigatingTo"));
-			this.currentPage = pageId;
-			
-			this.pages[pageId].classList.add("page-active");
-			this.pages[pageId].classList.add("page-slide-in");
-			
-			setTimeout(() => {
-				this.pages[pageId].classList.remove("page-slide-in");
-			}, 400);
-			
-			this.pages[pageId].dispatchEvent(new CustomEvent("navigatedTo", {
-				detail: {
-					...data,
-					pageId: pageId
-				}
-			}));
-		},
-		
-		setHeader(headerText) {
-			this.headerText = headerText;
-		},
-		
-		togglePane() {
-			if ((this.paneDisplayMode === "left-compact" || this.paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.paneDisplayMode !== "left")) {
-				this.expanded = !this.expanded
-			} else {
-				this.collapsed = !this.collapsed
-			}
-		}
-	},
-}
-</script>

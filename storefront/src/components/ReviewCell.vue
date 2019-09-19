@@ -9,7 +9,7 @@
 					<MetroTextBlock text-style="base">{{ profileData.username }}</MetroTextBlock>
 					
 					<template v-if="reviewData.device">
-						<MetroTextBlock text-style="base" style="margin-bottom: 0" v-if="reviewData.device.platform == 'iphoneos'">{{ DeviceStrings[reviewData.device.product] || $t('device.unknown_type') }}</MetroTextBlock>
+						<MetroTextBlock text-style="base" style="margin-bottom: 0" v-if="reviewData.device.platform == 'iphoneos'">{{ DeviceStrings[reviewData.device.product] || $t('device.unknown_product') }}</MetroTextBlock>
 						<MetroTextBlock text-style="base" style="margin-bottom: 0" v-else>{{ reviewData.device.product }}</MetroTextBlock>
 						
 						<MetroTextBlock text-style="base">{{ Platforms.platforms[reviewData.device.platform] || $t('device.unknown_platform') }} {{ reviewData.device.version }}</MetroTextBlock>

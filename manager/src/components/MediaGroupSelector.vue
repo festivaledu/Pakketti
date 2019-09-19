@@ -66,26 +66,17 @@ export default {
 		},
 		
 		_handleFile(file) {
-			// const reader = new FileReader();
-			// reader.onload = (progress) => {
-			// 	const blob = window.URL.createObjectURL(BlobUtil.arrayBufferToBlob(progress.target.result));
-			// 	this.selectedImageBlob = blob;
-			// }
-			// reader.readAsArrayBuffer(file);
-			
 			this.$emit("fileChanged", file)
 		},
 		async _deleteFile(mediaObj) {
 			let confirmDialog = new metroUI.ContentDialog({
-				title: "Delete this item?",
-				content: "<p>Are you sure you want to delete this item?<br>This action cannot be undone.</p>",
+				title: this.$t('package_editor.media.delete_item_title'),
+				content: this.$t('package_editor.media.delete_item_body'),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			
 			if (await confirmDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
-			// 	this.selectedImageBlob = null;
 				this.$refs["file-selector"].value = null;
-				
 				this.$emit("fileDeleted", mediaObj);
 			}
 		},

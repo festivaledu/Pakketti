@@ -80,8 +80,8 @@ export default {
 		},
 		async _deleteFile() {
 			let confirmDialog = new metroUI.ContentDialog({
-				title: "Delete this item?",
-				content: "<p>Are you sure you want to delete this item?<br>This action cannot be undone.</p>",
+				title: this.$t('package_editor.media.delete_item_title'),
+				content: this.$t('package_editor.media.delete_item_body'),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			

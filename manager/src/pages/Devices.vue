@@ -1,5 +1,7 @@
 <template>
 	<MetroPage page-id="devices">
+		<vue-headful :title="$t('root.item_devices')" />
+		
 		<template slot="bottom-app-bar">
 			<MetroCommandBar>
 				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click.native="deviceAddButtonClicked" />
@@ -11,12 +13,12 @@
 				<div class="device-container">
 					<div class="device-description-container">
 						<img class="device-artwork" v-if="deviceObj.variant"/>
-						<MetroTextBlock text-style="base">{{ deviceObj.name || "Unnamed device" }}</MetroTextBlock>
+						<MetroTextBlock text-style="base">{{ deviceObj.name || $t('devices.unnamed_device') }}</MetroTextBlock>
 						
-						<MetroTextBlock v-if="deviceObj.platform == 'iphoneos'">{{ DeviceStrings[deviceObj.product] || "Unknown type" }}</MetroTextBlock>
+						<MetroTextBlock v-if="deviceObj.platform == 'iphoneos'">{{ DeviceStrings[deviceObj.product] || $t('devices.unknown_product') }}</MetroTextBlock>
 						<MetroTextBlock v-else>{{ deviceObj.product }}</MetroTextBlock>
 						
-						<MetroTextBlock>{{ Platforms.platforms[deviceObj.platform] || "Unknown platform" }} {{ deviceObj.version }}</MetroTextBlock>
+						<MetroTextBlock>{{ Platforms.platforms[deviceObj.platform] || $t('devices.unknown_platform') }} {{ deviceObj.version }}</MetroTextBlock>
 					</div>
 					
 					<MetroStackPanel orientation="horizontal" class="device-toolbar">
@@ -57,11 +59,11 @@ export default {
 			let flyout = new metroUI.MenuFlyout({
 				items: [{
 					icon: "add",
-					text: "Add Device",
+					text: this.$t('devices.add_device'),
 					action: this.addDevice
 				}, {
 					icon: "add",
-					text: "Add iOS Device",
+					text: this.$t('devices.add_device_iphoneos'),
 					action: this.addiOSDevice
 				}]
 			});
@@ -72,22 +74,23 @@ export default {
 			let _deviceObj = {};
 			
 			let deviceDialog = new metroUI.ContentDialog({
-				title: "Edit device",
+				title: this.$t('devices.edit_device.add_title'),
 				content: () => {
 					return (
 						<div class="row">
 							<div class="col col-12 col-md-6">
 								<div class="mb-4">
 									<MetroTextBox
-										header="Device name"
-										placeholder-text="Optional"
+										header={this.$t('devices.edit_device.device_name_header')}
+										placeholder-text={this.$t('devices.edit_device.optional')}
 										v-model={_deviceObj.name}
 									/>
 								</div>
 								
 								<div class="mb-4">
 									<MetroTextBox
-										header="Product Identifier / Model Number"
+										header={this.$t('devices.edit_device.product_header')}
+										placeholder-text={this.$t('devices.edit_device.product_placeholder')}
 										v-model={_deviceObj.product}
 										required={true}
 									/>
@@ -95,7 +98,8 @@ export default {
 								
 								<div class="mb-4">
 									<MetroComboBox
-										header="Platform"
+										header={this.$t('package_editor.info.platform_title')}
+										placeholder-text={this.$t('package_editor.info.platform_placeholder')}
 										items-source={{
 											'win': this.$t('package_editor.info.platform.win'),
 											'darwin': this.$t('package_editor.info.platform.darwin'),
@@ -109,7 +113,8 @@ export default {
 								
 								<div class="mb-4">
 									<MetroTextBox
-										header="OS Version"
+										header={this.$t('devices.edit_device.os_header')}
+										placeholder-text={this.$t('devices.edit_device.os_placeholder')}
 										v-model={_deviceObj.version}
 										required={true}
 									/>
@@ -119,7 +124,8 @@ export default {
 							<div class="col col-12 col-md-6">
 								<div class="mb-4">
 									<MetroTextBox
-										header="Serial Number"
+										header={this.$t('devices.edit_device.udid_header')}
+										placeholder-text={this.$t('devices.edit_device.required')}
 										v-model={_deviceObj.udid}
 										required={true}
 									/>
@@ -127,7 +133,8 @@ export default {
 								
 								<div class="mb-4">
 									<MetroTextBox
-										header="Capacity (GB)"
+										header={this.$t('devices.edit_device.capacity_header')}
+										placeholder-text={this.$t('devices.edit_device.optional')}
 										v-model={_deviceObj.capacity}
 									/>
 								</div>
@@ -169,29 +176,32 @@ export default {
 			}
 			
 			let deviceDialog = new metroUI.ContentDialog({
-				title: "Edit device",
+				title: this.$t('devices.edit_device.edit_title'),
 				content: () => {
 					return (
 						<div class="row">
 							<div class="col col-12 col-md-6">
 								<div class="mb-4">
 									<MetroTextBox
-										header="Device name"
+										header={this.$t('devices.edit_device.device_name_header')}
+										placeholder-text={this.$t('devices.edit_device.optional')}
 										v-model={_deviceObj.name}
 									/>
 								</div>
 								
 								<div class="mb-4">
 									<MetroTextBox
-										header="Product Identifier / Model Number"
-										disabled={isiPhoneOSDevice}
+										header={this.$t('devices.edit_device.product_header')}
+										placeholder-text={this.$t('devices.edit_device.product_placeholder')}
 										v-model={_deviceObj.product}
+										disabled={isiPhoneOSDevice}
 									/>
 								</div>
 								
 								<div class="mb-4">
 									<MetroComboBox
-										header="Platform"
+										header={this.$t('package_editor.info.platform_title')}
+										placeholder-text={this.$t('package_editor.info.platform_placeholder')}
 										items-source={{
 											'win': this.$t('package_editor.info.platform.win'),
 											'darwin': this.$t('package_editor.info.platform.darwin'),
@@ -205,8 +215,10 @@ export default {
 								
 								<div class="mb-4">
 									<MetroTextBox
-										header="OS Version"
+										header={this.$t('devices.edit_device.os_header')}
+										placeholder-text={this.$t('devices.edit_device.os_placeholder')}
 										v-model={_deviceObj.version}
+										required={true}
 									/>
 								</div>
 							</div>
@@ -214,16 +226,18 @@ export default {
 							<div class="col col-12 col-md-6">
 								<div class="mb-4">
 									<MetroTextBox
-										header="UDID / Serial Number"
+										header={this.$t('devices.edit_device.udid_header')}
+										placeholder-text={this.$t('devices.edit_device.required')}
 										v-model={_deviceObj.udid}
-										disabled={true}
+										disabled={isiPhoneOSDevice}
 									/>
 								</div>
 								
 								{isiPhoneOSDevice &&
 								<div class="mb-4">
 									<MetroComboBox
-										header="Variant"
+										header={this.$t('devices.edit_device.variant_header')}
+										placeholder-text={this.$t('devices.edit_device.variant_placeholder')}
 										items-source={deviceVariants}
 										no-update={true}
 										v-model={_deviceObj.variant}
@@ -233,7 +247,8 @@ export default {
 								
 								<div class="mb-4">
 									<MetroTextBox
-										header="Capacity (GB)"
+										header={this.$t('devices.edit_device.capacity_header')}
+										placeholder-text={this.$t('devices.edit_device.optional')}
 										v-model={_deviceObj.capacity}
 									/>
 								</div>
@@ -258,8 +273,8 @@ export default {
 		},
 		async deviceDeleteButtonClicked(deviceObj) {
 			let deleteDialog = new metroUI.ContentDialog({
-				title: `Delete this device?`,
-				content: `Are you sure you want to delete this device? This action cannot be undone.\n\nAssociated Reviews will also be deleted.`,
+				title: this.$t('devices.delete_device_confirm_title'),
+				content: this.$t('devices.delete_device_confirm_body'),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			
