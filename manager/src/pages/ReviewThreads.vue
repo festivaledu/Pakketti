@@ -62,9 +62,6 @@ export default {
 		let _reviewData = await PackageAPI.getReviews();
 		
 		next(vm => {
-			vm.$parent.setHeader(null);
-			vm.$parent.setSelectedMenuItem("reviews");
-			
 			vm.packageData = _packageData;
 			vm.reviewData = _reviewData;
 			
@@ -72,6 +69,9 @@ export default {
 			vm.threadSelected(to.params.reviewId || null);
 			
 			vm.$refs["list-view"].navigate("messages");
+			
+			vm.$parent.setHeader(null);
+			vm.$parent.setSelectedMenuItem("reviews");
 		});
 	},
 	methods: {

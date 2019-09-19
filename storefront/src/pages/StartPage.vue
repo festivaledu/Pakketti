@@ -56,6 +56,7 @@ export default {
 		
 		next(vm => {
 			vm.packageData = _packageData;
+			
 			vm.$parent.setHeader(vm.$t('root.header.start'));
 			vm.$parent.setSelectedMenuItem("start");
 		});

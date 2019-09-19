@@ -38,7 +38,7 @@
 		<div class="content-root">
 			<div class="header-content" v-if="headerText || this.$slots['header']">
 				<slot name="header" :local="headerText" />
-				<MetroTextBlock v-if="this.$slots['header'] === null" :text="headerText" />
+				<MetroTextBlock v-if="!this.$slots['header'] || this.$slots['header'] === null" :text="headerText" />
 			</div>
 			
 			<div class="content-frame" ref="content-frame">

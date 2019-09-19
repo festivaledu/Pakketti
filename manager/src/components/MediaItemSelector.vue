@@ -156,6 +156,10 @@ export default {
 				max-height: 100%;
 			}
 		}
+		
+		.media-toolbar {
+			padding: 0 2px 2px;
+		}
 	}
 }
 </style>

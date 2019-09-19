@@ -40,6 +40,11 @@ const router = new Router({
 			path: '/reviews/:reviewId?',
 			name: 'reviews',
 			component: () => import(/* webpackChunkName: "ReviewThreads" */ './pages/ReviewThreads.vue')
+		},
+		{
+			path: '/devices',
+			name: 'devices',
+			component: () => import(/* webpackChunkName: "Devices" */ './pages/Devices.vue')
 		}
 	]
 });
