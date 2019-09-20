@@ -13,7 +13,8 @@
 			"edit": "Bearbeiten",
 			"delete": "Löschen",
 			"reload": "Aktualisieren",
-			"save": "Speichern"
+			"save": "Speichern",
+			"view": "Ansehen"
 		}
 	},
 	"login": {
@@ -124,6 +125,54 @@
 		
 		"delete_device_confirm_title": "Dieses Gerät löschen?",
 		"delete_device_confirm_body": "Möchtest du dieses Gerät wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.\n\nZugewiesene Rezensionen werden dadurch ebenfalls gelöscht."
+	},
+	"requests": {
+		"type": {
+			"title": "Anfrage-Typ",
+			"33": "Rückerstattung",
+			"34": "Benutzer-Meldung",
+			"35": "Bewerbung – Entwickler",
+			"36": "Bewerbung – Moderator",
+			"37": "Rollenherabstufung",
+			"38": "Lösch-Anfrage"
+		},
+		"status": {
+			"title": "Status",
+			"-1": "Nicht überprüft",
+			"0": "Akzeptiert",
+			"1": "Abgelehnt"
+		},
+		"no_items": "Es gibt keine Anfragen, die angezeigt werden können",
+		"review_request": "Anfrage überprüfen",
+		"detail_text_header": "Beschreibung",
+		"status_text_header": "Status-Beschreibung",
+		"creator": "Ersteller",
+		"affected": {
+			"account": "Betroffener Account",
+			"package": "Betroffenes Paket",
+			"review": "Betroffene Bewertung",
+			"na": "Nicht verfügbar"
+		},
+		
+		"delete_request_confirm_title": "Diese Anfrage löschen?",
+		"delete_request_confirm_body": "Möchtest du diese Anfrage wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+		
+		"role_application": {
+			"title_developer": "Als Entwickler bewerben",
+			"title_moderator": "Als Moderator bewerben",
+			"reason_header": "Sag uns, warum du dich bewerben möchtest:",
+			"developer_notice": "Wenn du dich als Entwickler bewirbst, musst du eine öffentliche, Git-basierte Repo angeben, die ein Paket und den dazu gehörigen Quellcode enthält. Wenn du diese Infos nicht bereitstellst, wird deine Bewerbung wahrscheinlich abgelehnt."
+		},
+		"role_downgrade": {
+			"title": "Rolle herabstufen",
+			"reason_header": "Sag uns, warum du deine Rolle herabstufen möchtest:",
+			"developer_notice": "Wenn du als Entwickler veröffentlichte Pakete hast, werden diese weiterhin zum Download zur Verfügung stehen. Du wirst diese allerdings nicht mehr verwalten können, bis du dich wieder als Entwickler bewirbst."
+		},
+		"account_deletion": {
+			"title": "Account löschen",
+			"reason_header": "Sag uns, warum du deinen Account löschen möchtest:",
+			"disclaimer": "Wenn dein Account gelöscht wird, werden all deine Pakete, Rezensionen, verbundenen Geräte etc. ebenfalls gelöscht. Sei also gewarnt, dass diese Aktion nicht rückgängig gemacht werden kann."
+		}
 	},
 	
 	"package_creator": {

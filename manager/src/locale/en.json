@@ -13,7 +13,8 @@
 			"edit": "Edit",
 			"delete": "Delete",
 			"reload": "Refresh",
-			"save": "Save"
+			"save": "Save",
+			"view": "View"
 		}
 	},
 	"login": {
@@ -124,6 +125,54 @@
 		
 		"delete_device_confirm_title": "Delete this device?",
 		"delete_device_confirm_body": "Are you sure you want to delete this device? This action cannot be undone.\n\nAssociated Reviews will also be deleted."
+	},
+	"requests": {
+		"type": {
+			"title": "Request Type",
+			"33": "Refund",
+			"34": "User Report",
+			"35": "Application – Developer",
+			"36": "Application – Moderator",
+			"37": "Role Downgrade",
+			"38": "Deletion Request"
+		},
+		"status": {
+			"title": "Status",
+			"-1": "Not reviewed",
+			"0": "Accepted",
+			"1": "Rejected"
+		},
+		"no_items": "No Requests to display",
+		"review_request": "Review Request",
+		"detail_text_header": "Description",
+		"status_text_header": "Status Description",
+		"creator": "Creator",
+		"affected": {
+			"account": "Affected Account",
+			"package": "Affected Package",
+			"review": "Affected Review",
+			"na": "Not available"
+		},
+		
+		"delete_request_confirm_title": "Delete this request?",
+		"delete_request_confirm_body": "Are you sure you want to delete this request? This action cannot be undone.",
+		
+		"role_application": {
+			"title_developer": "Request Developer Role",
+			"title_moderator": "Request Moderator Role",
+			"reason_header": "Tell us why you'd like to apply:",
+			"developer_notice": "When applying as a Developer, you must include a public Git-based repository containing a package and its source code. Failing to include this information will get your application rejected."
+		},
+		"role_downgrade": {
+			"title": "Downgrade Role",
+			"reason_header": "Tell us why you'd like to downgrade your role:",
+			"developer_notice": "If you are a developer and have published packages, those will remain available to download, but you'll not be able to manage them until you reapply as a Developer."
+		},
+		"account_deletion": {
+			"title": "Delete Account",
+			"reason_header": "Tell us why you'd like to delete your account:",
+			"disclaimer": "If your account is deleted, all your Packages, Reviews, linked Devices etc. will also be deleted. Be advised that this action cannot be undone."
+		}
 	},
 	
 	"package_creator": {

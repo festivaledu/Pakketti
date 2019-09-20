@@ -16,16 +16,16 @@
 					<div class="tr column-headers">
 						<div class="th column-header-item">{{ $t('requests.type.title') }}</div>
 						<div class="th column-header-item">{{ $t('requests.status.title') }}</div>
-						<div class="th column-header-item align-right">{{ $t('requests.actions') }}</div>
+						<div class="th column-header-item align-right">{{ $t('packages.actions') }}</div>
 					</div>
 					<div class="row-wrapper" v-for="(requestObj, index) in requestData" :key="index">
 						<div class="tr row">
 							<div class="td cell">
-								<MetroTextBlock>{{ requestObj.type }}</MetroTextBlock>
+								<MetroTextBlock>{{ $t(`requests.type.${requestObj.type}`) }}</MetroTextBlock>
 								<MetroTextBlock text-style="caption">{{ requestObj.detailText }}</MetroTextBlock>
 							</div>
 							<div class="td cell">
-								<MetroTextBlock>{{ requestObj.status }}</MetroTextBlock>
+								<MetroTextBlock>{{ $t(`requests.status.${requestObj.status}`) }}</MetroTextBlock>
 							</div>
 							<div class="td cell align-right">
 								<MetroButton @click="showActionMenu($event, requestObj)">
@@ -116,11 +116,11 @@ export default {
 				title: this.$t('requests.review_request'),
 				content: () => {
 					return (
-						<div class="row">
+						<div class="row" style="width: 500px">
 							<div class="col-12 col-md-6">
 								<div class="mb-4">
-									<MetroTextBlock text-style="base">{this.$t('requests.type.header')}</MetroTextBlock>
-									<MetroTextBlock>{requestObj.type}</MetroTextBlock>
+									<MetroTextBlock text-style="base">{this.$t('requests.type.title')}</MetroTextBlock>
+									<MetroTextBlock>{this.$t(`requests.type.${requestObj.type}`)}</MetroTextBlock>
 								</div>
 								
 								<div class="mb-4">
@@ -129,33 +129,32 @@ export default {
 								
 								<div class="mb-4">
 									<MetroComboBox
-										header={this.$t('requests.review_state.header')}
-										placeholder-text={this.$t('')}
+										header={this.$t('requests.status.title')}
 										items-source={{
-											'-1': this.$t('requests.review_status.not_reviewed'),
-											'0': this.$t('requests.review_status.accepted'),
-											'1': this.$t('requests.review_status.rejected')
+											'-1': this.$t('requests.status.-1'),
+											'0': this.$t('requests.status.0'),
+											'1': this.$t('requests.status.1')
 										}}
 										v-model={_requestObj.status}
 										no-update={true}
 										required={true}
-										disabled={(!this.isModerator && !this.isAdministrator) || requestObj.status >= 0}
+										disabled={(!this.isModerator && !this.isAdministrator) || requestObj.status >= 0 || requestObj.accountId == this.accountId}
 									/>
 								</div>
 								
 								<div class="mb-4">
-									<MetroTextBox textarea={true} readOnly={(!this.isModerator && !this.isAdministrator) || requestObj.status >= 0} header={this.$t('requests.status_text_header')} v-model={_requestObj.statusText} required={true} />
+									<MetroTextBox textarea={true} readOnly={(!this.isModerator && !this.isAdministrator) || requestObj.status >= 0 || requestObj.accountId == this.accountId} header={this.$t('requests.status_text_header')} v-model={_requestObj.statusText} required={true} />
 								</div>
 							</div>
 							
 							<div class="col-12 col-md-6">
 								<div class="mb-5">
-									<MetroTextBlock text-style="base">{this.$t('requests.affected.creator')}</MetroTextBlock>
-									<MetroTextBlock>{`${requestCreatorData.username} (${requestCreatorData.email})` || this.$t('requests.affected.na')}</MetroTextBlock>
+									<MetroTextBlock text-style="base">{this.$t('requests.creator')}</MetroTextBlock>
+									<MetroTextBlock>{`${requestCreatorData.username} (${requestCreatorData.email || this.$t('requests.affected.na')})` || this.$t('requests.affected.na')}</MetroTextBlock>
 								</div>
 								<div class="mb-4">
 									<MetroTextBlock text-style="base">{this.$t('requests.affected.account')}</MetroTextBlock>
-									<MetroTextBlock>{accountData ? `${accountData.username} (${accountData.email})` : this.$t('requests.affected.na')}</MetroTextBlock>
+									<MetroTextBlock>{accountData ? `${accountData.username} (${accountData.email || this.$t('requests.affected.na')})` : this.$t('requests.affected.na')}</MetroTextBlock>
 								</div>
 								<div class="mb-4">
 									<MetroTextBlock text-style="base">{this.$t('requests.affected.package')}</MetroTextBlock>
@@ -173,10 +172,10 @@ export default {
 			});
 			
 			if (await dialog.showAsync() == metroUI.ContentDialogResult.Primary) {
-				let result = RequestAPI.updateRequest({
+				let result = await RequestAPI.updateRequest({
 					"request.id": requestObj.id,
 				}, _requestObj);
-				console.log(_requestObj);
+				
 				if (result.error) {
 					console.error(result.error);
 				} else {
@@ -187,7 +186,7 @@ export default {
 		async deleteRequest(requestObj) {
 			let deleteDialog = new metroUI.ContentDialog({
 				title: this.$t('requests.delete_request_confirm_title'),
-				content: this.$t('requests.delete_requests_confirm_body'),
+				content: this.$t('requests.delete_request_confirm_body'),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			
@@ -206,13 +205,20 @@ export default {
 		upgradeButtonClicked(e) {
 			let flyout = new metroUI.MenuFlyout({
 				items: [{
-					text: this.$t('requests.request_role_developer'),
+					text: this.$t('requests.role_application.title_developer'),
 					disabled: this.isDeveloper,
 					action: () => this.requestRoleUpgrade(UserRole.DEVELOPER)
 				}, {
-					text: this.$t('requests.request_role_moderator'),
+					text: this.$t('requests.role_application.title_moderator'),
 					disabled: !this.isDeveloper || this.isModerator || this.isAdministrator,
 					action: () => this.requestRoleUpgrade(UserRole.MODERATOR)
+				}, {
+					text: this.$t('requests.role_downgrade.title'),
+					disabled: !this.isDeveloper && !this.isModerator,
+					action: () => this.requestRoleDowngrade()
+				}, {
+					text: this.$t('requests.account_deletion.title'),
+					action: () => this.requestAccountDeletion()
 				}]
 			});
 			
@@ -220,12 +226,19 @@ export default {
 		},
 		async requestRoleUpgrade(userRole) {
 			let dialog = new metroUI.ContentDialog({
-				title: this.$t('requests.role_application.title'),
+				title: (() => {
+					switch (userRole) {
+					case UserRole.DEVELOPER:
+						return this.$t('requests.role_application.title_developer');
+					case UserRole.MODERATOR:
+						return this.$t('requests.role_application.title_moderator');
+					}
+				})(),
 				content: () => {
 					return (
 						<div>
 							<div class="mb-4">
-								<MetroTextBox textarea={true} header={this.$t('requests.role_application.reason_header')} name="detailText" />
+								<MetroTextBox textarea={true} required={true} header={this.$t('requests.role_application.reason_header')} name="detailText" />
 							</div>
 							
 							<div class="mb-4">
@@ -238,9 +251,7 @@ export default {
 			});
 			
 			if (await dialog.showAsync() == metroUI.ContentDialogResult.Primary) {
-				let result = RequestAPI.createRequest({
-					"request.id": requestObj.id,
-				}, {
+				let result = await RequestAPI.createRequest({
 					detailText: dialog.text["detailText"],
 					type: (() => {
 						switch (userRole) {
@@ -250,6 +261,71 @@ export default {
 							return LogItemType.MOD_APPLICATION;
 						}
 					})()
+				});
+
+				if (result.error) {
+					console.error(result.error);
+				} else {
+					this.refresh();
+				}
+			}
+		},
+		async requestRoleDowngrade() {
+			let dialog = new metroUI.ContentDialog({
+				title: this.$t('requests.role_downgrade.title'),
+				content: () => {
+					return (
+						<div>
+							<div class="mb-4">
+								<MetroTextBox textarea={true} required={true} header={this.$t('requests.role_downgrade.reason_header')} name="detailText" />
+							</div>
+							
+							<div class="mb-4">
+								<MetroTextBlock text-style="caption">{this.$t('requests.role_downgrade.developer_notice')}</MetroTextBlock>
+							</div>
+						</div>
+					)
+				},
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+			});
+			
+			if (await dialog.showAsync() === metroUI.ContentDialogResult.Primary) {
+				let result = await RequestAPI.createRequest({
+					detailText: dialog.text["detailText"],
+					type: LogItemType.ROLE_DOWNGRADE
+				});
+
+				if (result.error) {
+					console.error(result.error);
+				} else {
+					this.refresh();
+				}
+			}
+		},
+		async requestAccountDeletion() {
+			let dialog = new metroUI.ContentDialog({
+				title: this.$t('requests.account_deletion.title'),
+				content: () => {
+					return (
+						<div>
+							<div class="mb-4">
+								<MetroTextBox textarea={true} required={true} header={this.$t('requests.account_deletion.reason_header')} name="detailText" />
+							</div>
+							
+							<div class="mb-4">
+								<MetroTextBlock text-style="caption">{this.$t('requests.account_deletion.disclaimer')}</MetroTextBlock>
+							</div>
+						</div>
+					)
+				},
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+			});
+			
+			if (await dialog.showAsync() === metroUI.ContentDialogResult.Primary) {
+				let result = await RequestAPI.createRequest({
+					detailText: dialog.text["detailText"],
+					affectedAccountId: this.accountId,
+					type: LogItemType.DELETE_REQUEST
 				});
 
 				if (result.error) {
