@@ -1669,6 +1669,7 @@ var script$6 = {
 		placeholderText: String,
 		itemsSource: null,
 		disabled: Boolean,
+		required: Boolean,
 		value: null,
 		noUpdate: {
 			type: Boolean,
@@ -1786,18 +1787,22 @@ var __vue_render__$6 = function() {
       _vm._v(" "),
       _c(
         "select",
-        { ref: "select", attrs: { name: _vm.name } },
-        _vm._l(_vm.items, function(value, key) {
-          return _c(
-            "option",
-            {
-              key: key,
-              domProps: { value: key, selected: _vm.$data._value === key }
-            },
-            [_vm._v(_vm._s(value))]
-          )
-        }),
-        0
+        { ref: "select", attrs: { name: _vm.name, required: _vm.required } },
+        [
+          _c("option"),
+          _vm._v(" "),
+          _vm._l(_vm.items, function(value, key) {
+            return _c(
+              "option",
+              {
+                key: key,
+                domProps: { value: key, selected: _vm.$data._value === key }
+              },
+              [_vm._v(_vm._s(value))]
+            )
+          })
+        ],
+        2
       ),
       _vm._v(" "),
       _c(

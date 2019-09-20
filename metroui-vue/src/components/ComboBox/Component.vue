@@ -2,7 +2,8 @@
 	<div class="combo-box" :disabled="disabled">
 		<label v-if="header">{{ header }}</label>
 		<!-- TODO: Add select element -->
-		<select :name="name" ref="select">
+		<select :name="name" ref="select" :required="required">
+			<option></option>
 			<option v-for="(value, key) in items" :key="key" :value="key" :selected="$data._value === key">{{ value }}</option>
 		</select>
 		
@@ -46,6 +47,7 @@ export default {
 		placeholderText: String,
 		itemsSource: null,
 		disabled: Boolean,
+		required: Boolean,
 		value: null,
 		noUpdate: {
 			type: Boolean,
