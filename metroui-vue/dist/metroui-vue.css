@@ -6840,6 +6840,7 @@ body[data-accent="camouflage"] .notification-center .notification {
 }
 .menu-flyout .menu-flyout-items .menu-flyout-item .menu-flyout-item-content {
   line-height: 32px;
+  white-space: nowrap;
 }
 .menu-flyout .menu-flyout-items .menu-flyout-item.disabled {
   color: var(--base-medium-low);
@@ -7094,6 +7095,7 @@ body[data-accent="camouflage"] .notification-center .notification {
 .app-bar-button .symbol-icon,
 .app-bar-button .font-icon,
 .app-bar-button .path-icon {
+  pointer-events: none;
   margin-top: 10px;
 }
 .app-bar-button label {
@@ -9448,7 +9450,7 @@ a.hyperlink-button[disabled] {
   opacity: 0.4;
 }
 .views,
-.view {
+.views > .view {
   position: absolute;
   width: 100%;
   top: 0;
@@ -9460,13 +9462,13 @@ a.hyperlink-button[disabled] {
 .views {
   background-color: var(--alt-high);
 }
-.views .view {
+.views > .view {
   overflow: hidden;
   box-sizing: border-box;
 }
-.views .view:not(.view-active) {
+.views > .view:not(.view-active) {
   display: none;
 }
-.views .view.view-active {
+.views > .view.view-active {
   z-index: 1000;
 }
