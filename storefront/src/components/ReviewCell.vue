@@ -31,16 +31,24 @@
 					<span v-html="reviewData.messages[0].text.replace(/\n/g, '<br>')" />
 				</MetroTextBlock>
 				
-				<MetroHyperlinkButton v-if="reviewData.messages.length > 1" @click="showAllMessages">
-					<MetroTextBlock text-style="base">{{ $t('package.reviews.show_messages', { messageCount: reviewData.messages.length }) }}</MetroTextBlock>
-				</MetroHyperlinkButton>
+				<MetroStackPanel orientation="horizontal" style="margin-top: 8px">
+					<MetroHyperlinkButton v-if="reviewData.messages.length > 1" @click="showAllMessages">
+						<MetroTextBlock text-style="base">{{ $t('package.reviews.show_messages', { messageCount: reviewData.messages.length }) }}</MetroTextBlock>
+					</MetroHyperlinkButton>
+					<div v-else />
+					
+					<MetroHyperlinkButton style="text-decoration: none" v-if="accountId !== reviewData.accountId || true" @click="reportReviewButtonClicked">
+						<MetroFontIcon glyph="&#xE7C1;" font-size="14px" />
+					</MetroHyperlinkButton>
+				</MetroStackPanel>
 			</div>
 		</template>
 	</div>
 </template>
 
 <script>
-import { AccountAPI, DeviceAPI, PackageAPI } from '@/scripts/ApiUtil'
+import { AccountAPI, DeviceAPI, PackageAPI, RequestAPI } from '@/scripts/ApiUtil'
+import { LogItemType } from '@/scripts/Enumerations'
 import CurrentRating from './CurrentRating';
 
 import Platforms from '../../../platforms.json'
@@ -98,23 +106,6 @@ export default {
 			new metroUI.ContentDialog({
 				content: (dialog) => {
 					return (
-						// <div class="screenshot-viewer">
-						// 	<MetroStackPanel orientation="horizontal" class="screenshot-viewer-chrome">
-						// 		<MetroTextBlock>{this.$t('package.screenshots_title')}</MetroTextBlock>
-						// 		<MetroButton onclick={() => dialog.hide.apply(dialog)}>
-						// 			<MetroSymbolIcon symbol="cancel" />
-						// 		</MetroButton>
-						// 	</MetroStackPanel>
-						// 	<MetroFlipView initial-index={initialIndex}>
-						// 		{this.packageData.screenshots.map((screenshotObj, index) => {
-						// 			return (
-						// 				<MetroFlipViewItem>
-						// 					<img src={`http://localhost:3000/media/screenshot/${screenshotObj.id}`} />
-						// 				</MetroFlipViewItem>
-						// 			)
-						// 		})}
-						// 	</MetroFlipView>
-						// </div>
 						<div class="review-viewer">
 							<MetroStackPanel orientation="horizontal" class="review-viewer-chrome">
 								<MetroTextBlock>{this.$t('package.pivot_titles.reviews')}</MetroTextBlock>
@@ -122,9 +113,9 @@ export default {
 									<MetroSymbolIcon symbol="cancel" />
 								</MetroButton>
 							</MetroStackPanel>
-							<MetroStackPanel orientation="vertical" class="review-viewer-header">
+							<MetroStackPanel orientation="vertical" class="review-viewer-header" style="padding: 0 24px">
 								<MetroTextBlock text-style="header">{this.reviewData.title}</MetroTextBlock>
-								<div class="rating-stars">
+								<div class="rating-stars" style="margin-top: 12px">
 									<div class="rating-value" style={{'width': `${(this.reviewData.rating.value / 5) * 100}%`}} />
 								</div>
 							</MetroStackPanel>
@@ -136,6 +127,54 @@ export default {
 					)
 				}
 			}).show();
+		},
+		async reportReviewButtonClicked() {
+			if (!this.accountId) {
+				this.parent.login();
+			} else {
+				let reportDialog = new metroUI.ContentDialog({
+					title: this.$t('package.report_compose.title_review'),
+					content: (
+						<div style="min-width: 320px">
+							<MetroTextBox
+								header={ this.$t('package.report_compose.message_review') }
+								required={true}
+								textarea={true}
+								name="detailText"
+								style="margin-bottom: 8px"
+							/>
+						</div>
+					),
+					commands: [{ text: this.$t('app.ok'), primary: true }, { text: this.$t('app.cancel') }]
+				});
+				if (await reportDialog.showAsync() == metroUI.ContentDialogResult.Primary) {
+					let requestData = await RequestAPI.createRequest({
+						type: LogItemType.USER_REPORT,
+						detailText: reportDialog.text["detailText"],
+						affectecAccountId: this.reviewData.accountId,
+						affectedPackageId: this.reviewData.packageId,
+						affectedReviewId: this.reviewData.id
+					});
+					
+					if (requestData.error) {
+						console.error(requestData.error);
+					} else {
+						new metroUI.ContentDialog({
+							title: this.$t('package.report_compose.success_title'),
+							content: this.$t('package.report_compose.success_message'),
+							commands: [{ text: this.$t('app.ok'), primary: true }]
+						}).show()
+					}
+				}
+			}
+		}
+	},
+	computed: {
+		accountId() {
+			return this.$store.state.accountId;
+		},
+		parent() {
+			return this.$parent.$parent.$parent.$parent.parent;
 		}
 	},
 	filters: {

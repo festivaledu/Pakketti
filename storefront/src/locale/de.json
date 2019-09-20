@@ -125,7 +125,9 @@
 		},
 		"report_compose": {
 			"title": "%{packageName} melden",
-			"message": "Erzähl uns, warum du dieses Paket melden möchtest",
+			"title_review": "Eine Rezension melden",
+			"message": "Erzähl uns, warum du dieses Paket melden möchtest:",
+			"message_review": "Erzähl uns, warum du diese Rezension melden möchtest:",
 			"success_title": "Danke für deine Meldung!",
 			"success_message": "Wir haben deine Anfrage an unser Moderations-Team weitergeleitet und werden uns so schnell wie möglich darum kümmern."
 		},
@@ -133,7 +135,7 @@
 			"rate": "Diesen Artikel bewerten",
 			"write_a_review": "Bewertung schreiben",
 			"headline_title": "Titel für deine Bewertung",
-			"body_title": "Teil uns mit, was dir gefällt und was nicht",
+			"body_title": "Teil uns mit, was dir gefällt und was nicht:",
 			"select_device_title": "Wähle das Gerät, das du benutzt hast",
 			"select_device_placeholder": "Gerät auswählen",
 			"success_title": "Danke für deine Rezension!",

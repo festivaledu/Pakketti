@@ -97,6 +97,7 @@
 			"report_package_title": "Report this Package",
 			"report_package_link": "Report this Package to @:(app.name)"
 		},
+		
 		"system_requirements": {
 			"minimum_title": "Minimum",
 			"minimum_description": "Your device must meet all minimum requirements to use this product",
@@ -123,8 +124,10 @@
 			"show_messages": "Show %{messageCount} messages"
 		},
 		"report_compose": {
-			"title": "Review %{packageName}",
-			"message": "Tell us what you would like to report about this package",
+			"title": "Report %{packageName}",
+			"title_review": "Report Review",
+			"message": "Tell us what you would like to report about this package:",
+			"message_review": "Tell us what you would like to report about this review:",
 			"success_title": "Thank you for your report!",
 			"success_message": "We have forwarded your request to our moderation staff and we'll handle your report soon."
 		},
@@ -132,7 +135,7 @@
 			"rate": "Rate this item",
 			"write_a_review": "Write a review",
 			"headline_title": "Give it a headline",
-			"body_title": "Tell us what you like and don't like",
+			"body_title": "Tell us what you like and don't like:",
 			"select_device_title": "Select the device you've used",
 			"select_device_placeholder": "Select a device",
 			"success_title": "Thank you for your review!",
