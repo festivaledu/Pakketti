@@ -8,26 +8,32 @@
 			</MetroCommandBar>
 		</template>
 		
-		<div class="grid-view">
-			<div class="grid-view-item" v-for="(deviceObj) in deviceData" :key="deviceObj.id">
-				<div class="device-container">
-					<div class="device-description-container">
-						<img class="device-artwork" v-if="deviceObj.variant"/>
-						<MetroTextBlock text-style="base">{{ deviceObj.name || $t('devices.unnamed_device') }}</MetroTextBlock>
+		<template v-if="deviceData && !deviceData.length">
+			<MetroTextBlock>{{ $t('dashboard.devices_no_items') }}</MetroTextBlock>
+		</template>
+		
+		<template v-if="deviceData && deviceData.length">
+			<div class="grid-view">
+				<div class="grid-view-item" v-for="(deviceObj) in deviceData" :key="deviceObj.id">
+					<div class="device-container">
+						<div class="device-description-container">
+							<img class="device-artwork" v-if="deviceObj.variant"/>
+							<MetroTextBlock text-style="base">{{ deviceObj.name || $t('devices.unnamed_device') }}</MetroTextBlock>
+							
+							<MetroTextBlock v-if="deviceObj.platform == 'iphoneos'">{{ DeviceStrings[deviceObj.product] || $t('devices.unknown_product') }}</MetroTextBlock>
+							<MetroTextBlock v-else>{{ deviceObj.product }}</MetroTextBlock>
+							
+							<MetroTextBlock>{{ Platforms.platforms[deviceObj.platform] || $t('devices.unknown_platform') }} {{ deviceObj.version }}</MetroTextBlock>
+						</div>
 						
-						<MetroTextBlock v-if="deviceObj.platform == 'iphoneos'">{{ DeviceStrings[deviceObj.product] || $t('devices.unknown_product') }}</MetroTextBlock>
-						<MetroTextBlock v-else>{{ deviceObj.product }}</MetroTextBlock>
-						
-						<MetroTextBlock>{{ Platforms.platforms[deviceObj.platform] || $t('devices.unknown_platform') }} {{ deviceObj.version }}</MetroTextBlock>
+						<MetroStackPanel orientation="horizontal" class="device-toolbar">
+							<MetroAppBarButton icon="edit" :label="$t('app.actions.edit')" @click="deviceEditButtonClicked(deviceObj)" />
+							<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" @click="deviceDeleteButtonClicked(deviceObj)" />
+						</MetroStackPanel>
 					</div>
-					
-					<MetroStackPanel orientation="horizontal" class="device-toolbar">
-						<MetroAppBarButton icon="edit" :label="$t('app.actions.edit')" @click="deviceEditButtonClicked(deviceObj)" />
-						<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" @click="deviceDeleteButtonClicked(deviceObj)" />
-					</MetroStackPanel>
 				</div>
 			</div>
-		</div>
+		</template>
 	</MetroPage>
 </template>
 
@@ -48,7 +54,7 @@ export default {
 		let _deviceData = await DeviceAPI.getDevices();
 		
 		next(vm => {
-			vm.deviceData = _deviceData;
+			vm.deviceData = [];
 			
 			vm.$parent.setHeader(vm.$t('root.item_devices'));
 			vm.$parent.setSelectedMenuItem("devices");
