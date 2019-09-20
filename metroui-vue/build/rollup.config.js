@@ -1,23 +1,28 @@
-import commonjs from 'rollup-plugin-commonjs'; // Convert CommonJS modules to ES6
-import vue from 'rollup-plugin-vue'; // Handle .vue SFC files
-import less from 'rollup-plugin-less'; // Transpile/polyfill with reasonable browser support
+import lessModules from 'rollup-plugin-less-modules';
+import commonjs from 'rollup-plugin-commonjs';
+import vue from 'rollup-plugin-vue';
+import minify from 'rollup-plugin-babel-minify';
+
 export default {
-    input: 'src/index.js', // Path relative to package.json
-    output: {
-        name: 'metroUI-vue',
-        exports: 'named',
-    },
-    plugins: [
-		less({
+	input: 'src/index.js',
+	output: {
+		name: 'metroUI-vue',
+		exports: 'named',
+	},
+	plugins: [
+		lessModules({
 			output: "dist/metroui-vue.css",
-			option: {
+			options: {
 				javascriptEnabled: true
-			}
+			},
+			minify: true,
+			sourcemap: false
 		}),
-        commonjs(),
-        vue({
-            css: true, // Dynamically inject css as a <style> tag
-            compileTemplate: true, // Explicitly convert template to render function
-        })
-    ],
+		commonjs(),
+		vue({
+			css: true,
+			compileTemplate: true,
+		}),
+		minify()
+	],
 };

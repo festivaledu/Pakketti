@@ -4,7 +4,7 @@
   "description": "metroUI Framework, built for Vue.js",
   "main": "dist/metroui-vue.esm.js",
   "scripts": {
-	"vue-build": "rollup --config build/rollup.config.js --format es --file dist/metroui-vue.esm.js",
+    "vue-build": "rollup --config build/rollup.config.js --format es --file dist/metroui-vue.esm.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "SniperGER",
@@ -18,9 +18,9 @@
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
     "rollup": "^1.21.4",
-    "rollup-plugin-buble": "^0.19.8",
+    "rollup-plugin-babel-minify": "^9.1.0",
     "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-less": "^1.1.2",
+    "rollup-plugin-less-modules": "^0.1.11",
     "rollup-plugin-vue": "^5.0.1",
     "vue-template-compiler": "^2.6.10"
   }
