@@ -7239,6 +7239,11 @@ button:disabled {
 .combo-box .combo-box-content:active {
   background-color: var(--base-low);
 }
+.combo-box .combo-box-content > .text-block {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .combo-box .combo-box-content .drop-down-glyph {
   position: absolute;
   top: 0;

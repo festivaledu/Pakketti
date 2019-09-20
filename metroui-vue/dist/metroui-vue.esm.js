@@ -79,7 +79,7 @@ class ContentDialog {
 			commands.className = "content-dialog-commands";
 			dialog.container.appendChild(commands);
 			
-			params.commands.slice(0, 3).forEach((command, index) => {
+			params.commands.slice(0, 3).filter(Boolean).forEach((command, index) => {
 				let commandButton = document.createElement("button");
 				commandButton.innerText = command.text;
 				commandButton.className = command.primary ? "system-accent-color primary" : "";
