@@ -116,7 +116,7 @@ export default {
 				if (authData.code) {
 					new metroUI.ContentDialog({
 						title: this.$t('login.login_error_title'),
-						content: `<p>${this.$t('login.login_error_message')}<br><span style="font-style: italic">${typeof authData === 'string' ? authData : `${authData.code}: ${authData.message}`}</span></p>`,
+						content: this.$t('login.login_error_message)', { code: authData.code, name: authData.name, message: authData.message}),
 						commands: [{ text: this.$t('app.ok'), primary: true }]
 					}).show();
 					return;
@@ -188,7 +188,7 @@ export default {
 					if (!authData.auth) {
 						new metroUI.ContentDialog({
 							title: this.$t('login.login_error_title'),
-						content: `<p>${this.$t('login.login_error_message')}<br><span style="font-style: italic">${typeof authData === 'string' ? authData : `${authData.code}: ${authData.message}`}</span></p>`,
+							content: this.$t('login.login_error_message)', { code: authData.code, name: authData.name, message: authData.message}),
 							commands: [{ text: "Ok", primary: true }]
 						}).show();
 						return;

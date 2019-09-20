@@ -178,7 +178,11 @@ export default {
 				}, _requestObj);
 				
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				} else {
 					this.refresh();
 				}
@@ -197,7 +201,11 @@ export default {
 				});
 				
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				} else {
 					this.refresh();
 				}
@@ -266,7 +274,11 @@ export default {
 				});
 
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				} else {
 					this.refresh();
 				}
@@ -298,7 +310,11 @@ export default {
 				});
 
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				} else {
 					this.refresh();
 				}
@@ -331,7 +347,11 @@ export default {
 				});
 
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				} else {
 					this.refresh();
 				}

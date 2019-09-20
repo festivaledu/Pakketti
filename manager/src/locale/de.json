@@ -18,7 +18,10 @@
 			"view": "Ansehen"
 		},
 		
-		"select_file": "Datei auswählen"
+		"select_file": "Datei auswählen",
+		
+		"operational_error_title": "Entschuldigung, das hätte nicht passieren dürfen.",
+		"operational_error_message": "<p>Beim Ausführen dieses Vorgangs ist ein Fehler aufgetreten.<br><br>%{code} %{name}<br><em>%{message}</em></p>"
 	},
 	
 	"login": {
@@ -30,7 +33,7 @@
 		"login_button": "Anmelden",
 		"login_register": "Noch kein Account?",
 		"login_error_title": "Es gab ein Problem beim Anmelden",
-		"login_error_message": "Der Server lieferte folgende Fehlermeldung:",
+		"login_error_message": "<p>Der Server lieferte folgende Fehlermeldung:<br><br>%{code} %{name}<br><em>%{message}</em</p>",
 		
 		"register_title": "Für @:(app.name) registrieren",
 		"register_username": "Benutzername",
@@ -114,7 +117,10 @@
 	},
 	
 	"reviews": {
-		"messages_placeholder": "Eine Nachricht eingeben"
+		"messages_placeholder": "Eine Nachricht eingeben",
+		
+		"delete_review_confirm_title": "Diese Rezension löschen?",
+		"delete_review_confirm_body": "<p>Möchtest du diese Rezension wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>"
 	},
 	
 	"devices": {

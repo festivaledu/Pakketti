@@ -130,7 +130,15 @@ export default {
 			this.isWorking.createPackage = false;
 			
 			if (packageObjResponse.data.error) {
-				console.error(packageObjResponse.data.error);
+				new metroUI.ContentDialog({
+					title: this.$t('app.operational_error_title'),
+					content: this.$t('app.operational_error_message', {
+						code: packageObjResponse.data.error.code,
+						name: packageObjResponse.data.error.name,
+						message: packageObjResponse.data.error.message
+					}),
+					commands: [{ text: this.$t('app.ok'), primary: true }]
+				}).show();
 			} else {
 				this.$router.replace(`/package/${packageObjResponse.data.identifier}`);
 			}

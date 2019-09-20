@@ -493,7 +493,11 @@ export default {
 			}));
 		
 			if (result.error) {
-				console.error(result.error);
+				new metroUI.ContentDialog({
+					title: this.$t('app.operational_error_title'),
+					content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+					commands: [{ text: this.$t('app.ok'), primary: true }]
+				}).show();
 			} else {
 				this.packageData = result;
 			}
@@ -514,7 +518,11 @@ export default {
 				});
 				
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				} else {
 					this.$router.replace("/packages");
 				}
@@ -555,7 +563,11 @@ export default {
 				}, iconFile);
 				
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				}
 			} else {
 				let result = await PackageAPI.deletePackageIcon({
@@ -563,7 +575,11 @@ export default {
 				});
 				
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				}
 			}
 		},
@@ -574,7 +590,11 @@ export default {
 				}, headerFile);
 				
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				}
 			} else {
 				let result = await PackageAPI.deletePackageHero({
@@ -582,7 +602,11 @@ export default {
 				});
 				
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				}
 			}
 		},
@@ -601,7 +625,11 @@ export default {
 					}]);
 					
 					if (screenshotList.error) {
-						console.error(screenshotList.error);
+						new metroUI.ContentDialog({
+							title: this.$t('app.operational_error_title'),
+							content: this.$t('app.operational_error_message', { code: screenshotList.error.code, name: screenshotList.error.name, message: screenshotList.error.message }),
+							commands: [{ text: this.$t('app.ok'), primary: true }]
+						}).show();
 					} else {
 						let result = await PackageAPI.uploadPackageScreenshots({
 							"package.id": this.packageData.id
@@ -714,7 +742,11 @@ export default {
 				}, _versionObj);
 				
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				} else {
 					this.refresh();
 				}
@@ -796,7 +828,11 @@ export default {
 				}, _versionObj);
 				
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				} else {
 					this.refresh();
 				}
@@ -816,7 +852,11 @@ export default {
 				});
 				
 				if (result.error) {
-					console.error(result.error);
+					new metroUI.ContentDialog({
+						title: this.$t('app.operational_error_title'),
+						content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+						commands: [{ text: this.$t('app.ok'), primary: true }]
+					}).show();
 				} else {
 					this.refresh();
 				}
@@ -830,7 +870,11 @@ export default {
 			}, file);
 			
 			if (result.error) {
-				console.error(result.error);
+				new metroUI.ContentDialog({
+					title: this.$t('app.operational_error_title'),
+					content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+					commands: [{ text: this.$t('app.ok'), primary: true }]
+				}).show();
 			}
 		}
 	},
