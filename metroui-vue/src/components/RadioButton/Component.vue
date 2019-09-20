@@ -31,6 +31,7 @@ export default {
 			}
 			
 			this.$emit("input", e.target.value);
+			e.target.dispatchEvent(new Event("input"));
 		}
 	},
 	computed: {

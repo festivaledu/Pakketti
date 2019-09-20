@@ -12,11 +12,15 @@
 			"add": "Hinzufügen",
 			"edit": "Bearbeiten",
 			"delete": "Löschen",
+			"dont_save": "Nicht speichern",
 			"reload": "Aktualisieren",
 			"save": "Speichern",
 			"view": "Ansehen"
-		}
+		},
+		
+		"select_file": "Datei auswählen"
 	},
+	
 	"login": {
 		"login_title": "@:(app.name) – Anmelden",
 		"login_username": "Benutzername oder E-Mail-Adresse",
@@ -41,6 +45,7 @@
 		"register_success_title": "Registrierung erfolgreich",
 		"register_success_message": "<p>Dein Account wurde erfolgreich erstellt.<br>Du wirst jetzt zum Dashboard weitergeleitet.<p>"
 	},
+	
 	"root": {
 		"pane_title": "@:(app.name)",
 		"item_dashboard": "Dashboard",
@@ -55,6 +60,7 @@
 		"item_profile": "Profil",
 		"item_settings": "Einstellungen"
 	},
+	
 	"dashboard": {
 		"overview_header": "Übersicht",
 		"overview_downloads": "Downloads",
@@ -78,12 +84,14 @@
 		"devices_create": "Verknüpfe ein neues Gerät",
 		"devices_see_all": "Alle Geräte anzeigen"
 	},
+	
 	"packages": {
 		"header": "Pakete",
 		"name": "Paket",
 		"version": "Version",
 		"downloads": "Downloads",
 		"visible": "Sichtbar",
+		"created": "Erstellt",
 		"updated": "Aktualisiert",
 		"actions": "Aktionen",
 		"no_items": "Es gibt keine Pakete, die angezeigt werden können",
@@ -96,9 +104,11 @@
 		"delete_package_confirm_title": "„%{name}“ löschen?",
 			"delete_package_confirm_body": "Möchtest du „%{name}“ wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.\n\nZugewiesene Rezensionen werden dadurch ebenfalls gelöscht."
 	},
+	
 	"reviews": {
 		"messages_placeholder": "Eine Nachricht eingeben"
 	},
+	
 	"devices": {
 		"unnamed_device": "Unbenanntes Gerät",
 		"unknown_product": "Unbekanntes Modell",
@@ -126,6 +136,7 @@
 		"delete_device_confirm_title": "Dieses Gerät löschen?",
 		"delete_device_confirm_body": "Möchtest du dieses Gerät wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.\n\nZugewiesene Rezensionen werden dadurch ebenfalls gelöscht."
 	},
+	
 	"requests": {
 		"type": {
 			"title": "Anfrage-Typ",
@@ -189,6 +200,11 @@
 			"versions": "Versionen"
 		},
 		
+		"unsaved_changes": {
+			"title": "Ungesicherter Änderungen",
+			"body": "<p>Möchtest du deine Änderungen speichern?<br>Deine Änderungen gehen verloren, wenn du sie nicht speicherst.</p>"
+		},
+		
 		"info": {
 			"package_name_title": "Paket-Name",
 			"package_name_placeholder": "Beispiel-Paket",
@@ -230,17 +246,24 @@
 			"section_description": "Wähle eine Kategorie, die am besten zu deinem Paket passt.",
 			"section_placeholder": "Kategorie auswählen",
 			
+			"support_title": "Support-URL",
+			"support_placeholder": "https://github.com/username/repository",
+			
 			"system_requirements_title": "Systemanforderungen",
 			"system_requirements_min_os": "Erforderliche Systemversion",
 			"system_requirements_max_os": "Maximal unterstütze Systemversion",
 			
 			"publishing_title": "Veröffentlichungsoptionen",
-			"publishing_now": "Das Paket sofort veröffentlichen",
-			"publishing_later": "Das Paket später manuell veröffentlichen",
+			"package_publishing_now": "Das Paket sofort veröffentlichen",
+			"package_publishing_later": "Das Paket später manuell veröffentlichen",
+			"version_publishing_now": "Diese Version sofort veröffentlichen",
+			"version_publishing_later": "Diese Version später manuell veröffentlichen",
 			
 			"visibility_title": "Sichtbarkeit",
-			"visibility_visible": "Das Paket ist sichtbar und kann heruntergeladen werden",
-			"visibility_hidden": "Das Paket nicht im Store anzeigen",
+			"package_visibility_visible": "Das Paket ist sichtbar und kann heruntergeladen werden",
+			"package_visibility_hidden": "Das Paket nicht im Store anzeigen",
+			"version_visibility_visible": "Diese Version ist sichtbar und kann heruntergeladen werden",
+			"version_visibility_hidden": "Diese Version nicht im Store anzeigen",
 			
 			"package_name_availability": {
 				"available_title": "Paket-Name ist verfügbar",
@@ -256,8 +279,25 @@
 			}
 		},
 		"media": {
+			"app_icon_title": "App-Symbol",
+			"header_image_title": "Titelbild",
+			"screenshots_title": "Screenshots",
 			"delete_item_title": "Dieses Objekt löschen?",
 			"delete_item_body": "<p>Möchtest du dieses Objekt wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>"
+		},
+		"versions": {
+			"add": "Version hinzufügen",
+			"edit": "Version bearbeiten",
+			"version_header": "Version",
+			"version_placeholder": "z.B. 1.3",
+			"package_type": {
+				"header": "Veröffentlichungstyp",
+				"placeholder": "Typ auswählen",
+				"full": "Vollständiger Release",
+				"combo": "Combo Update",
+				"delta": "Delta Update"
+			},
+			"release_notes": "Versionshinweise"
 		}
 	}
 }

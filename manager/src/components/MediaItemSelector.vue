@@ -66,7 +66,6 @@ export default {
 			this._handleFile(e.target.files[0]);
 		},
 		
-		
 		_handleFile(file) {
 			const reader = new FileReader();
 			reader.onload = (progress) => {

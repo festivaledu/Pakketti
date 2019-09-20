@@ -12,11 +12,15 @@
 			"add": "Add",
 			"edit": "Edit",
 			"delete": "Delete",
+			"dont_save": "Don't save",
 			"reload": "Refresh",
 			"save": "Save",
 			"view": "View"
-		}
+		},
+		
+		"select_file": "Select file"
 	},
+	
 	"login": {
 		"login_title": "@:(app.name) – Login",
 		"login_username": "Username or E-Mail Address",
@@ -41,6 +45,7 @@
 		"register_success_title": "Registration successful",
 		"register_success_message": "<p>Your account has been successfully created.<br>You will now be redirected to the Dashboard.<p>"
 	},
+	
 	"root": {
 		"pane_title": "@:(app.name)",
 		"item_dashboard": "Dashboard",
@@ -55,6 +60,7 @@
 		"item_profile": "Profile",
 		"item_settings": "Settings"
 	},
+	
 	"dashboard": {
 		"overview_header": "Overview",
 		"overview_downloads": "Downloads",
@@ -78,12 +84,14 @@
 		"devices_create": "Link a Device",
 		"devices_see_all": "See all Devices"
 	},
+	
 	"packages": {
 		"header": "Packages",
 		"name": "Packages",
 		"version": "Version",
 		"downloads": "Downloads",
 		"visible": "Visible",
+		"created": "Created",
 		"updated": "Updated",
 		"actions": "Actions",
 		"no_items": "No Packages to display",
@@ -96,9 +104,11 @@
 		"delete_package_confirm_title": "Delete \"%{name}\"?",
 		"delete_package_confirm_body": "Are you sure you want to delete \"%{name}\"? This action cannot be undone.\n\nAssociated Reviews will also be deleted."
 	},
+	
 	"reviews": {
 		"messages_placeholder": "Type a message"
 	},
+	
 	"devices": {
 		"unnamed_device": "Unnamed device",
 		"unknown_product": "Unknown type",
@@ -126,6 +136,7 @@
 		"delete_device_confirm_title": "Delete this device?",
 		"delete_device_confirm_body": "Are you sure you want to delete this device? This action cannot be undone.\n\nAssociated Reviews will also be deleted."
 	},
+	
 	"requests": {
 		"type": {
 			"title": "Request Type",
@@ -180,12 +191,18 @@
 		"create_package_disclaimer": "To create your Package, you first need to reserve a name and a bundle identifier.\nWith both of these associated to you, you can start submitting your Package.",
 		"button_reserve": "Reserve Package Name"
 	},
+	
 	"package_editor": {
 		"pivot_title": "Package Editor",
 		"pivot_headers": {
 			"info": "Info",
 			"media": "Media",
 			"versions": "Versions"
+		},
+		
+		"unsaved_changes": {
+			"title": "Unsaved changes",
+			"body": "<p>Do you want to save the changes you've made?<br>Your changes will be lost if you don't save them.</p>"
 		},
 		
 		"info": {
@@ -229,17 +246,24 @@
 			"section_description": "Pick the category that best describes your Package",
 			"section_placeholder": "Pick a category",
 			
+			"support_title": "Support URL",
+			"support_placeholder": "https://github.com/username/repository",
+			
 			"system_requirements_title": "System Requirements",
 			"system_requirements_min_os": "Minimum required OS",
 			"system_requirements_max_os": "Maximum supported OS",
 			
 			"publishing_title": "Publishing Options",
-			"publishing_now": "Publish this Package immediately",
-			"publishing_later": "Publish this Package manually",
+			"package_publishing_now": "Publish this Package immediately",
+			"package_publishing_later": "Publish this Package manually",
+			"version_publishing_now": "Publish this Version immediately",
+			"version_publishing_later": "Publish this Version manually",
 			
 			"visibility_title": "Visibility",
-			"visibility_visible": "This Package is visible and can be downloaded",
-			"visibility_hidden": "Don't show this Package in the Store",
+			"package_visibility_visible": "This Package is visible and can be downloaded",
+			"package_visibility_hidden": "Don't show this Package in the Store",
+			"version_visibility_visible": "This Version is visible and can be downloaded",
+			"version_visibility_hidden": "Don't show this Version in the Store",
 			
 			"package_name_availability": {
 				"available_title": "Package name is available",
@@ -255,8 +279,25 @@
 			}
 		},
 		"media": {
+			"app_icon_title": "App Icon",
+			"header_image_title": "Header Image",
+			"screenshots_title": "Screenshots",
 			"delete_item_title": "Delete this item?",
 			"delete_item_body": "<p>Are you sure you want to delete this item?<br>This action cannot be undone.</p>"
+		},
+		"versions": {
+			"add": "Add Version",
+			"edit": "Edit Version",
+			"version_header": "Version",
+			"version_placeholder": "eg. 1.3",
+			"package_type": {
+				"header": "Release Type",
+				"placeholder": "Select a type",
+				"full": "Full Release",
+				"combo": "Combo Update",
+				"delta": "Delta Update"
+			},
+			"release_notes": "Release Notes"
 		}
 	}
 }

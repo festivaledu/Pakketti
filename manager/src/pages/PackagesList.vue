@@ -94,7 +94,7 @@ export default {
 				vm.packageData = [];
 			}
 			
-			vm.$parent.setHeader(this.$t('root.item_packages'));
+			vm.$parent.setHeader(vm.$t('root.item_packages'));
 			vm.$parent.setSelectedMenuItem("packages");
 		});
 	},
@@ -115,9 +115,7 @@ export default {
 				items: [{
 					icon: "edit",
 					text: this.$t('app.actions.edit'),
-					action: () => {
-						this.navigate(`/package/${packageObj.identifier}`)
-					}
+					action: () => this.navigate(`/package/${packageObj.identifier}`)
 				}, {
 					icon: "delete",
 					text: this.$t('app.actions.delete'),

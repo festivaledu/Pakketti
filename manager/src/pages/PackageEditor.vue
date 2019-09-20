@@ -1,6 +1,6 @@
 <template>
 	<MetroPage page-id="package-editor">
-		<vue-headful :title="$t('package_creator.pivot_title')" />
+		<vue-headful :title="$t('package_editor.pivot_title')" />
 		
 		<template slot="top-app-bar">
 			<template slot="content">
@@ -190,6 +190,17 @@
 						</div>
 						
 						<div class="mb-4">
+							<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.support_title') }}</MetroTextBlock>
+							
+							<MetroTextBox
+								:placeholder-text="$t('package_editor.info.support_placeholder')"
+								:disabled="!isOwnedPackage"
+								v-model="packageData.issueURL"
+								@input="$v.packageData.$touch()"
+							/>
+						</div>
+						
+						<div class="mb-4">
 							<MetroTextBlock text-style="sub-title" class="mb-2">{{ $t('package_editor.info.system_requirements_title') }}</MetroTextBlock>
 							
 							<MetroTextBox
@@ -217,7 +228,7 @@
 								<MetroRadioButton
 									group-name="package-visibility"
 									:name="true"
-									:content="$t('package_editor.info.publishing_now')"
+									:content="$t('package_editor.info.package_publishing_now')"
 									:disabled="!isOwnedPackage"
 									v-model="packageData.visible"
 									@input="$v.packageData.$touch()"
@@ -226,7 +237,7 @@
 								<MetroRadioButton
 									group-name="package-visibility"
 									:name="false"
-									:content="$t('package_editor.info.publishing_later')"
+									:content="$t('package_editor.info.package_publishing_later')"
 									:disabled="!isOwnedPackage"
 									v-model="packageData.visible"
 									@input="$v.packageData.$touch()"
@@ -239,7 +250,7 @@
 								<MetroRadioButton
 									group-name="package-visibility"
 									:name="true"
-									:content="$t('package_editor.info.visibility_visible')"
+									:content="$t('package_editor.info.package_visibility_visible')"
 									:disabled="!isOwnedPackage"
 									v-model="packageData.visible"
 									@input="$v.packageData.$touch()"
@@ -248,7 +259,7 @@
 								<MetroRadioButton
 									group-name="package-visibility"
 									:name="false"
-									:content="$t('package_editor.info.visibility_hidden')"
+									:content="$t('package_editor.info.package_visibility_hidden')"
 									:disabled="!isOwnedPackage"
 									v-model="packageData.visible"
 									@input="$v.packageData.$touch()"
@@ -260,7 +271,7 @@
 			</MetroPivotItem>
 			<MetroPivotItem :header="$t('package_editor.pivot_headers.media')">
 				<div class="mb-4">
-					<MetroTextBlock text-style="sub-title mb-2">App Icon</MetroTextBlock>
+					<MetroTextBlock text-style="sub-title mb-2">{{ $t('package_editor.media.app_icon_title') }}</MetroTextBlock>
 					<MediaItemSelector
 						:defaultImgSrc="`http://localhost:3000/media/icon/${packageData.id}`"
 						v-model="packageData.iconMime"
@@ -269,7 +280,7 @@
 				</div>
 				
 				<div class="mb-4">
-					<MetroTextBlock text-style="sub-title mb-2">Header Image</MetroTextBlock>
+					<MetroTextBlock text-style="sub-title mb-2">{{ $t('package_editor.media.header_image_title') }}</MetroTextBlock>
 					<MediaItemSelector
 						:defaultImgSrc="`http://localhost:3000/media/hero/${packageData.id}`"
 						v-model="packageData.headerImageMime"
@@ -278,7 +289,7 @@
 				</div>
 				
 				<div class="mb-4">
-					<MetroTextBlock text-style="sub-title mb-2">Screenshots</MetroTextBlock>
+					<MetroTextBlock text-style="sub-title mb-2">{{ $t('package_editor.media.screenshots_title') }}</MetroTextBlock>
 					<MediaGroupSelector
 						defaultImgSrc="http://localhost:3000/media/screenshot"
 						v-model="packageData.screenshots"
@@ -288,10 +299,49 @@
 				</div>
 			</MetroPivotItem>
 			<MetroPivotItem :header="$t('package_editor.pivot_headers.versions')">
-				<p>Versions</p>
-			</MetroPivotItem>
-			<MetroPivotItem :header="$t('package_editor.pivot_headers.reviews')" :disabled="true">
-				<p>test 3</p>
+				<div class="data-grid package-version-list mb-4">
+					<div class="data-grid-wrapper">
+						<div class="table">
+							<div class="column-headers-border" />
+							<div class="tr column-headers">
+								<div class="th column-header-item">{{ $t('packages.version') }}</div>
+								<div class="th column-header-item">{{ $t('packages.downloads') }}</div>
+								<div class="th column-header-item">{{ $t('packages.visible') }}</div>
+								<div class="th column-header-item">{{ $t('packages.created') }}</div>
+								<div class="th column-header-item align-right">{{ $t('packages.actions') }}</div>
+							</div>
+							<div class="row-wrapper" v-for="(versionObj, index) in packageData.versions" :key="index">
+								<div class="tr row">
+									<div class="td cell">
+										<MetroTextBlock>{{ versionObj.version }}</MetroTextBlock>
+										<MetroTextBlock text-style="caption">{{ $t(`package_editor.versions.package_type.${versionObj.packageType }`) }}</MetroTextBlock>
+									</div>
+									<div class="td cell">
+										<MetroTextBlock>{{ versionObj.downloadCount | number }}</MetroTextBlock>
+									</div>
+									<div class="td cell">
+										<MetroToggleSwitch :value="versionObj.visible"
+											:offContent="$t('packages.visible_no')"
+											:onContent="$t('packages.visible_yes')"
+											:readonly="true"
+										/>
+									</div>
+									<div class="td cell">
+										<MetroTextBlock>{{ versionObj.createdAt | date }}</MetroTextBlock>
+									</div>
+									<div class="td cell align-right">
+										<MetroButton @click="showVersionMenu($event, versionObj)">
+											<MetroSymbolIcon icon="more" />
+										</MetroButton>
+									</div>
+								</div>
+								<div class="row-background" :style="{'top': `${(index * 47) + 32}px`}" />
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<MetroButton @click="addVersion">{{ $t('package_editor.versions.add') }}</MetroButton>
 			</MetroPivotItem>
 		</MetroPivot>
 	</MetroPage>
@@ -306,6 +356,7 @@ import { PackageAPI } from "@/scripts/ApiUtil"
 import { VueEditor } from "vue2-editor"
 import MediaItemSelector from "@/components/MediaItemSelector"
 import MediaGroupSelector from "@/components/MediaGroupSelector"
+import FileSelector from "@/components/FileSelector"
 
 import crypto from "crypto-js"
 
@@ -314,7 +365,8 @@ export default {
 	components: {
 		VueEditor,
 		MediaItemSelector,
-		MediaGroupSelector
+		MediaGroupSelector,
+		FileSelector
 	},
 	data: () => ({
 		editorToolbar: [
@@ -388,12 +440,12 @@ export default {
 	async beforeRouteLeave(to, from, next) {
 		if (this.$v.$anyDirty) {
 			let confirmDialog = new metroUI.ContentDialog({
-				title: "Unsaved changes",
-				content: "<p>Do you want to save the changes you've made?<br>Your changes will be lost if you don't save them.</p>",
+				title: this.$t('package_editor.unsaved_changes.title'),
+				content: this.$t('package_editor.unsaved_changes.body'),
 				commands: [
-					{ text: "Cancel" },
-					{ text: "Don't Save", secondary: true },
-					{ text: "Save", primary: true }]
+					{ text: this.$t('app.cancel') },
+					{ text: this.$t('app.actions.dont_save'), secondary: true },
+					{ text: this.$t('app.actions.save'), primary: true }]
 			});
 			
 			switch (await confirmDialog.showAsync()) {
@@ -413,31 +465,18 @@ export default {
 		}
 	},
 	methods: {
-		async checkNameAvailability() {
-			this.isWorking.packageName = true;
-			
-			let packageList = await PackageAPI.getPackages({
-				"package.name": this.packageData.name
+		async refresh() {
+			let _packageData = await PackageAPI.getPackages({
+				"package.identifier": this.$route.params["packageId"],
+				include: "reviews,screenshots,versions"
 			});
-			this.isWorking.packageName = false;
+			this.packageData = _packageData[0];
 			
-			if (packageList.length) {
-				new metroUI.ContentDialog({
-					title: "Package name unavailable",
-					content: "The selected Package name is already in use. Please use a different Package name.",
-					commands: [{ text: "Ok", primary: true }]
-				}).show();
-			} else {
-				new metroUI.ContentDialog({
-					title: "Package name is available",
-					content: "The selected Package name is available for use.",
-					commands: [{ text: "Ok", primary: true }]
-				}).show();
-			}
-		},
-		deviceFamilyCheckboxChecked(type) {
-			this.packageData.deviceFamilies ^= type;
-			this.$v.packageData.deviceFamilies.$touch();
+			this.$nextTick(() => {
+				setTimeout(() => {
+					this.$v.$reset();
+				}, 50);
+			});
 		},
 		async savePackage() {
 			this.isWorking.savePackage = true;
@@ -457,8 +496,51 @@ export default {
 			this.isWorking.savePackage = false;
 			this.$v.packageData.$reset();
 		},
-		decodeText(text) {
-			return HtmlEntities.decode(text.replace(/<[^>]*>/g, ''));
+		async deletePackage() {
+			let deleteDialog = new metroUI.ContentDialog({
+				title: this.$t('packages.delete_package_confirm_title', { name: this.packageData.name }),
+				content: this.$t('packages.delete_package_confirm_body', { name: this.packageData.name }),
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+			});
+			
+			if (await deleteDialog.showAsync() === metroUI.ContentDialogResult.Primary) {
+				let result = await PackageAPI.deletePackage({
+					"package.id": this.packageData.id
+				});
+				
+				if (result.error) {
+					console.error(result.error);
+				} else {
+					this.refresh();
+				}
+			}
+		},
+		
+		async checkNameAvailability() {
+			this.isWorking.packageName = true;
+			
+			let packageList = await PackageAPI.getPackages({
+				"package.name": this.packageData.name
+			});
+			this.isWorking.packageName = false;
+			
+			if (packageList.length) {
+				new metroUI.ContentDialog({
+					title: this.$t('package_editor.package_name_availability.unavailable_title'),
+					content: this.$t('package_editor.package_name_availability.unavailable_body'),
+					commands: [{ text: "Ok", primary: true }]
+				}).show();
+			} else {
+				new metroUI.ContentDialog({
+					title: this.$t('package_editor.package_name_availability.available_title'),
+					content: this.$t('package_editor.package_name_availability.available_body'),
+					commands: [{ text: "Ok", primary: true }]
+				}).show();
+			}
+		},
+		deviceFamilyCheckboxChecked(type) {
+			this.packageData.deviceFamilies ^= type;
+			this.$v.packageData.deviceFamilies.$touch();
 		},
 		
 		async packageIconChanged(iconFile) {
@@ -467,13 +549,17 @@ export default {
 					"package.id": this.packageData.id
 				}, iconFile);
 				
-				console.log(result);
+				if (result.error) {
+					console.error(result.error);
+				}
 			} else {
 				let result = await PackageAPI.deletePackageIcon({
 					"package.id": this.packageData.id
 				});
 				
-				console.log(result);
+				if (result.error) {
+					console.error(result.error);
+				}
 			}
 		},
 		async packageHeaderChanged(headerFile) {
@@ -482,13 +568,17 @@ export default {
 					"package.id": this.packageData.id
 				}, headerFile);
 				
-				console.log(result);
+				if (result.error) {
+					console.error(result.error);
+				}
 			} else {
 				let result = await PackageAPI.deletePackageHero({
 					"package.id": this.packageData.id
 				});
 				
-				console.log(result);
+				if (result.error) {
+					console.error(result.error);
+				}
 			}
 		},
 		async screenshotAdded(file) {
@@ -505,7 +595,6 @@ export default {
 						sha256: crypto.SHA256(reader.result).toString(crypto.enc.hex)
 					}]);
 					
-					console.log(screenshotList);
 					if (screenshotList.error) {
 						console.error(screenshotList.error);
 					} else {
@@ -531,6 +620,206 @@ export default {
 				"package.id": this.packageData.id,
 				"screenshot.id": screenshotObj.id
 			});
+		},
+		
+		showVersionMenu(event, versionObj) {
+			let packageFlyout = new metroUI.MenuFlyout({
+				items: [{
+					icon: "edit",
+					text: this.$t('app.actions.edit'),
+					action: () => this.editVersion(versionObj)
+				}, {
+					icon: "delete",
+					text: this.$t('app.actions.delete'),
+					disabled: this.packageData.versions.length <= 1,
+					action: () => this.deleteVersion(versionObj)
+				}]
+			});
+			
+			packageFlyout.showAt(event.target);
+		},
+		async addVersion() {
+			let _versionObj = {
+				version: null,
+				packageType: null,
+				changeText: "Initial release",
+				visible: false
+			};
+			
+			let dialog = new metroUI.ContentDialog({
+				title: this.$t('package_editor.versions.add'),
+				content: () => {
+					return (
+						<div>
+							<MetroTextBox
+								header={this.$t('package_editor.versions.version_header')}
+								placeholder-text={this.$t('package_editor.versions.version_placeholder')}
+								v-model={_versionObj.version}
+								required={true}
+							/>
+							
+							<MetroComboBox
+								header={this.$t('package_editor.versions.package_type.header')}
+								placeholder-text={this.$t('package_editor.versions.package_type.placeholder')}
+								items-source={{
+									"full": this.$t('package_editor.versions.package_type.full'),
+									"combo": this.$t('package_editor.versions.package_type.combo'),
+									"delta": this.$t('package_editor.versions.package_type.delta')
+								}}
+								v-model={_versionObj.packageType}
+								no-update={true}
+								required={true}
+								style="margin-top: 8px"
+							/>
+							
+							<FileSelector class="my-4" content={this.$t('app.select_file')} v-model={_versionObj.file} required={true} />
+							
+							<div class="my-2">
+								<MetroTextBlock style="margin-bottom: 4px">{this.$t('package_editor.versions.release_notes')}</MetroTextBlock>
+								<VueEditor
+									editorToolbar={this.editorToolbar}
+									v-model={_versionObj.changeText}
+									required={true}
+								/>
+							</div>
+							
+							<MetroTextBlock text-style="sub-title" class="mb-2">{this.$t('package_editor.info.publishing_title')}</MetroTextBlock>
+							<MetroRadioButton
+								group-name="version-visibility"
+								name={true}
+								content={this.$t('package_editor.info.version_publishing_now')}
+								v-model={_versionObj.visible}
+							/>
+							
+							<MetroRadioButton
+								group-name="package-visibility"
+								name={false}
+								content={this.$t('package_editor.info.version_publishing_later')}
+								v-model={_versionObj.visible}
+							/>
+						</div>
+					)
+				},
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.actions.save'), primary: true }]
+			});
+			
+			if (await dialog.showAsync() == metroUI.ContentDialogResult.Primary) {
+				let result = await PackageAPI.createPackageVersion({
+					"package.id": this.packageData.id
+				}, _versionObj);
+				
+				if (result.error) {
+					console.error(result.error);
+				} else {
+					this.refresh();
+				}
+			}
+		},
+		async editVersion(versionObj) {
+			let _versionObj = {...versionObj};
+			
+			let dialog = new metroUI.ContentDialog({
+				title: this.$t('package_editor.versions.edit'),
+				content: () => {
+					return (
+						<div>
+							<MetroTextBox
+								header={this.$t('package_editor.versions.version_header')}
+								placeholder-text={this.$t('package_editor.versions.version_placeholder')}
+								v-model={_versionObj.version}
+								disabled={true}
+							/>
+							
+							<MetroComboBox
+								header={this.$t('package_editor.versions.package_type.header')}
+								placeholder-text={this.$t('package_editor.versions.package_type.placeholder')}
+								items-source={{
+									"full": this.$t('package_editor.versions.package_type.full'),
+									"combo": this.$t('package_editor.versions.package_type.combo'),
+									"delta": this.$t('package_editor.versions.package_type.delta')
+								}}
+								v-model={_versionObj.packageType}
+								no-update={true}
+								required={true}
+								style="margin-top: 8px"
+							/>
+							
+							<FileSelector
+								content={this.$t('app.select_file')} 
+								oninput={(file) => this._replaceVersionFile(versionObj, file)} class="my-4" />
+							
+							<div class="my-2">
+								<MetroTextBlock style="margin-bottom: 4px">{this.$t('package_editor.versions.release_notes')}</MetroTextBlock>
+								<VueEditor
+									editorToolbar={this.editorToolbar}
+									v-model={_versionObj.changeText}
+									required={true}
+								/>
+							</div>
+							
+							<MetroTextBlock text-style="sub-title" class="mb-2">{this.$t('package_editor.info.visibility_title')}</MetroTextBlock>
+							<MetroRadioButton
+								group-name="version-visibility"
+								name={true}
+								content={this.$t('package_editor.info.version_visibility_visible')}
+								v-model={_versionObj.visible}
+							/>
+							
+							<MetroRadioButton
+								group-name="version-visibility"
+								name={false}
+								content={this.$t('package_editor.info.version_visibility_hidden')}
+								v-model={_versionObj.visible}
+							/>
+						</div>
+					)
+				},
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.actions.save'), primary: true }]
+			});
+			
+			if (await dialog.showAsync() == metroUI.ContentDialogResult.Primary) {
+				let result = await PackageAPI.updatePackageVersion({
+					"package.id": this.packageData.id,
+					"version.id": versionObj.id
+				}, _versionObj);
+				
+				if (result.error) {
+					console.error(result.error);
+				} else {
+					this.refresh();
+				}
+			}
+		},
+		async deleteVersion(versionObj) {
+			let deleteDialog = new metroUI.ContentDialog({
+				title: this.$t('packages.delete_version_confirm_title'),
+				content: this.$t('packages.delete_version_confirm_body'),
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+			});
+			
+			if (await deleteDialog.showAsync() === metroUI.ContentDialogResult.Primary) {
+				let result = await PackageAPI.deletePackageVersion({
+					"package.id": this.packageData.id,
+					"version.id": versionObj.id
+				});
+				
+				if (result.error) {
+					console.error(result.error);
+				} else {
+					this.refresh();
+				}
+			}
+		},
+		
+		async _replaceVersionFile(versionObj, file) {
+			let result = await PackageAPI.updatePackageVersionFile({
+				"package.id": versionObj.packageId,
+				"version.id": versionObj.id
+			}, file);
+			
+			if (result.error) {
+				console.error(result.error);
+			}
 		}
 	},
 	computed: {
@@ -542,6 +831,14 @@ export default {
 		},
 		isExistingPackage() {
 			return this.packageData.status == 1;
+		}
+	},
+	filters: {
+		number(value) {
+			return new Intl.NumberFormat().format(value)
+		},
+		date(value) {
+			return new Date(value).toLocaleString();
 		}
 	}
 }
@@ -568,199 +865,6 @@ export default {
 	
 	.combo-box {
 		display: inline-block;
-	}
-	
-	.quillWrapper {
-		margin-bottom: 12px;
-		
-		.ql-snow {
-			border: none !important;
-			
-			a {
-				color: var(--system-accent-color);
-			}
-			
-			.ql-tooltip {
-				left: 8px !important;
-				right: 8px !important;
-				
-				height: auto;
-				line-height: 32px;
-				background-color: var(--alt-high);
-				border: none;
-				box-shadow: inset 0 0 0 2px var(--chrome-disabled-low);
-				color: var(--base-high);
-				
-				input[type="text"] {
-					appearance: none;
-					-webkit-appearance: none;
-					-moz-appearance: none;
-					outline: none;
-					padding: 5px 8px 8px 12px;
-					background-color: var(--alt-high); 
-					border: none;
-					box-shadow: inset 0 0 0 2px var(--chrome-disabled-low);
-					border-radius: 0;
-					resize: none;
-					height: auto;
-					font-size: inherit;
-					
-					&::placeholder {
-						color: var(--base-medium);
-					}
-					
-					&:hover:not(:focus) {
-						box-shadow: inset 0 0 0 2px var(--base-medium-high);
-					}
-					
-					&:not(:focus) {
-						color: var(--base-high);
-					}
-					
-					&:focus {
-						background-color: #FFFFFF !important;
-						box-shadow: inset 0 0 0 2px var(--system-accent-color);
-						
-						&::placeholder {
-							color: var(--base-medium-low);
-						}
-					}
-				}
-				
-				a {
-					line-height: 32px;
-				}
-			}
-		}
-		
-		.ql-toolbar {
-			box-shadow: inset 0 2px 0 0 var(--chrome-disabled-low), inset 2px 0 0 0 var(--chrome-disabled-low), inset -2px 0 0 0 var(--chrome-disabled-low);
-			padding: 2px 2px 0;
-			
-			.ql-formats {
-				margin: 0;
-				
-				.ql-stroke {
-					stroke: var(--chrome-disabled-low);
-				}
-				
-				.ql-fill {
-					fill: var(--chrome-disabled-low);
-				}
-				
-				.ql-active {
-					.ql-stroke {
-						stroke: var(--system-accent-color);
-					}
-					
-					.ql-fill {
-						fill: var(--system-accent-color);
-					}
-				}
-				
-				button {
-					width: 32px;
-					height: 32px;
-					margin: 0;
-					padding: 5px;
-				}
-				
-				.ql-picker {
-					top: 0;
-					height: 32px;
-					line-height: 32px;
-					outline: none;
-					
-					.ql-picker-label {
-						border: none;
-						color: var(--chrome-disabled-low);
-						outline: none;
-						
-						&.ql-active {
-							color: var(--system-accent-color);
-						}
-					}
-					
-					&.ql-expanded {
-						.ql-picker-label {
-							color: var(--system-accent-color);
-						}
-						
-						.ql-stroke {
-							stroke: var(--system-accent-color);
-						}
-						
-						.ql-fill {
-							fill: var(--system-accent-color);
-						}
-					}
-					
-					.ql-picker-options {
-						background-color: var(--chrome-medium-low);
-						box-shadow: 0 0 0 1px var(--chrome-high);
-						border: none;
-						padding: 4px 0;
-						
-						.ql-picker-item {
-							padding: 0 12px;
-							color: var(--base-high);
-							outline: none;
-							
-							&:hover:not(:active) {
-								background-color: var(--list-low);
-							}
-							
-							&:active {
-								background-color: var(--list-medium-low);
-								transform: scale(0.98);
-							}
-							
-							&.ql-selected {
-								color: var(--base-high);
-								background-color: var(--list-accent-low);
-					
-								&:hover:not(:active),
-								&:active {
-									background-color: var(--list-accent-medium);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		.ql-editor {
-			height: 366px;
-			box-shadow: inset 0 0 0 2px var(--chrome-disabled-low);
-			
-			// &:hover:not(:focus) {
-			// 	box-shadow: inset 0 0 0 2px var(--base-high);
-			// }
-			
-			// &:focus {
-			// 	box-shadow: inset 0 0 0 2px var(--system-accent-color);
-			// 	background-color: #FFFFFF;
-			// 	color: #000000;
-			// }
-			
-			strong {
-				&, & * {
-					font-weight: 600;
-				}
-			}
-			
-			h1, h2, h3, h4, h5, h6 {
-				& * {
-					font-size: inherit;
-				}
-			}
-			
-			pre {
-				font-family: "SF Mono", "Menlo", monospace;
-				font-size: 12px;
-			}
-		}
 	}
 	
 	.grid-view {
@@ -799,6 +903,230 @@ export default {
 				}
 			}
 		}		
+	}
+	
+	.data-grid {
+		.row {
+			.cell:not(:first-child) {
+				color: var(--base-medium);
+			}
+		}
+		
+		&.package-version-list {
+			.table {
+				width: 100%;
+			}
+			
+			.row {
+				height: 47px;
+			}
+			.row-background {
+				height: 47px;
+				
+				&:after {
+					height: 47px;
+				}
+			}
+			
+			.toggle-switch,
+			.rating-control {
+				pointer-events: none;
+				min-width: auto;
+			}
+		}
+	}
+}
+
+.quillWrapper {
+	margin-bottom: 12px;
+	
+	.ql-snow {
+		border: none !important;
+		
+		a {
+			color: var(--system-accent-color);
+		}
+		
+		.ql-tooltip {
+			left: 8px !important;
+			right: 8px !important;
+			
+			height: auto;
+			line-height: 32px;
+			background-color: var(--alt-high);
+			border: none;
+			box-shadow: inset 0 0 0 2px var(--chrome-disabled-low);
+			color: var(--base-high);
+			
+			input[type="text"] {
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				outline: none;
+				padding: 5px 8px 8px 12px;
+				background-color: var(--alt-high); 
+				border: none;
+				box-shadow: inset 0 0 0 2px var(--chrome-disabled-low);
+				border-radius: 0;
+				resize: none;
+				height: auto;
+				font-size: inherit;
+				
+				&::placeholder {
+					color: var(--base-medium);
+				}
+				
+				&:hover:not(:focus) {
+					box-shadow: inset 0 0 0 2px var(--base-medium-high);
+				}
+				
+				&:not(:focus) {
+					color: var(--base-high);
+				}
+				
+				&:focus {
+					background-color: #FFFFFF !important;
+					box-shadow: inset 0 0 0 2px var(--system-accent-color);
+					
+					&::placeholder {
+						color: var(--base-medium-low);
+					}
+				}
+			}
+			
+			a {
+				line-height: 32px;
+			}
+		}
+	}
+	
+	.ql-toolbar {
+		box-shadow: inset 0 2px 0 0 var(--chrome-disabled-low), inset 2px 0 0 0 var(--chrome-disabled-low), inset -2px 0 0 0 var(--chrome-disabled-low);
+		padding: 2px 2px 0;
+		
+		.ql-formats {
+			margin: 0;
+			
+			.ql-stroke {
+				stroke: var(--chrome-disabled-low);
+			}
+			
+			.ql-fill {
+				fill: var(--chrome-disabled-low);
+			}
+			
+			.ql-active {
+				.ql-stroke {
+					stroke: var(--system-accent-color);
+				}
+				
+				.ql-fill {
+					fill: var(--system-accent-color);
+				}
+			}
+			
+			button {
+				width: 32px;
+				height: 32px;
+				margin: 0;
+				padding: 5px;
+			}
+			
+			.ql-picker {
+				top: 0;
+				height: 32px;
+				line-height: 32px;
+				outline: none;
+				
+				.ql-picker-label {
+					border: none;
+					color: var(--chrome-disabled-low);
+					outline: none;
+					
+					&.ql-active {
+						color: var(--system-accent-color);
+					}
+				}
+				
+				&.ql-expanded {
+					.ql-picker-label {
+						color: var(--system-accent-color);
+					}
+					
+					.ql-stroke {
+						stroke: var(--system-accent-color);
+					}
+					
+					.ql-fill {
+						fill: var(--system-accent-color);
+					}
+				}
+				
+				.ql-picker-options {
+					background-color: var(--chrome-medium-low);
+					box-shadow: 0 0 0 1px var(--chrome-high);
+					border: none;
+					padding: 4px 0;
+					
+					.ql-picker-item {
+						padding: 0 12px;
+						color: var(--base-high);
+						outline: none;
+						
+						&:hover:not(:active) {
+							background-color: var(--list-low);
+						}
+						
+						&:active {
+							background-color: var(--list-medium-low);
+							transform: scale(0.98);
+						}
+						
+						&.ql-selected {
+							color: var(--base-high);
+							background-color: var(--list-accent-low);
+				
+							&:hover:not(:active),
+							&:active {
+								background-color: var(--list-accent-medium);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	.ql-editor {
+		height: 366px;
+		box-shadow: inset 0 0 0 2px var(--chrome-disabled-low);
+		
+		// &:hover:not(:focus) {
+		// 	box-shadow: inset 0 0 0 2px var(--base-high);
+		// }
+		
+		// &:focus {
+		// 	box-shadow: inset 0 0 0 2px var(--system-accent-color);
+		// 	background-color: #FFFFFF;
+		// 	color: #000000;
+		// }
+		
+		strong {
+			&, & * {
+				font-weight: 600;
+			}
+		}
+		
+		h1, h2, h3, h4, h5, h6 {
+			& * {
+				font-size: inherit;
+			}
+		}
+		
+		pre {
+			font-family: "SF Mono", "Menlo", monospace;
+			font-size: 12px;
+		}
 	}
 }
 </style>

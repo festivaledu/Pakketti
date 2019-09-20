@@ -11,7 +11,7 @@
 							</template>
 						</MetroNavigationViewItem>
 					</router-link>
-					<router-link tag="div" to="/packages">
+					<router-link tag="div" to="/packages" v-if="isDeveloper || isModerator || isAdministrator">
 						<MetroNavigationViewItem :content="$t('root.item_packages')" page-id="packages">
 							<template slot="icon">
 								<MetroSymbolIcon icon="package" />
@@ -25,31 +25,34 @@
 							</template>
 						</MetroNavigationViewItem>
 					</router-link>
-					<MetroNavigationViewItem :content="$t('root.item_devices')" page-id="devices" :disabled="true">
-						<template slot="icon">
-							<MetroSymbolIcon icon="cell-phone" />
-						</template>
-					</MetroNavigationViewItem>
-					<MetroNavigationViewItem :content="$t('root.item_users')" page-id="users" :disabled="true">
-						<template slot="icon">
-							<MetroSymbolIcon icon="people" />
-						</template>
-					</MetroNavigationViewItem>
-					<MetroNavigationViewItem :content="$t('root.item_requests')" page-id="requests" :disabled="true">
-						<template slot="icon">
-							<MetroSymbolIcon icon="report-hacked" />
-						</template>
-					</MetroNavigationViewItem>
-					<MetroNavigationViewItem :content="$t('root.item_moderation_log')" page-id="logs" :disabled="true">
-						<template slot="icon">
-							<MetroSymbolIcon icon="clipboard-list" />
-						</template>
-					</MetroNavigationViewItem>
-					<MetroNavigationViewItem :content="$t('root.item_statistics')" page-id="statistics" :disabled="true">
-						<template slot="icon">
-							<MetroSymbolIcon icon="area-chart" />
-						</template>
-					</MetroNavigationViewItem>
+					<router-link tag="div" to="/devices">
+						<MetroNavigationViewItem :content="$t('root.item_devices')" page-id="devices" :disabled="false">
+							<template slot="icon">
+								<MetroSymbolIcon icon="cell-phone" />
+							</template>
+						</MetroNavigationViewItem>
+					</router-link>
+					<router-link tag="div" to="/requests">
+						<MetroNavigationViewItem :content="$t('root.item_requests')" page-id="requests">
+							<template slot="icon">
+								<MetroSymbolIcon icon="report-hacked" />
+							</template>
+						</MetroNavigationViewItem>
+					</router-link>
+					<router-link tag="div" to="/log" v-if="isModerator || isAdministrator">
+						<MetroNavigationViewItem :content="$t('root.item_moderation_log')" page-id="logs" :disabled="true">
+							<template slot="icon">
+								<MetroSymbolIcon icon="clipboard-list" />
+							</template>
+						</MetroNavigationViewItem>
+					</router-link>
+					<router-link tag="div" to="/statistics" v-if="isModerator || isAdministrator">
+						<MetroNavigationViewItem :content="$t('root.item_statistics')" page-id="statistics" :disabled="true">
+							<template slot="icon">
+								<MetroSymbolIcon icon="area-chart" />
+							</template>
+						</MetroNavigationViewItem>
+					</router-link>
 				</template>
 				
 				<template slot="pane-footer">
@@ -69,6 +72,8 @@
 </template>
 
 <script>
+import { UserRole } from "@/scripts/Enumerations"
+
 import MinimalNavigationView from '@/components/MinimalNavigationView'
 
 export default {
@@ -85,6 +90,15 @@ export default {
 	computed: {
 		routeName() {
 			return this.$route.path;
+		},
+		isDeveloper() {
+			return this.$store.state.role & UserRole.DEVELOPER == UserRole.DEVELOPER;
+		},
+		isModerator() {
+			return this.$store.state.role & UserRole.MODERATOR == UserRole.MODERATOR;
+		},
+		isAdministrator() {
+			return this.$store.state.role & UserRole.ADMINISTRATOR == UserRole.ADMINISTRATOR;
 		}
 	}
 }
