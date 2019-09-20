@@ -17,6 +17,12 @@ Object.defineProperty(Object.prototype, 'filter', {
     enumerable: false
 });
 
+let asyncForEach = async (array, callback) => {
+	for (let index = 0; index < array.length; index++) {
+		await callback(array[index], index)
+	}
+}
+
 
 
 /**
@@ -25,7 +31,7 @@ Object.defineProperty(Object.prototype, 'filter', {
  * Gets a list of available (visible) packages with optional includable metadata
  */
 router.get("/", async (req, res) => {
-	const { Package } = req.models;
+	const { Package, PackageVersion } = req.models;
 
 	let packageList = await Package.findAll({
 		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
@@ -39,6 +45,23 @@ router.get("/", async (req, res) => {
 		),
 		include: req.includes,
 		attributes: { exclude: ["icon", "headerImage"] }
+	});
+	
+	await asyncForEach(packageList, async packageObj => {
+		await PackageVersion.findAll({
+			where: Object.assign({
+				packageId: packageObj.id
+			}, req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+					[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
+							visible: true,
+							accountId: req.developer !== undefined ? req.developer.id : undefined
+						}))
+					)()
+				}
+			)
+		}).then(versionList => {
+			packageObj.dataValues.downloadCount = versionList.map(_ => _.downloadCount).reduce((a, b) => a + b);
+		}).catch(error => ErrorHandler(req, res, error));
 	});
 
 	res.status(httpStatus.OK).send(packageList);
