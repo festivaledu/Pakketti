@@ -295,13 +295,13 @@ export default {
 			return this.$store.state.accountId;
 		},
 		isDeveloper() {
-			return this.$store.state.role & UserRole.DEVELOPER;
+			return this.$store.state.role & UserRole.DEVELOPER == UserRole.DEVELOPER;
 		},
 		isModerator() {
-			return this.$store.state.role & UserRole.MODERATOR;
+			return this.$store.state.role & UserRole.MODERATOR == UserRole.MODERATOR;
 		},
 		isAdministrator() {
-			return this.$store.state.role & UserRole.ADMINISTRATOR;
+			return this.$store.state.role & UserRole.ADMINISTRATOR == UserRole.ADMINISTRATOR;
 		}
 	},
 	filters: {
