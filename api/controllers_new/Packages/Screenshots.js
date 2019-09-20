@@ -79,7 +79,7 @@ router.post("/screenshots", async (req, res) => {
 		}
 	});
 
-	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER || !req.developer) return res.status(httpStatus.FORBIDDEN).send({
 		error: {
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,
@@ -174,7 +174,7 @@ router.post("/screenshots/files", async (req, res) => {
 		}
 	});
 
-	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER|| !req.developer) return res.status(httpStatus.FORBIDDEN).send({
 		error: {
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,
@@ -309,7 +309,7 @@ router.delete("/screenshot", async (req, res) => {
 		}
 	});
 
-	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) return res.status(httpStatus.FORBIDDEN).send({
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER || !req.developer) return res.status(httpStatus.FORBIDDEN).send({
 		error: {
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,

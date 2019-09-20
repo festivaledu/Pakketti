@@ -380,7 +380,8 @@ export class PackageAPI {
 		
 		return await SocketService.post(`/packages/screenshots?${query}`, data, {
 			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
+				"x-pakketti-developer": localStorage.getItem("vuex") ? `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}` : undefined
 			}
 		});
 	}
@@ -395,7 +396,8 @@ export class PackageAPI {
 		
 		return await post(`${apiUrl}/packages/screenshots/files?${query}`, formData, {
 			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
+				"x-pakketti-developer": localStorage.getItem("vuex") ? `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}` : undefined
 			}
 		});
 	}
@@ -405,7 +407,8 @@ export class PackageAPI {
 		
 		return await SocketService.delete(`/packages/screenshot?${query}`, {
 			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
+				"x-pakketti-developer": localStorage.getItem("vuex") ? `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}` : undefined
 			}
 		});
 	}
@@ -431,7 +434,7 @@ export class PackageAPI {
 		
 		return await post(`${apiUrl}/packages/versions/new?${query}`, formData, {
 			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`,"x-pakketti-developer": localStorage.getItem("vuex") ? `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}` : undefined
 			}
 		});
 	}
@@ -441,7 +444,8 @@ export class PackageAPI {
 		
 		return await SocketService.put(`/packages/versions?${query}`, data, {
 			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
+				"x-pakketti-developer": localStorage.getItem("vuex") ? `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}` : undefined
 			}
 		});
 	}
@@ -454,7 +458,8 @@ export class PackageAPI {
 
 		return await put(`${apiUrl}/packages/versions/file?${query}`, formData, {
 			headers: {
-				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
+				"x-pakketti-developer": localStorage.getItem("vuex") ? `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}` : undefined
 			}
 		});
 	}
@@ -462,7 +467,12 @@ export class PackageAPI {
 	static async deletePackageVersion(parameters) {
 		const query = parseUrlFromObject(flattenObject(parameters)); 
 		
-		return await SocketService.delete(`/packages/versions?${query}`);
+		return await SocketService.delete(`/packages/versions?${query}`, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`,
+				"x-pakketti-developer": localStorage.getItem("vuex") ? `Developer ${JSON.parse(localStorage.getItem("vuex"))["accountId"]}` : undefined
+			}
+		});
 	}
 }
 
