@@ -1,7 +1,7 @@
 <template>
 	<MetroView view-id="main-view">
 		<MetroPage page-id="login">
-			<vue-headful :title="`${$t('login.login-title')} - ${$t('app.name')}`" />
+			<vue-headful :title="`${$t('login.login_title')} - ${$t('app.name')}`" />
 			
 			<div class="container">
 				<div class="row justify-content-around">
