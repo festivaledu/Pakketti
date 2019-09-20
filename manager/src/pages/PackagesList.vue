@@ -1,6 +1,6 @@
 <template>
 	<MetroPage page-id="packages">
-		<vue-headful :title="$t('root.item_packages')" />
+		<vue-headful :title="`${$t('root.item_packages')} - ${$t('app.name')}`" />
 		
 		<template slot="bottom-app-bar">
 			<MetroCommandBar>
@@ -40,8 +40,8 @@
 							</div>
 							<div class="td cell">
 								<MetroToggleSwitch :value="packageObj.visible"
-									:offContent="$t('packages.visible_no')"
-									:onContent="$t('packages.visible_yes')"
+									:offContent="$t('packages.visible_state.no')"
+									:onContent="$t('packages.visible_state.yes')"
 									:readonly="true"
 								/>
 							</div>

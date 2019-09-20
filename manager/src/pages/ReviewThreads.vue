@@ -1,6 +1,6 @@
 <template>
 	<MetroPage page-id="reviews">
-		<vue-headful :title="$t('root.item_reviews')" />
+		<vue-headful :title="`${$t('root.item_reviews')} - ${$t('app.name')}`" />
 		
 		<MetroListView :pane-title="$t('root.item_reviews')" ref="list-view">
 			<template slot="menu-items">
@@ -85,8 +85,8 @@ export default {
 		},
 		async deleteReview(reviewId) {
 			let deleteDialog = new metroUI.ContentDialog({
-				title: `Delete this review?`,
-				content: "Are you sure you want to delete this review? This action cannot be undone.",
+				title: this.$t('reviews.delete_review_confirm_title'),
+				content: this.$t('reviews.delete_review_confirm_body'),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			

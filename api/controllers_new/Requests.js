@@ -25,13 +25,13 @@ router.get("/", async (req, res) => {
 		}
 	});
 
-	if (account.role < UserRole.MODERATOR) return res.status(httpStatus.FORBIDDEN).send({
-		error: {
-			name: httpStatus[httpStatus.FORBIDDEN],
-			code: httpStatus.FORBIDDEN,
-			message: "You are not allowed to perform this action"
-		}
-	});
+	// if (account.role < UserRole.MODERATOR) return res.status(httpStatus.FORBIDDEN).send({
+	// 	error: {
+	// 		name: httpStatus[httpStatus.FORBIDDEN],
+	// 		code: httpStatus.FORBIDDEN,
+	// 		message: "You are not allowed to perform this action"
+	// 	}
+	// });
 	
 	const { LogItem } = req.models;
 	
@@ -42,7 +42,9 @@ router.get("/", async (req, res) => {
 		raw: true
 	});
 	
-	if (account.role < UserRole.MODERATOR) {
+	if (account.role < UserRole.DEVELOPER) {
+		return res.status(httpStatus.OK).send(logItemList.filter(item => item.accountId === account.id));
+	} else if (account.role < UserRole.MODERATOR) {
 		return res.status(httpStatus.OK).send(logItemList.filter(item => item.type === LogItemType.REFUND));
 	} else if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER) {
 		return res.status(httpStatus.OK).send(logItemList.filter(item => item.type !== LogItemType.REFUND));

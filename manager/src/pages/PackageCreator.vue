@@ -1,8 +1,8 @@
 <template>
 	<MetroPage page-id="package-creator">
-		<vue-headful :title="$t('package_creator.title')" />
+		<vue-headful :title="`${$t('package_creator.title')} - ${$t('app.name')}`" />
 		
-		<MetroTextBlock>{{ $t('package_creator.create_package_disclaimer') }}</MetroTextBlock>
+		<MetroTextBlock><span v-html="$t('package_creator.create_package_disclaimer')" /></MetroTextBlock>
 		
 		<div class="row">
 			<div class="col-12 col-md-6">
@@ -47,7 +47,6 @@
 		
 		<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="center">
 			<MetroButton class="system-accent-color" :disabled="!packageData.name.length || !packageData.identifier.length || isWorking.createPackage" @click="createPackage">{{ $t('package_creator.button_reserve') }}</MetroButton>
-			<MetroButton style="margin: 0 4px">{{ $t('app.cancel') }}</MetroButton>
 			
 			<MetroProgressRing :active="isWorking.createPackage" />
 		</MetroStackPanel>
@@ -89,14 +88,14 @@ export default {
 			
 			if (packageList.length) {
 				new metroUI.ContentDialog({
-					title: this.$t('package_editor.package_name_availability.unavailable_title'),
-					content: this.$t('package_editor.package_name_availability.unavailable_body'),
+					title: this.$t('package_editor.info.package_name_availability.unavailable_title'),
+					content: this.$t('package_editor.info.package_name_availability.unavailable_body'),
 					commands: [{ text: "Ok", primary: true }]
 				}).show();
 			} else {
 				new metroUI.ContentDialog({
-					title: this.$t('package_editor.package_name_availability.available_title'),
-					content: this.$t('package_editor.package_name_availability.available_body'),
+					title: this.$t('package_editor.info.package_name_availability.available_title'),
+					content: this.$t('package_editor.info.package_name_availability.available_body'),
 					commands: [{ text: "Ok", primary: true }]
 				}).show();
 			}
@@ -111,14 +110,14 @@ export default {
 			
 			if (packageList.length) {
 				new metroUI.ContentDialog({
-					title: this.$t('package_editor.bundle_id_availability.unavailable_title'),
-					content: this.$t('package_editor.bundle_id_availability.unavailable_body'),
+					title: this.$t('package_editor.info.bundle_id_availability.unavailable_title'),
+					content: this.$t('package_editor.info.bundle_id_availability.unavailable_body'),
 					commands: [{ text: "Ok", primary: true }]
 				}).show();
 			} else {
 				new metroUI.ContentDialog({
-					title: this.$t('package_editor.bundle_id_availability.available_title'),
-					content: this.$t('package_editor.bundle_id_availability.available_body'),
+					title: this.$t('package_editor.info.bundle_id_availability.available_title'),
+					content: this.$t('package_editor.info.bundle_id_availability.available_body'),
 					commands: [{ text: "Ok", primary: true }]
 				}).show();
 			}

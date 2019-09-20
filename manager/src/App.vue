@@ -164,14 +164,14 @@ body[data-theme="dark"] {
 @media all and (min-width: 641px) {
 	.navigation-view {
 		& > .pane-content {
-			position: static;
+			position: static !important;
 			flex-shrink: 0;
 		}
 		
 		& > .content-root {
-			width: calc(~"100% - 40px");
+			min-width: calc(~"100% - 40px");
 			flex: 1 0 auto;
-			margin-left: 0;
+			margin-left: 0 !important;
 			
 			& > .content-frame > .page > .page-content {
 				padding: 24px;

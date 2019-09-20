@@ -4,7 +4,7 @@
 		
 		<MetroTextBlock v-if="header" style="margin-bottom: 4px">{{ header }}</MetroTextBlock>
 		<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="center">
-			<MetroButton @click="openFileSelector">{{ content }}</MetroButton>
+			<MetroButton :disabled="disabled" @click="openFileSelector">{{ content }}</MetroButton>
 			<MetroTextBlock style="margin-left: 12px" v-if="selectedFile">{{ selectedFile.name }} ({{ selectedFile.size | filesize }})</MetroTextBlock>
 		</MetroStackPanel>
 	</div>
@@ -15,6 +15,7 @@ export default {
 	name: "FileSelector",
 	props: {
 		value: null,
+		disabled: Boolean,
 		required: Boolean,
 		header: String,
 		content: String

@@ -1,10 +1,11 @@
 <template>
 	<MetroPage page-id="requests">
-		<vue-headful :title="$t('root.item_requests')" />
+		<vue-headful :title="`${$t('root.item_requests')} - ${$t('app.name')}`" />
 		
-		<!-- TODO: Request role upgrade -->
 		<template slot="bottom-app-bar">
 			<MetroCommandBar>
+				<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" @click="refresh" />
+				<MetroAppBarSeparator />
 				<MetroAppBarButton label="Upgrade" icon="shield" @click.native="upgradeButtonClicked" />
 			</MetroCommandBar>
 		</template>
@@ -79,7 +80,7 @@ export default {
 					icon: "delete",
 					text: this.$t('app.actions.delete'),
 					action: () => this.deleteRequest(requestObj),
-					disabled: !this.isModerator && !this.isAdministrator
+					disabled: !this.isModerator && !this.isAdministrator && requestObj.accountId !== this.accountId
 				}]
 			});
 			
@@ -260,7 +261,8 @@ export default {
 						case UserRole.MODERATOR:
 							return LogItemType.MOD_APPLICATION;
 						}
-					})()
+					})(),
+					affectedAccountId: this.accountId
 				});
 
 				if (result.error) {

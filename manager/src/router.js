@@ -42,7 +42,7 @@ const router = new Router({
 			component: () => import(/* webpackChunkName: "ReviewThreads" */ './pages/ReviewThreads.vue')
 		},
 		{
-			path: '/devices',
+			path: '/devices/:deviceId?',
 			name: 'devices',
 			component: () => import(/* webpackChunkName: "Devices" */ './pages/Devices.vue')
 		},

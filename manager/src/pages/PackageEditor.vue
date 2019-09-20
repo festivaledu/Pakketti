@@ -1,6 +1,6 @@
 <template>
 	<MetroPage page-id="package-editor">
-		<vue-headful :title="$t('package_editor.pivot_title')" />
+		<vue-headful :title="`${$t('package_editor.pivot_title')} - ${$t('app.name')}`" />
 		
 		<template slot="top-app-bar">
 			<template slot="content">
@@ -13,6 +13,7 @@
 					icon="delete"
 					:label="$t('app.actions.delete')"
 					:disabled="isWorking.deletePackage || !isOwnedPackage"
+					@click="deletePackage"
 				/>
 				<MetroAppBarButton
 					icon="save"
@@ -150,6 +151,7 @@
 									'darwin': $t('package_editor.info.platform.darwin'),
 									'iphoneos': $t('package_editor.info.platform.iphoneos'),
 									'debian': $t('package_editor.info.platform.debian'),
+									'other': $t('package_editor.info.platform.other'),
 									'universal': $t('package_editor.info.platform.universal')
 								}"
 								v-model="packageData.platform"
@@ -276,6 +278,7 @@
 						:defaultImgSrc="`http://localhost:3000/media/icon/${packageData.id}`"
 						v-model="packageData.iconMime"
 						@fileChanged="packageIconChanged"
+						:disabled="!this.isOwnedPackage"
 					/>
 				</div>
 				
@@ -285,6 +288,7 @@
 						:defaultImgSrc="`http://localhost:3000/media/hero/${packageData.id}`"
 						v-model="packageData.headerImageMime"
 						@fileChanged="packageHeaderChanged"
+						:disabled="!this.isOwnedPackage"
 					/>
 				</div>
 				
@@ -295,6 +299,7 @@
 						v-model="packageData.screenshots"
 						@fileChanged="screenshotAdded"
 						@fileDeleted="screenshotDeleted"
+						:disabled="!this.isOwnedPackage"
 					/>
 				</div>
 			</MetroPivotItem>
@@ -321,8 +326,8 @@
 									</div>
 									<div class="td cell">
 										<MetroToggleSwitch :value="versionObj.visible"
-											:offContent="$t('packages.visible_no')"
-											:onContent="$t('packages.visible_yes')"
+											:offContent="$t('packages.visible_state.no')"
+											:onContent="$t('packages.visible_state.yes')"
 											:readonly="true"
 										/>
 									</div>
@@ -341,7 +346,7 @@
 					</div>
 				</div>
 				
-				<MetroButton @click="addVersion">{{ $t('package_editor.versions.add') }}</MetroButton>
+				<MetroButton :disabled="!isOwnedPackage" @click="addVersion">{{ $t('package_editor.versions.add') }}</MetroButton>
 			</MetroPivotItem>
 		</MetroPivot>
 	</MetroPage>
@@ -511,7 +516,7 @@ export default {
 				if (result.error) {
 					console.error(result.error);
 				} else {
-					this.refresh();
+					this.$router.replace("/packages");
 				}
 			}
 		},
@@ -526,14 +531,14 @@ export default {
 			
 			if (packageList.length) {
 				new metroUI.ContentDialog({
-					title: this.$t('package_editor.package_name_availability.unavailable_title'),
-					content: this.$t('package_editor.package_name_availability.unavailable_body'),
+					title: this.$t('package_editor.info.package_name_availability.unavailable_title'),
+					content: this.$t('package_editor.info.package_name_availability.unavailable_body'),
 					commands: [{ text: "Ok", primary: true }]
 				}).show();
 			} else {
 				new metroUI.ContentDialog({
-					title: this.$t('package_editor.package_name_availability.available_title'),
-					content: this.$t('package_editor.package_name_availability.available_body'),
+					title: this.$t('package_editor.info.package_name_availability.available_title'),
+					content: this.$t('package_editor.info.package_name_availability.available_body'),
 					commands: [{ text: "Ok", primary: true }]
 				}).show();
 			}
@@ -741,12 +746,16 @@ export default {
 								v-model={_versionObj.packageType}
 								no-update={true}
 								required={true}
+								disabled={!this.isOwnedPackage}
 								style="margin-top: 8px"
 							/>
 							
 							<FileSelector
 								content={this.$t('app.select_file')} 
-								oninput={(file) => this._replaceVersionFile(versionObj, file)} class="my-4" />
+								oninput={(file) => this._replaceVersionFile(versionObj, file)}
+								disabled={!this.isOwnedPackage}
+								class="my-4"
+							/>
 							
 							<div class="my-2">
 								<MetroTextBlock style="margin-bottom: 4px">{this.$t('package_editor.versions.release_notes')}</MetroTextBlock>
@@ -754,6 +763,7 @@ export default {
 									editorToolbar={this.editorToolbar}
 									v-model={_versionObj.changeText}
 									required={true}
+									disabled={!this.isOwnedPackage}
 								/>
 							</div>
 							
@@ -763,6 +773,7 @@ export default {
 								name={true}
 								content={this.$t('package_editor.info.version_visibility_visible')}
 								v-model={_versionObj.visible}
+								disabled={!this.isOwnedPackage}
 							/>
 							
 							<MetroRadioButton
@@ -770,6 +781,7 @@ export default {
 								name={false}
 								content={this.$t('package_editor.info.version_visibility_hidden')}
 								v-model={_versionObj.visible}
+								disabled={!this.isOwnedPackage}
 							/>
 						</div>
 					)

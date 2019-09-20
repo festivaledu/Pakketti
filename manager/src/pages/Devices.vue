@@ -1,6 +1,6 @@
 <template>
 	<MetroPage page-id="devices">
-		<vue-headful :title="$t('root.item_devices')" />
+		<vue-headful :title="`${$t('root.item_devices')} - ${$t('app.name')}`" />
 		
 		<template slot="bottom-app-bar">
 			<MetroCommandBar>
@@ -23,7 +23,7 @@
 							<MetroTextBlock v-if="deviceObj.platform == 'iphoneos'">{{ DeviceStrings[deviceObj.product] || $t('devices.unknown_product') }}</MetroTextBlock>
 							<MetroTextBlock v-else>{{ deviceObj.product }}</MetroTextBlock>
 							
-							<MetroTextBlock>{{ Platforms.platforms[deviceObj.platform] || $t('devices.unknown_platform') }} {{ deviceObj.version }}</MetroTextBlock>
+							<MetroTextBlock>{{ Platforms.platforms[deviceObj.platform] ? $t(`package_editor.info.platform.${deviceObj.platform}`) : $t('devices.unknown_platform') }} {{ deviceObj.version }}</MetroTextBlock>
 						</div>
 						
 						<MetroStackPanel orientation="horizontal" class="device-toolbar">
@@ -54,7 +54,11 @@ export default {
 		let _deviceData = await DeviceAPI.getDevices();
 		
 		next(vm => {
-			vm.deviceData = [];
+			vm.deviceData = _deviceData;
+			
+			if (to.params.deviceId && _deviceData.find(deviceObj => deviceObj.id == to.params.deviceId)) {
+				vm.deviceEditButtonClicked(_deviceData.find(deviceObj => deviceObj.id == to.params.deviceId));
+			}
 			
 			vm.$parent.setHeader(vm.$t('root.item_devices'));
 			vm.$parent.setSelectedMenuItem("devices");
@@ -109,7 +113,8 @@ export default {
 										items-source={{
 											'win': this.$t('package_editor.info.platform.win'),
 											'darwin': this.$t('package_editor.info.platform.darwin'),
-											'iphoneos': this.$t('package_editor.info.platform.iphoneos')
+											'iphoneos': this.$t('package_editor.info.platform.iphoneos'),
+											'other': this.$t('package_editor.info.platform.other')
 										}}
 										v-model={_deviceObj.platform}
 										no-update={true}
@@ -211,7 +216,8 @@ export default {
 										items-source={{
 											'win': this.$t('package_editor.info.platform.win'),
 											'darwin': this.$t('package_editor.info.platform.darwin'),
-											'iphoneos': this.$t('package_editor.info.platform.iphoneos')
+											'iphoneos': this.$t('package_editor.info.platform.iphoneos'),
+											'other': this.$t('package_editor.info.platform.other')
 										}}
 										v-model={_deviceObj.platform}
 										no-update={true}
@@ -276,11 +282,15 @@ export default {
 					this.refresh()
 				}
 			}
+			
+			if (this.$route.params.deviceId) {
+				this.$router.replace(`/${this.$route.path.split("/")[1]}`);
+			}
 		},
 		async deviceDeleteButtonClicked(deviceObj) {
 			let deleteDialog = new metroUI.ContentDialog({
-				title: this.$t('devices.delete_device_confirm_title'),
-				content: this.$t('devices.delete_device_confirm_body'),
+				title: this.$t('devices.delete_device_confirm_title', { name: deviceObj.name || this.$t('devices.unnamed_device') }),
+				content: this.$t('devices.delete_device_confirm_body', { name: deviceObj.name || this.$t('devices.unnamed_device') }),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			

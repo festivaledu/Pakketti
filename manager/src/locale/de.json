@@ -79,6 +79,7 @@
 		
 		"devices_header": "Geräte",
 		"devices_type": "Typ",
+		"devices_platform": "Plattform",
 		"devices_serial_number": "Seriennummer",
 		"devices_no_items": "Es gibt keine Geräte, die angezeigt werden können",
 		"devices_create": "Verknüpfe ein neues Gerät",
@@ -98,11 +99,18 @@
 		"create": "Erstelle ein neues Paket",
 		"see_all": "Alle Pakete anzeigen",
 		
-		"visible_yes": "Ja",
-		"visible_no": "Nein",
+		"visible_state": {
+			"no": "Nein",
+			"yes": "Ja"
+		},
+		
+		"status": {
+			"0": "Unvollständig",
+			"1": "Vollständig"
+		},
 		
 		"delete_package_confirm_title": "„%{name}“ löschen?",
-			"delete_package_confirm_body": "Möchtest du „%{name}“ wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.\n\nZugewiesene Rezensionen werden dadurch ebenfalls gelöscht."
+			"delete_package_confirm_body": "<p>Möchtest du „%{name}“ wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.<br><br>Zugehörige Rezensionen werden dadurch ebenfalls gelöscht.</p>"
 	},
 	
 	"reviews": {
@@ -133,8 +141,8 @@
 			"optional": "Optional"
 		},
 		
-		"delete_device_confirm_title": "Dieses Gerät löschen?",
-		"delete_device_confirm_body": "Möchtest du dieses Gerät wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.\n\nZugewiesene Rezensionen werden dadurch ebenfalls gelöscht."
+		"delete_device_confirm_title": "„%{name}“ löschen?",
+		"delete_device_confirm_body": "<p>Möchtest du „%{name}“ wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.<br><br>Zugehörige Rezensionen werden dadurch ebenfalls gelöscht.</p>"
 	},
 	
 	"requests": {
@@ -166,7 +174,7 @@
 		},
 		
 		"delete_request_confirm_title": "Diese Anfrage löschen?",
-		"delete_request_confirm_body": "Möchtest du diese Anfrage wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+		"delete_request_confirm_body": "<p>Möchtest du diese Anfrage wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>",
 		
 		"role_application": {
 			"title_developer": "Als Entwickler bewerben",
@@ -188,7 +196,7 @@
 	
 	"package_creator": {
 		"title": "Paket erstellen",
-		"create_package_disclaimer": "Um ein Paket zu erstellen, musst du zunächst einen Namen und eine Bundle-ID reservieren.\nSobald dir diese zugewiesen sind, kannst du mit dem Einreichen deines Pakets beginnen.",
+		"create_package_disclaimer": "<p>Um ein Paket zu erstellen, musst du zunächst einen Namen und eine Bundle-ID reservieren.<br>Sobald dir diese zugewiesen sind, kannst du mit dem Einreichen deines Pakets beginnen.</p>",
 		"button_reserve": "Paket-Namen reservieren"
 	},
 	
@@ -230,6 +238,7 @@
 				"darwin": "macOS",
 				"iphoneos": "iOS",
 				"debian": "Linux (Debian/Ubuntu)",
+				"other": "Andere",
 				"universal": "Universell"
 			},
 			"architecture_description": "Wähle die Architektur, für die das Paket erstellt wurde.",

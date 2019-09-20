@@ -1,12 +1,12 @@
 <template>
 	<MetroPage page-id="dashboard">
-		<vue-headful :title="$t('root.item_dashboard')" />
+		<vue-headful :title="`${$t('root.item_dashboard')} - ${$t('app.name')}`" />
 		
 		<div class="mb-2" v-if="(isModerator || isAdministrator)">
 			<MetroTextBlock text-style="sub-title">{{ $t('dashboard.overview_header') }}</MetroTextBlock>
 		</div>
 		
-		<div class="row no-margin" v-if="statisticsData">
+		<div class="row no-margin" v-if="statisticsData && (isModerator || isAdministrator)">
 			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
 				<Statcard :name="$t('dashboard.overview_downloads')" :dataset="this.statisticsData.items.map(item => item['versionDownloaded'])" />
 			</div>
@@ -57,13 +57,13 @@
 								</div>
 								<div class="td cell">
 									<MetroToggleSwitch :value="packageObj.visible"
-										:offContent="$t('packages.visible_no')"
-										:onContent="$t('packages.visible_yes')"
+										:offContent="$t('packages.visible_state.no')"
+										:onContent="$t('packages.visible_state.yes')"
 										:readonly="true"
 									/>
 								</div>
 								<div class="td cell">
-									<MetroTextBlock>{{ packageObj.status }}</MetroTextBlock>
+									<MetroTextBlock>{{ $t(`packages.status.${packageObj.status}`) }}</MetroTextBlock>
 								</div>
 								<div class="td cell">
 									<MetroTextBlock>{{ packageObj.updatedAt | date }}</MetroTextBlock>
@@ -81,9 +81,9 @@
 							<div class="tr row">
 								<div class="td cell">
 									<MetroTextBlock text-style="caption">{{ $t('packages.no_items') }}</MetroTextBlock>
-									<MetroHyperlinkButton>
+									<router-link to="/packages/new" class="hyperlink-button">
 										<MetroTextBlock text-style="caption">{{ $t('packages.create') }}</MetroTextBlock>
-									</MetroHyperlinkButton>
+									</router-link>
 								</div>
 							</div>
 						</div>
@@ -113,7 +113,7 @@
 								<div class="th column-header-item">{{ $t('dashboard.reviews_date') }}</div>
 								<div class="th column-header-item">{{ $t('dashboard.reviews_rating') }}</div>
 							</div>
-							<div class="row-wrapper" v-for="(reviewObj, index) in reviewData.slice(0,5)" :key="index">
+							<router-link tag="div" :to="`/reviews/${reviewObj.id}`" class="row-wrapper" v-for="(reviewObj, index) in reviewData.slice(0,5)" :key="index">
 								<div class="tr row">
 									<div class="td cell">
 										<MetroTextBlock>{{ reviewObj.title }}</MetroTextBlock>
@@ -127,7 +127,7 @@
 									</div>
 								</div>
 								<div class="row-background" :style="{'top': `${(index * 47) + 32}px`}" />
-							</div>
+							</router-link>
 							
 							<div class="row-wrapper" v-if="!reviewData.length">
 								<div class="tr row">
@@ -158,35 +158,41 @@
 							<div class="column-headers-border" />
 							<div class="tr column-headers">
 								<div class="th column-header-item">{{ $t('dashboard.devices_type') }}</div>
+								<div class="th column-header-item">{{ $t('dashboard.devices_platform') }}</div>
 								<div class="th column-header-item">{{ $t('dashboard.devices_serial_number') }}</div>
 							</div>
 							
-							<div class="row-wrapper" v-for="(deviceObj, index) in deviceData.slice(0,5)" :key="index">
+							<router-link tag="div" :to="`/devices/${deviceObj.id}`" class="row-wrapper" v-for="(deviceObj, index) in deviceData.slice(0,5)" :key="index">
 								<div class="tr row">
 									<div class="td cell">
 										<MetroStackPanel orientation="horizontal" vertical-alignment="center">
 											<!-- <img src="{{device-icon}}" -->
 											
 											<MetroStackPanel>
-												<MetroTextBlock>device type</MetroTextBlock>
-												<MetroTextBlock text-style="caption">device variant</MetroTextBlock>
+												<MetroTextBlock>{{ deviceObj.name || $t('devices.unnamed_device') }}</MetroTextBlock>
+												
+												<MetroTextBlock text-style="caption" v-if="deviceObj.platform == 'iphoneos'">{{ DeviceStrings[deviceObj.product] || $t('devices.unknown_product') }}</MetroTextBlock>
+												<MetroTextBlock text-style="caption" v-else>{{ deviceObj.product }}</MetroTextBlock>
 											</MetroStackPanel>
 										</MetroStackPanel>
 									</div>
 									<div class="td cell">
-										<MetroTextBlock>device serial</MetroTextBlock>
+										<MetroTextBlock>{{ Platforms.platforms[deviceObj.platform] || $t('devices.unknown_platform') }}</MetroTextBlock>
+									</div>
+									<div class="td cell">
+										<MetroTextBlock>{{ deviceObj.udid }}</MetroTextBlock>
 									</div>
 								</div>
 								<div class="row-background" :style="{'top': `${(index * 47) + 32}px`}" />
-							</div>
+							</router-link>
 							
 							<div class="row-wrapper" v-if="!deviceData.length">
 								<div class="tr row">
 									<div class="td cell">
 										<MetroTextBlock text-style="caption">{{ $t('dashboard.devices_no_items') }}</MetroTextBlock>
-										<MetroHyperlinkButton>
+										<router-link to="/devices" class="hyperlink-button">
 											<MetroTextBlock text-style="caption">{{ $t('dashboard.devices_create') }}</MetroTextBlock>
-										</MetroHyperlinkButton>
+										</router-link>
 									</div>
 								</div>
 							</div>
@@ -205,6 +211,8 @@
 <script>
 import { DeviceAPI, PackageAPI, StatisticsAPI } from '@/scripts/ApiUtil'
 import { UserRole } from "@/scripts/Enumerations"
+import Platforms from '../../../platforms.json'
+import DeviceStrings from '../../../deviceStrings.json'
 
 import Statcard from "@/components/Statcard"
 
@@ -217,7 +225,9 @@ export default {
 		packageData: null,
 		statisticsData: null,
 		reviewData: null,
-		deviceData: null
+		deviceData: null,
+		Platforms: Platforms,
+		DeviceStrings: DeviceStrings
 	}),
 	beforeRouteEnter: async (to, from, next) => {
 		let _packageData = await PackageAPI.getPackages({

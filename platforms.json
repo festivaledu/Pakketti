@@ -4,6 +4,7 @@
 		"darwin": "macOS",
 		"iphoneos": "iOS",
 		"debian": "Linux (Debian/Ubuntu)",
+		"other": "Other",
 		"universal": "Universal"
 	},
 	"architectures": {

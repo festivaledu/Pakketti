@@ -1,9 +1,9 @@
 <template>
 	<div class="grid-view">
-		<div class="grid-view-item media-selector" @dragenter="dragIn" @dragover="dragIn" @dragleave="dragOut" @drop="dropFile" ref="container">
+		<div class="grid-view-item media-selector" :class="{'disabled': disabled}" @dragenter="dragIn" @dragover="dragIn" @dragleave="dragOut" @drop="dropFile" ref="container">
 			<input type="file" ref="file-selector" accept="image/png,image/jpeg" @change="fileChanged" />
 			<template v-if="!selectedImageBlob && !value">
-				<div class="grid-view-item-content add-button" @click="openFileSelector" />
+				<div class="grid-view-item-content add-button" :class="{'disabled': disabled}" @click="openFileSelector" />
 			</template>
 			
 			<template v-else>
@@ -15,7 +15,7 @@
 					
 					<div class="media-toolbar">
 						<MetroStackPanel orientation="horizontal" horizontal-alignment="right">
-							<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" @click="_deleteFile" />
+							<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" :disabled="disabled" @click="_deleteFile" />
 						</MetroStackPanel>
 					</div>
 				</div>
@@ -31,7 +31,8 @@ export default {
 	name: "MediaItemSelector",
 	props: {
 		value: null,
-		defaultImgSrc: String
+		defaultImgSrc: String,
+		disabled: Boolean
 	},
 	data: () => ({
 		selectedImageBlob: null
@@ -105,6 +106,10 @@ export default {
 		visibility: hidden;
 	}
 	
+	&.disabled {
+		pointer-events: none;
+	}
+	
 	&.drop-available {
 		box-shadow: inset 0 0 0 2px #00FF00;
 	}
@@ -131,6 +136,10 @@ export default {
 			top: 50%;
 			left: 50%;
 			transform: translate3d(-50%, -50%, 0);
+		}
+		
+		&.disabled {
+			opacity: 0.4;
 		}
 	}
 	

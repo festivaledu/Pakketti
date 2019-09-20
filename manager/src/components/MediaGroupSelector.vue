@@ -11,6 +11,7 @@
 						<MetroAppBarButton
 							icon="delete"
 							:label="$t('app.actions.delete')"
+							:disabled="disabled"
 							@click="_deleteFile(mediaObj)"
 						/>
 					</MetroStackPanel>
@@ -18,9 +19,9 @@
 			</div>
 		</div>
 		
-		<div class="grid-view-item media-item" @dragenter="dragIn" @dragover="dragIn" @dragleave="dragOut" @drop="dropFile" ref="container">
-			<input type="file" ref="file-selector" accept="image/png,image/jpeg" @change="fileChanged" />
-			<div class="grid-view-item-content add-button" @click="openFileSelector" />
+		<div class="grid-view-item media-item" :class="{'disabled': disabled}" @dragenter="dragIn" @dragover="dragIn" @dragleave="dragOut" @drop="dropFile" ref="container">
+			<input type="file" ref="file-selector" accept="image/png,image/jpeg" @change="fileChanged" multiple="multiple" />
+			<div class="grid-view-item-content add-button" :class="{'disabled': disabled}" @click="openFileSelector" />
 		</div>
 	</div>
 </template>
@@ -32,7 +33,8 @@ export default {
 	name: "MediaGroupSelector",
 	props: {
 		value: null,
-		defaultImgSrc: String
+		defaultImgSrc: String,
+		disabled: Boolean
 	},
 	methods: {
 		dragIn(e) {
@@ -61,7 +63,10 @@ export default {
 			this.$refs["file-selector"].click();
 		},
 		fileChanged(e) {
-			this._handleFile(e.target.files[0]);
+			let files = [...e.target.files];
+			files.forEach(file => {
+				this._handleFile(file);
+			});
 			this.$refs["file-selector"].value = null;
 		},
 		
@@ -93,6 +98,10 @@ export default {
 		visibility: hidden;
 	}
 	
+	&.disabled {
+		pointer-events: none;
+	}
+	
 	&.drop-available {
 		box-shadow: inset 0 0 0 2px #00FF00;
 	}
@@ -119,6 +128,10 @@ export default {
 			top: 50%;
 			left: 50%;
 			transform: translate3d(-50%, -50%, 0);
+		}
+		
+		&.disabled {
+			opacity: 0.4;
 		}
 	}
 	

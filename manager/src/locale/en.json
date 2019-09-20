@@ -79,6 +79,7 @@
 		
 		"devices_header": "Devices",
 		"devices_type": "Type",
+		"devices_platform": "Platform",
 		"devices_serial_number": "Serial Number",
 		"devices_no_items": "No Devices to display",
 		"devices_create": "Link a Device",
@@ -98,11 +99,18 @@
 		"create": "Create a Package",
 		"see_all": "See all Packages",
 		
-		"visible_yes": "Yes",
-		"visible_no": "No",
+		"visible_state": {
+			"no": "No",
+			"yes": "Yes"
+		},
+		
+		"status": {
+			"0": "Incomplete",
+			"1": "Complete"
+		},
 		
 		"delete_package_confirm_title": "Delete \"%{name}\"?",
-		"delete_package_confirm_body": "Are you sure you want to delete \"%{name}\"? This action cannot be undone.\n\nAssociated Reviews will also be deleted."
+		"delete_package_confirm_body": "<p>Are you sure you want to delete \"%{name}\"?<br>This action cannot be undone.<br><br>Associated Reviews will also be deleted.</p>"
 	},
 	
 	"reviews": {
@@ -133,8 +141,8 @@
 			"optional": "Optional"
 		},
 		
-		"delete_device_confirm_title": "Delete this device?",
-		"delete_device_confirm_body": "Are you sure you want to delete this device? This action cannot be undone.\n\nAssociated Reviews will also be deleted."
+		"delete_device_confirm_title": "Delete \"%{name}\"?",
+		"delete_device_confirm_body": "<p>Are you sure you want to delete \"%{name}\"?<br>This action cannot be undone.<br><br>Associated Reviews will also be deleted.</p>"
 	},
 	
 	"requests": {
@@ -166,7 +174,7 @@
 		},
 		
 		"delete_request_confirm_title": "Delete this request?",
-		"delete_request_confirm_body": "Are you sure you want to delete this request? This action cannot be undone.",
+		"delete_request_confirm_body": "<p>Are you sure you want to delete this request?<br>This action cannot be undone.</p>",
 		
 		"role_application": {
 			"title_developer": "Request Developer Role",
@@ -188,7 +196,7 @@
 	
 	"package_creator": {
 		"title": "Create a Package",
-		"create_package_disclaimer": "To create your Package, you first need to reserve a name and a bundle identifier.\nWith both of these associated to you, you can start submitting your Package.",
+		"create_package_disclaimer": "<p>To create your Package, you first need to reserve a name and a bundle identifier.<br>With both of these associated to you, you can start submitting your Package.</p>",
 		"button_reserve": "Reserve Package Name"
 	},
 	
@@ -230,6 +238,7 @@
 				"darwin": "macOS",
 				"iphoneos": "iOS",
 				"debian": "Linux (Debian/Ubuntu)",
+				"other": "Other",
 				"universal": "Universal"
 			},
 			"architecture_description": "Select the architecture your Package was built for.",
