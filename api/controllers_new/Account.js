@@ -6,6 +6,8 @@ const httpStatus = require("http-status");
 const ErrorHandler = require("../helpers/ErrorHandler");
 const { UserRole, LogItemType, LogItemStatus } = require("../helpers/Enumerations");
 
+const bcrypt = require("bcryptjs");
+
 
 
 /**
@@ -45,24 +47,31 @@ router.put("/me", async (req, res) => {
 
 	let { Account, LogItem } = req.models;
 
-	let existing = await Account.findOne({
-		where: Object.assign(JSON.parse(JSON.stringify({
-			username: req.body.username || undefined,
-			email: req.body.email || undefined,
-		})), {
-			id: {
-				[Sequelize.Op.ne]: account.id,
-			}
-		})
-	});
+	if (req.body.username || req.body.email) {
+		let existing = await Account.findOne({
+			where: Object.assign(JSON.parse(JSON.stringify({
+				username: req.body.username || undefined,
+				email: req.body.email || undefined,
+			})), {
+				id: {
+					[Sequelize.Op.ne]: account.id,
+				}
+			})
+		});
 
-	if (existing) return res.status(httpStatus.CONFLICT).send({
-		error: {
-			name: httpStatus[httpStatus.CONFLICT],
-			code: httpStatus.CONFLICT,
-			message: "Username or E-Mail address already in use"
-		}
-	});
+		if (existing) return res.status(httpStatus.CONFLICT).send({
+			error: {
+				name: httpStatus[httpStatus.CONFLICT],
+				code: httpStatus.CONFLICT,
+				message: "Username or E-Mail address already in use"
+			}
+		});
+	}
+	
+	if (req.body.password) {
+		const salt = bcrypt.genSaltSync(10);
+		req.body.password = bcrypt.hashSync(req.body.password, salt);
+	}
 
 	return account.update(Object.assign(req.body, {
 		id: account.id,
