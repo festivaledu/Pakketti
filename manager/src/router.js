@@ -45,6 +45,11 @@ const router = new Router({
 			path: '/devices',
 			name: 'devices',
 			component: () => import(/* webpackChunkName: "Devices" */ './pages/Devices.vue')
+		},
+		{
+			path: '/requests',
+			name: 'requests',
+			component: () => import(/* webpackChunkName: "Requests" */ './pages/Requests.vue')
 		}
 	]
 });
