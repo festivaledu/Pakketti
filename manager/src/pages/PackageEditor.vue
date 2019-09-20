@@ -1,5 +1,7 @@
 <template>
 	<MetroPage page-id="package-editor">
+		<vue-headful :title="$t('package_creator.pivot_title')" />
+		
 		<template slot="top-app-bar">
 			<template slot="content">
 				<MetroStackPanel vertical-alignment="center" style="height: 40px">

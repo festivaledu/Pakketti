@@ -256,7 +256,7 @@ export default {
 						</div>
 					)
 				},
-				commands: [{ text: "Cancel" }, { text: "Update", primary: true }]
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.actions.save'), primary: true }]
 			});
 			
 			if (await deviceDialog.showAsync() == metroUI.ContentDialogResult.Primary) {

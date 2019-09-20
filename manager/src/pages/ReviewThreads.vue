@@ -1,5 +1,7 @@
 <template>
 	<MetroPage page-id="reviews">
+		<vue-headful :title="$t('root.item_reviews')" />
+		
 		<MetroListView :pane-title="$t('root.item_reviews')" ref="list-view">
 			<template slot="menu-items">
 				<template v-if="reviewData.length">
@@ -30,7 +32,7 @@
 			<MetroPage page-id="messages">
 				<template slot="bottom-app-bar">
 					<MetroCommandBar>
-						<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" @click="refresh()" />
+						<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" @click="refresh" />
 						<MetroAppBarSeparator />
 						<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" :disabled="!selectedThread || !isOwnedReview" @click="deleteReview(selectedThread)" />
 					</MetroCommandBar>

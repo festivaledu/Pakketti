@@ -1,5 +1,7 @@
 <template>
 	<MetroPage page-id="packages">
+		<vue-headful :title="$t('root.item_packages')" />
+		
 		<template slot="bottom-app-bar">
 			<MetroCommandBar>
 				<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" @click="refresh()" />
@@ -92,7 +94,7 @@ export default {
 				vm.packageData = [];
 			}
 			
-			vm.$parent.setHeader("Packages");
+			vm.$parent.setHeader(this.$t('root.item_packages'));
 			vm.$parent.setSelectedMenuItem("packages");
 		});
 	},
