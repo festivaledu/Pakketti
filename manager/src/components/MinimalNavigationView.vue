@@ -106,16 +106,21 @@ export default {
 				this.menuItems[item.getAttribute("data-page-id")] = item;
 				
 				item.addEventListener("click", () => {
-					this.navigate(item.getAttribute("data-page-id"));
+
+					if ((this.$data._paneDisplayMode === "left-compact" || this.$data._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.$data._paneDisplayMode !== "left")) {
+						this.expanded = false;
+						
+						setTimeout(() => {
+							this.navigate(item.getAttribute("data-page-id"));
+						}, 350);
+					} else {
+						this.navigate(item.getAttribute("data-page-id"));
+					}
 					
 					this.$emit("selectionChanged", item, {
 						selectedItem: item,
 						isSettingsSelected: item === this.$refs["settings-nav-pane-item"]
 					});
-
-					if ((this.$data._paneDisplayMode === "left-compact" || this.$data._paneDisplayMode === "left-minimal") || (window.innerWidth < 1008 && this.$data._paneDisplayMode !== "left")) {
-						this.expanded = false
-					}
 				});
 			}
 		});
@@ -135,14 +140,14 @@ export default {
 							
 							setTimeout(() => {
 								this.navigate(item.__vue__.$props.pageId);
-							}, 350)
+							}, 350);
 						} else {
 							this.navigate(item.__vue__.$props.pageId);
 						}
 						
 						nav.$emit("selectionChanged", item, {
 							selectedItem: item,
-							isSettingsSelected: item === this.$refs["settings-nav-pane-item"].$el
+							isSettingsSelected: this.$refs["settings-nav-pane-item"] ? item === this.$refs["settings-nav-pane-item"].$el : false
 						});
 					});
 				}

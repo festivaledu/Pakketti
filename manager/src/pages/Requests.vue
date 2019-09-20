@@ -59,7 +59,7 @@ export default {
 	data: () => ({
 		requestData: null
 	}),
-	async beforeRouteEnter(to, from, next) {
+	beforeRouteEnter: async (to, from, next) => {
 		let _requestData = await RequestAPI.getRequests();
 		
 		next(vm => {
@@ -223,10 +223,11 @@ export default {
 					action: () => this.requestRoleUpgrade(UserRole.MODERATOR)
 				}, {
 					text: this.$t('requests.role_downgrade.title'),
-					disabled: !this.isDeveloper && !this.isModerator,
+					disabled: (!this.isDeveloper && !this.isModerator) || this.isRoot,
 					action: () => this.requestRoleDowngrade()
 				}, {
 					text: this.$t('requests.account_deletion.title'),
+					disabled: this.isRoot,
 					action: () => this.requestAccountDeletion()
 				}]
 			});
@@ -374,6 +375,9 @@ export default {
 		isAdministrator() {
 			return this.$store.state.role & UserRole.ADMINISTRATOR == UserRole.ADMINISTRATOR;
 		},
+		isRoot() {
+			return this.$store.state.role & UserRole.ROOT == UserRole.ROOT;
+		}
 	}
 }
 </script>

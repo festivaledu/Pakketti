@@ -43,7 +43,7 @@
 						<span v-if="!accountData">{{ $t('root.button_sign_in') }}</span>
 						
 						<template slot="icon" v-if="accountData">
-							<MetroPersonPicture v-if="!accountData.profileImageMime" />
+							<MetroPersonPicture :display-name="accountData.username" v-if="!accountData.profileImageMime" />
 							<MetroPersonPicture :profile-picture="`http://localhost:3000/media/avatar/${accountData.id}`" v-if="accountData.profileImageMime" />
 						</template>
 						<span v-if="accountData">{{ accountData.username }}</span>

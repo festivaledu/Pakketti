@@ -25,7 +25,7 @@
 	},
 	
 	"login": {
-		"login_title": "@:(app.name) – Login",
+		"login_title": "Sign in",
 		"login_username": "Username or E-Mail Address",
 		"login_username_placeholder": "John Appleseed",
 		"login_password": "Password",
@@ -314,5 +314,47 @@
 			},
 			"release_notes": "Release Notes"
 		}
+	},
+	
+	"profile": {
+		"avatar": "Avatar",
+		"choose_avatar": "Choose Avatar",
+		
+		"delete_avatar": "Delete Avatar",
+		"delete_avatar_confirm_title": "Delete avatar?",
+		"delete_avatar_confirm_body": "<p>Are you sure you want to delete your avatar?<br>This action cannot be undone.</p>",
+		
+		"account_info": {
+			"title": "Account Information",
+			"username": "Username: %{name}",
+			"email": "E-Mail Address: %{email}"
+		},
+		
+		"edit_account": {
+			"title": "Edit Account",
+			"username": {
+				"title": "Change Username",
+				"placeholder": "Enter a username"
+			},
+			"email": {
+				"title": "Change E-Mail Address",
+				"placeholder": "Enter an E-Mail address"
+			},
+			"password":{
+				"title": "Change Password",
+				"current_placeholder": "Current password",
+				"new_placeholder": "New password (8 characters minimum)",
+				"confirm_placeholder": "Confirm new password",
+				
+				"error_match": "The passwords you've entered do not match."
+			},
+			"error_title": "There was an error updating your profile",
+			
+			"profile_changed_success_title": "Profile updated",
+			"profile_changed_success_message": "Your profile has been updated successfully."
+		},
+		
+		"sign_out_title": "Sign out",
+		"sign_out_body": "<p>Are you sure you want to sign out?<br>Unsaved changes will be lost.</p>"
 	}
 }

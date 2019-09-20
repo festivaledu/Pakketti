@@ -56,11 +56,9 @@
 				</template>
 				
 				<template slot="pane-footer">
-					<MetroNavigationViewItem icon="contact" :content="$t('root.item_profile')" page-id="profile" :disabled="true" />
-					<MetroNavigationViewItem icon="setting" :content="$t('root.item_settings')" page-id="settings" :disabled="true" />
-					<MetroButton class="system-accent-color" @click="signOut">
-						<MetroSymbolIcon icon="ethernet-error" />
-					</MetroButton>
+					<router-link tag="div" to="/profile">
+						<MetroNavigationViewItem icon="contact" :content="$t('root.item_profile')" page-id="profile" />
+					</router-link>
 				</template>
 				
 				<router-view/>
@@ -80,12 +78,6 @@ export default {
 	name: "App",
 	components: {
 		MinimalNavigationView
-	},
-	methods: {
-		signOut() {
-			window.$cookies.remove("authToken");
-			this.$router.replace("/login");
-		}
 	},
 	computed: {
 		routeName() {
