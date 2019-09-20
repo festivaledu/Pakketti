@@ -133,6 +133,7 @@ export default {
 			this.$refs["select"].value = item;
 			
 			this.$emit("input", this.$data._value);
+			this.$refs["select"].dispatchEvent(new Event("input"));
 		}
 	},
 	computed: {
