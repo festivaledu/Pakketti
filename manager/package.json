@@ -15,6 +15,7 @@
     "metroui-vue": "file:../metroui-vue",
     "socket.io-client": "^2.2.0",
     "vue": "^2.6.10",
+    "vue-clamp": "^0.2.2",
     "vue-cookies": "^1.5.13",
     "vue-headful": "^2.0.1",
     "vue-i18n": "^8.14.1",

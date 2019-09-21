@@ -1,63 +1,83 @@
 <template>
 	<MetroPage page-id="reviews">
-		<vue-headful :title="`${$t('root.item_reviews')} - ${$t('app.name')}`" />
+		<vue-headful :title="`${$t('root.item_reviews')} – ${$t('app.name')}`" />
 		
-		<MetroListView :pane-title="$t('root.item_reviews')" ref="list-view">
-			<template slot="menu-items">
-				<template v-if="reviewData.length">
-					<div class="list-view-item"
-						:class="{'selected': selectedThread && (selectedThread === reviewObj.id)}"
-						@click="threadSelected(reviewObj.id)"
-						v-for="(reviewObj) in sortedReviews"
-						:key="reviewObj.id"
-					>
-						<div class="list-view-item-inner">
-							<div class="list-view-item-content">
-								<MetroStackPanel vertical-alignment="top">
-									<MetroStackPanel>
-										<span class="text-label">{{ reviewObj.title }}</span>
-										<span class="detail-text-label">{{ getPackageInfo(reviewObj.packageId).name }} – {{ getPackageInfo(reviewObj.packageId).identifier }}</span>
-									</MetroStackPanel>
-									
-									<MetroStackPanel orientation="horizontal" vertical-alignment="center">
-										<span class="detail-text-label align-right">{{ reviewObj.messages.lastObject().createdAt | dateTime }}</span>
-										<MetroRatingControl :value="reviewObj.rating.value" style="pointer-events: none" />
-									</MetroStackPanel>
+		<template slot="bottom-app-bar">
+			<MetroCommandBar>
+				<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" />
+			</MetroCommandBar>
+		</template>
+		
+		<template v-if="reviewData && !reviewData.length">
+			<MetroTextBlock>{{ $t('dashboard.reviews_no_items') }}</MetroTextBlock>
+		</template>
+		
+		<template v-if="packageData && reviewData && reviewData.length">
+			<div class="grid-view">
+				<div class="grid-view-item" v-for="(reviewObj, index) in reviewData" :key="index">
+					<div class="review-container">
+						<div class="review-description-container">
+							<MetroRatingControl :value="reviewObj.rating.value" />
+							<MetroStackPanel orientation="vertical">
+								<MetroStackPanel orientation="vertical" vertical-alignment="top">
+									<MetroTextBlock text-style="base">{{ reviewObj.title }}</MetroTextBlock>
+									<MetroTextBlock>
+										<v-clamp autoresize :max-lines="3">{{ reviewObj.messages.lastObject().text }}</v-clamp>
+									</MetroTextBlock>
 								</MetroStackPanel>
-							</div>
+								
+								<MetroStackPanel orientation="vertical" vertical-alignment="top" class="mt-2">
+									<MetroTextBlock text-style="caption">
+										{{ _getPackageInfo(reviewObj.packageId).name }} • {{ _getPackageInfo(reviewObj.packageId).identifier }}
+									</MetroTextBlock>
+									
+									<MetroTextBlock text-style="caption" v-if="reviewObj.device">
+										{{ reviewObj.device.platform == 'iphoneos' ?
+											(DeviceStrings[reviewObj.device.product] || $t('devices.unknown_product')) :
+											reviewObj.device.product
+										}},
+										{{ Platforms.platforms[reviewObj.device.platform] ?
+											$t(`package_editor.info.platform.${reviewObj.device.platform}`) :
+											$t('devices.unknown_platform')
+										}}
+										{{ reviewObj.device.version }}
+									</MetroTextBlock>
+									
+									<MetroTextBlock text-style="caption">
+										{{ $t('reviews.last_updated') }}: {{ reviewObj.messages.lastObject().createdAt | dateTime }}
+									</MetroTextBlock>
+								</MetroStackPanel>
+							</MetroStackPanel>
 						</div>
+						
+						<MetroStackPanel orientation="horizontal" class="review-toolbar">
+							<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" @click="reviewDeleteButtonClicked(reviewObj)" />
+							<MetroAppBarButton icon="view" :label="$t('app.actions.view')" @click="reviewViewButtonClicked(reviewObj)" />
+						</MetroStackPanel>
 					</div>
-				</template>
-			</template>
-			<MetroPage page-id="messages">
-				<template slot="bottom-app-bar">
-					<MetroCommandBar>
-						<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" @click="refresh" />
-						<MetroAppBarSeparator />
-						<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" :disabled="!selectedThread || !isOwnedReview" @click="deleteReview(selectedThread)" />
-					</MetroCommandBar>
-				</template>
-				<MetroMessages :placeholder-text="$t('reviews.messages_placeholder')" ref="messages" v-show="selectedThread" @messageSent="addMessage" :disabled="!isOwnedReview" />
-			</MetroPage>
-		</MetroListView>
+				</div>
+			</div>
+		</template>
 	</MetroPage>
 </template>
 
 <script>
-import { PackageAPI, AccountAPI } from "@/scripts/ApiUtil";
-import { UserRole } from "@/scripts/Enumerations"
+import { AccountAPI, PackageAPI } from '@/scripts/ApiUtil'
+import Platforms from '../../../platforms.json'
+import DeviceStrings from '../../../deviceStrings.json'
 
-import MetroListView from '@/components/ListView'
+import VClamp from 'vue-clamp'
 
 export default {
 	name: "ReviewThreads",
 	components: {
-		MetroListView
+		VClamp
 	},
 	data: () => ({
-		packageData: [],
-		reviewData: [],
-		selectedThread: null
+		packageData: null,
+		reviewData: null,
+		Platforms: Platforms,
+		DeviceStrings: DeviceStrings
 	}),
 	beforeRouteEnter: async (to, from, next) => {
 		let _packageData = await PackageAPI.getPackages();
@@ -67,23 +87,83 @@ export default {
 			vm.packageData = _packageData;
 			vm.reviewData = _reviewData;
 			
-			vm.selectedThread = null;
-			vm.threadSelected(to.params.reviewId || null);
+			if (to.params.reviewId && _reviewData.find(reviewObj => reviewObj.id == to.params.reviewId)) {
+				vm.reviewItemClicked(_reviewData.find(reviewObj => reviewObj.id == to.params.reviewId));
+			}
 			
-			vm.$refs["list-view"].navigate("messages");
-			
-			vm.$parent.setHeader(null);
+			vm.$parent.setHeader(vm.$t('root.item_reviews'));
 			vm.$parent.setSelectedMenuItem("reviews");
-		});
+		})
 	},
 	methods: {
 		async refresh() {
 			this.packageData = await PackageAPI.getPackages();
 			this.reviewData = await PackageAPI.getReviews();
-			
-			this.threadSelected(this.selectedThread);
 		},
-		async deleteReview(reviewId) {
+		async reviewViewButtonClicked(reviewObj) {			
+			let packageOwnerAccountData = await AccountAPI.getUser({
+				"account.id": this.packageData.find(packageObj => packageObj.id === reviewObj.packageId).accountId
+			});
+			let reviewerAccountData = await AccountAPI.getUser({
+				"account.id": reviewObj.accountId
+			});
+			
+			let messages = reviewObj.messages.map(messageObj => ({
+				author: messageObj.accountId,
+				displayName: [packageOwnerAccountData, reviewerAccountData].find(accountObj => accountObj.id === messageObj.accountId).username,
+				date: new Date(messageObj.createdAt),
+				text: messageObj.text,
+				type: messageObj.accountId === this.accountId ? "sent" : "received"
+			}));
+			
+			let dialog = new metroUI.ContentDialog({
+				className:"review-content-dialog",
+				content: (dialog) => (
+					<div class="review-viewer">
+						<MetroStackPanel orientation="horizontal" class="review-viewer-chrome">
+							<MetroTextBlock>{ this.$t('root.item_reviews') }</MetroTextBlock>
+							<MetroButton onclick={() => dialog.hide.apply(dialog)}>
+								<MetroSymbolIcon symbol="cancel" />
+							</MetroButton>
+						</MetroStackPanel>
+						
+						<div class="review-viewer-header">
+							<MetroTextBlock>{ this._getPackageInfo(reviewObj.packageId).name } • { this._getPackageInfo(reviewObj.packageId).identifier }</MetroTextBlock>
+							<MetroStackPanel orientation="horizontal" vertical-alignment="center">
+								<MetroStackPanel orientation="vertical">
+									<MetroTextBlock text-style="sub-title">{reviewObj.title}</MetroTextBlock>
+									{reviewObj.device &&
+									<MetroTextBlock class="mt-2">
+										{ reviewObj.device.platform == 'iphoneos' ?
+											(DeviceStrings[reviewObj.device.product] || this.$t('devices.unknown_product')) :
+											reviewObj.device.product
+										},
+										&nbsp;
+										{ Platforms.platforms[reviewObj.device.platform] ?
+											this.$t(`package_editor.info.platform.${reviewObj.device.platform}`) :
+											this.$t('devices.unknown_platform')
+										}
+										&nbsp;
+										{ reviewObj.device.version }
+									</MetroTextBlock>
+									}
+								</MetroStackPanel>
+								<MetroRatingControl value={reviewObj.rating.value} />
+							</MetroStackPanel>
+						</div>
+						
+						<MetroMessages messages={messages} disabled={!this._isParticipatingReview(reviewObj)} onMessageSent={(text) => this.addMessage(reviewObj, text)} />
+					</div>
+				)
+			});
+			
+			if (await dialog.showAsync() == metroUI.ContentDialogResult.None) {
+				if (this.$route.params.reviewId) {
+					this.$router.replace(`/${this.$route.path.split("/")[1]}`);
+				}
+			}
+		},
+		async reviewDeleteButtonClicked(reviewObj) {
 			let deleteDialog = new metroUI.ContentDialog({
 				title: this.$t('reviews.delete_review_confirm_title'),
 				content: this.$t('reviews.delete_review_confirm_body'),
@@ -91,14 +171,11 @@ export default {
 			});
 			
 			if (await deleteDialog.showAsync() === metroUI.ContentDialogResult.Primary) {
-				let reviewObj = this.reviewData.find(reviewObj => reviewObj.id === reviewId);
-				let packageObj = this.packageData.find(packageObj => packageObj.id === reviewObj.packageId);
-				
 				let result = await PackageAPI.deletePackageReview({
-					"package.id": packageObj.id,
+					"package.id": reviewObj.packageId,
 					"review.id": reviewObj.id
 				});
-
+				
 				if (result.error) {
 					new metroUI.ContentDialog({
 						title: this.$t('app.operational_error_title'),
@@ -110,8 +187,7 @@ export default {
 				}
 			}
 		},
-		async addMessage(text) {
-			let reviewObj = this.reviewData.find(reviewObj => reviewObj.id === this.selectedThread);
+		async addMessage(reviewObj, text) {
 			let packageObj = this.packageData.find(packageObj => packageObj.id === reviewObj.packageId);
 			
 			let result = await PackageAPI.addPackageReviewMessage({
@@ -128,76 +204,38 @@ export default {
 					commands: [{ text: this.$t('app.ok'), primary: true }]
 				}).show();
 			} else {
-				this.refresh();
-			}
-		},
-		
-		getPackageInfo(packageId) {
-			return this.packageData.find(packageObj => packageObj.id == packageId);
-		},
-		getReviewLastMessage(reviewObj) {
-			return reviewObj.messages[reviewObj.messages.length - 1].text;
-		},
-		async threadSelected(threadId) {
-			let thread = this.reviewData.find(reviewObj => reviewObj.id === threadId);
-			if (!thread) {
-				this.selectedThread = null;
-				this.$refs["list-view"].setHeader("");
-				return;
-			}
-			
-			// thread.messages.find(messageObj => messageObj.
-			let packageOwnerAccountData = await AccountAPI.getUser({
-				"account.id": this.packageData.find(packageObj => packageObj.id === thread.packageId).accountId
-			});
-			let reviewerAccountData = await AccountAPI.getUser({
-				"account.id": thread.accountId
-			});
-			
-			this.selectedThread = threadId;
-			let messages = thread.messages.map(messageObj => {
-				return {
+				await this.refresh();
+				
+				let packageOwnerAccountData = await AccountAPI.getUser({
+					"account.id": this.packageData.find(packageObj => packageObj.id === reviewObj.packageId).accountId
+				});
+				let reviewerAccountData = await AccountAPI.getUser({
+					"account.id": reviewObj.accountId
+				});
+				
+				let messages = this.reviewData.find(_ => _.id === reviewObj.id).messages.map(messageObj => ({
 					author: messageObj.accountId,
 					displayName: [packageOwnerAccountData, reviewerAccountData].find(accountObj => accountObj.id === messageObj.accountId).username,
 					date: new Date(messageObj.createdAt),
 					text: messageObj.text,
 					type: messageObj.accountId === this.accountId ? "sent" : "received"
-				}
-			});
-			
-			this.$refs["list-view"].setHeader(thread.title);
-			if (this.$refs["messages"]) {
-				this.$refs["messages"].setMessages(messages);
+				}));
+				
+				document.querySelector(".messages").__vue__.setMessages(messages);
 			}
+		},
+		
+		_getPackageInfo(packageId) {
+			return this.packageData.find(packageObj => packageObj.id == packageId);
+		},
+		_isParticipatingReview(reviewObj) {
+			return [this._getPackageInfo(reviewObj.packageId).accountId, reviewObj.accountId].indexOf(this.accountId) >= 0;
 		}
 	},
 	computed: {
-		sortedReviews() {
-			return this.reviewData.sort((a, b) => new Date(b.messages.lastObject().createdAt).getTime() - new Date(a.messages.lastObject().createdAt).getTime());
-		},
-		
 		accountId() {
 			return this.$store.state.accountId;
 		},
-		isDeveloper() {
-			return this.$store.state.role & UserRole.DEVELOPER == UserRole.DEVELOPER;
-		},
-		isModerator() {
-			return this.$store.state.role & UserRole.MODERATOR == UserRole.MODERATOR;
-		},
-		isAdministrator() {
-			return this.$store.state.role & UserRole.ADMINISTRATOR == UserRole.ADMINISTRATOR;
-		},
-		isOwnedReview() {
-			if (!this.selectedThread) return false;
-			
-			let review = this.reviewData.find(reviewObj => reviewObj.id === this.selectedThread);
-			if (review.accountId == this.accountId) return true;
-			if (this.getPackageInfo(review.packageId).accountId == this.accountId) return true;
-			if (this.isModerator || this.isAdministrator) return true;
-			
-			return false;
-		}
 	},
 	filters: {
 		date(value) {
@@ -212,35 +250,141 @@ export default {
 
 <style lang="less">
 .page[data-page-id="reviews"] {
-	& > .page-content {
-		height: 100%;
-		padding: 0 !important
-	}
-	
-	.list-view .list-view-item {
-		height: 76px;
-		
-		.list-view-item-content {
-			max-width: 100%;
-			margin-left: 0;
-			margin-right: 0;
-			padding-right: 16px;
-			max-height: 76px !important;
+	.grid-view {
+		.grid-view-item {
+			align-self: initial;
+			background-color: var(--list-low);
 			
-			span {
+			&::before {
+				content: '';
 				display: block;
-				line-height: 22px;
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
+				padding-top: 100%;
+			}
+			
+			@media all and (max-width: 640px) {
+				width: 100%;
+				margin-right: 0;
 				
-				&.text-label {
-					font-weight: 600;
+				&::before {
+					content: '';
+					display: block;
+					padding-top: 75%;
+				}
+			}
+			
+			@media all and (min-width: 641px) and (max-width:1007px) {
+				width: calc(~"(100% - (3 * 4px)) / 4");
+				
+				&:nth-child(4n) {
+					margin-right: 0;
+				}
+			}
+			
+			@media all and (min-width: 1008px) and (max-width: 1365px) {
+				width: calc(~"(100% - (3 * 4px)) / 4");
+				
+				&:nth-child(4n) {
+					margin-right: 0;
+				}
+			}
+			
+			@media all and (min-width: 1366px) and (max-width: 1919px) {
+				width: calc(~"(100% - (5 * 4px)) / 6");
+				
+				&:nth-child(6n) {
+					margin-right: 0;
+				}
+			}
+			
+			@media all and (min-width: 1920px) {
+				width: calc(~"(100% - (7 * 4px)) / 8");
+				
+				&:nth-child(8n) {
+					margin-right: 0;
+				}
+			}
+			
+			.review-container {
+				position: absolute;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				
+				.review-description-container {
+					display: flex;
+					flex-direction: column;
+					flex: 1 0 auto;
+					flex-basis: 0;
+					overflow: hidden;
+					padding: 8px;
+					text-align: center;
+					
+					.rating-control {
+						pointer-events: none;
+					}
+					
+					& > .stack-panel {
+						flex: 1;
+						justify-content: space-between;
+					}
 				}
 				
-				&.detail-text-label {
-					color: var(--base-medium);
+				.review-toolbar {
+					padding: 0 2px 2px;
 				}
+			}
+		}		
+	}
+}
+
+.review-content-dialog {
+	max-width: initial;
+	box-shadow: 0 0 0 1px var(--base-low);
+	
+	.content-dialog-content {
+		position: relative;
+		overflow-x: visible;
+		
+		& > .review-viewer {
+			margin: -18px -24px;
+			width: 100vw;
+			height: 100vh;
+			max-width: 640px;
+			max-height: 800px;
+			display: flex;
+			flex-direction: column;
+			
+			.review-viewer-chrome {
+				& > .text-block {
+					line-height: 32px;
+					padding: 0 8px;
+				}
+				
+				& > button {
+					&:not(:hover):not(:active) {
+						background-color: transparent;
+					}
+					&:hover:not(:active) {
+						box-shadow: none;
+					}
+				}
+			}
+			
+			.review-viewer-header {
+				padding: 12px;
+			}
+			
+			.rating-control {
+				pointer-events: none;
+				height: 22px;
+			}
+			
+			.messages {
+				flex: 1;
+				min-height: 0;
 			}
 		}
 	}

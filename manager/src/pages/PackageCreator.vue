@@ -58,19 +58,17 @@ import { PackageAPI } from "@/scripts/ApiUtil"
 
 export default {
 	name: "PackageCreator",
-	data() {
-		return {
-			packageData: {
-				name: "",
-				identifier: ""
-			},
-			isWorking: {
-				packageName: false,
-				packageIdentifier: false,
-				createPackage: false
-			}
+	data: () => ({
+		packageData: {
+			name: "",
+			identifier: ""
+		},
+		isWorking: {
+			packageName: false,
+			packageIdentifier: false,
+			createPackage: false
 		}
-	},
+	}),
 	beforeRouteEnter: async (to, from, next) => {
 		next(vm => {
 			vm.$parent.setHeader(vm.$t('package_creator.title'));

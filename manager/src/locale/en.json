@@ -117,6 +117,7 @@
 	},
 	
 	"reviews": {
+		"last_updated": "Last updated",
 		"messages_placeholder": "Type a message",
 		
 		"delete_review_confirm_title": "Delete this review?",

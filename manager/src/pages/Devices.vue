@@ -27,8 +27,8 @@
 						</div>
 						
 						<MetroStackPanel orientation="horizontal" class="device-toolbar">
-							<MetroAppBarButton icon="edit" :label="$t('app.actions.edit')" @click="deviceEditButtonClicked(deviceObj)" />
 							<MetroAppBarButton icon="delete" :label="$t('app.actions.delete')" @click="deviceDeleteButtonClicked(deviceObj)" />
+							<MetroAppBarButton icon="edit" :label="$t('app.actions.edit')" @click="deviceEditButtonClicked(deviceObj)" />
 						</MetroStackPanel>
 					</div>
 				</div>
@@ -339,10 +339,13 @@ export default {
 			}
 			
 			@media all and (max-width: 640px) {
-				width: calc(~"(100% - (1 * 4px)) / 2");
+				width: 100%;
+				margin-right: 0;
 				
-				&:nth-child(2n) {
-					margin-right: 0;
+				&::before {
+					content: '';
+					display: block;
+					padding-top: 75%;
 				}
 			}
 			
@@ -354,7 +357,15 @@ export default {
 				}
 			}
 			
-			@media all and (min-width: 1008px) {
+			@media all and (min-width: 1008px) and (max-width: 1365px) {
+				width: calc(~"(100% - (3 * 4px)) / 4");
+				
+				&:nth-child(4n) {
+					margin-right: 0;
+				}
+			}
+			
+			@media all and (min-width: 1366px) and (max-width: 1919px) {
 				width: calc(~"(100% - (5 * 4px)) / 6");
 				
 				&:nth-child(6n) {
@@ -362,10 +373,10 @@ export default {
 				}
 			}
 			
-			@media all and (min-width: 1366px) {
+			@media all and (min-width: 1920px) {
 				width: calc(~"(100% - (7 * 4px)) / 8");
 				
-				&:nth-child(10n) {
+				&:nth-child(8n) {
 					margin-right: 0;
 				}
 			}
