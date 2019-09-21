@@ -39,7 +39,7 @@ router.get("/", async (req, res) => {
 		where: Object.assign((req.query.request || {}).filter(["id", "type"]), {
 			status: { [Sequelize.Op.ne]: LogItemStatus.LOG_USAGE }
 		}),
-		raw: true
+		order: [["createdAt", "DESC"]]
 	});
 	
 	if (account.role < UserRole.DEVELOPER) {

@@ -60,7 +60,9 @@ router.get("/", async (req, res) => {
 				}
 			)
 		}).then(versionList => {
-			packageObj.dataValues.downloadCount = versionList.map(_ => _.downloadCount).reduce((a, b) => a + b);
+			if (versionList) {
+				packageObj.dataValues.downloadCount = versionList.map(_ => _.downloadCount).reduce((a, b) => a + b);
+			}
 		}).catch(error => ErrorHandler(req, res, error));
 	});
 

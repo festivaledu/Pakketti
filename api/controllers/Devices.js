@@ -26,7 +26,6 @@ router.get("/", async (req, res) => {
 		where: {
 			accountId: account.id
 		},
-		raw: true
 	});
 	
 	return res.status(httpStatus.OK).send(deviceList);
@@ -105,7 +104,6 @@ router.get("/:deviceId", async (req, res) => {
 			},
 			accountId: account.id
 		},
-		raw: true
 	});
 	
 	if (!deviceObj) return res.status(httpStatus.NOT_FOUND).send({
@@ -148,7 +146,6 @@ router.put("/:deviceId", async (req, res) => {
 			},
 			accountId: account.id
 		},
-		raw: true
 	});
 	
 	if (!deviceObj) return res.status(httpStatus.NOT_FOUND).send({

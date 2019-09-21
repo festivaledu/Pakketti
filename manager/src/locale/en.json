@@ -10,6 +10,7 @@
 		
 		"actions": {
 			"add": "Add",
+			"close": "Close",
 			"edit": "Edit",
 			"delete": "Delete",
 			"dont_save": "Don't save",
@@ -114,91 +115,6 @@
 		
 		"delete_package_confirm_title": "Delete \"%{name}\"?",
 		"delete_package_confirm_body": "<p>Are you sure you want to delete \"%{name}\"?<br>This action cannot be undone.<br><br>Associated Reviews will also be deleted.</p>"
-	},
-	
-	"reviews": {
-		"last_updated": "Last updated",
-		"messages_placeholder": "Type a message",
-		
-		"delete_review_confirm_title": "Delete this review?",
-		"delete_review_confirm_body": "<p>Are you sure you want to delete this review?<br>This action cannot be undone.</p>"
-	},
-	
-	"devices": {
-		"unnamed_device": "Unnamed device",
-		"unknown_product": "Unknown type",
-		"unknown_platform": "Unknown platform",
-		
-		"add_device": "Add Device",
-		"add_device_iphoneos": "Add iOS Device",
-		"edit_device": {
-			"add_title": "Add Device",
-			"edit_title": "Edit Device",
-			"device_name_header": "Device name",
-			"product_header": "Product Identifier / Model Number",
-			"product_placeholder": "eg. iPhone8,1",
-			"os_header": "OS Version",
-			"os_placeholder": "eg. 12.2",
-			"udid_header": "UDID / Serial Number",
-			"variant_header": "Variant",
-			"variant_placeholder": "Select a variant",
-			"capacity_header": "Capacity (GB)",
-			
-			"required": "Required",
-			"optional": "Optional"
-		},
-		
-		"delete_device_confirm_title": "Delete \"%{name}\"?",
-		"delete_device_confirm_body": "<p>Are you sure you want to delete \"%{name}\"?<br>This action cannot be undone.<br><br>Associated Reviews will also be deleted.</p>"
-	},
-	
-	"requests": {
-		"type": {
-			"title": "Request Type",
-			"33": "Refund",
-			"34": "User Report",
-			"35": "Application – Developer",
-			"36": "Application – Moderator",
-			"37": "Role Downgrade",
-			"38": "Deletion Request"
-		},
-		"status": {
-			"title": "Status",
-			"-1": "Not reviewed",
-			"0": "Accepted",
-			"1": "Rejected"
-		},
-		"no_items": "No Requests to display",
-		"review_request": "Review Request",
-		"detail_text_header": "Description",
-		"status_text_header": "Status Description",
-		"creator": "Creator",
-		"affected": {
-			"account": "Affected Account",
-			"package": "Affected Package",
-			"review": "Affected Review",
-			"na": "Not available"
-		},
-		
-		"delete_request_confirm_title": "Delete this request?",
-		"delete_request_confirm_body": "<p>Are you sure you want to delete this request?<br>This action cannot be undone.</p>",
-		
-		"role_application": {
-			"title_developer": "Request Developer Role",
-			"title_moderator": "Request Moderator Role",
-			"reason_header": "Tell us why you'd like to apply:",
-			"developer_notice": "When applying as a Developer, you must include a public Git-based repository containing a package and its source code. Failing to include this information will get your application rejected."
-		},
-		"role_downgrade": {
-			"title": "Downgrade Role",
-			"reason_header": "Tell us why you'd like to downgrade your role:",
-			"developer_notice": "If you are a developer and have published packages, those will remain available to download, but you'll not be able to manage them until you reapply as a Developer."
-		},
-		"account_deletion": {
-			"title": "Delete Account",
-			"reason_header": "Tell us why you'd like to delete your account:",
-			"disclaimer": "If your account is deleted, all your Packages, Reviews, linked Devices etc. will also be deleted. Be advised that this action cannot be undone."
-		}
 	},
 	
 	"package_creator": {
@@ -315,6 +231,122 @@
 			},
 			"release_notes": "Release Notes"
 		}
+	},
+	
+	"devices": {
+		"unnamed_device": "Unnamed device",
+		"unknown_product": "Unknown type",
+		"unknown_platform": "Unknown platform",
+		
+		"add_device": "Add Device",
+		"add_device_iphoneos": "Add iOS Device",
+		"edit_device": {
+			"add_title": "Add Device",
+			"edit_title": "Edit Device",
+			"device_name_header": "Device name",
+			"product_header": "Product Identifier / Model Number",
+			"product_placeholder": "eg. iPhone8,1",
+			"os_header": "OS Version",
+			"os_placeholder": "eg. 12.2",
+			"udid_header": "UDID / Serial Number",
+			"variant_header": "Variant",
+			"variant_placeholder": "Select a variant",
+			"capacity_header": "Capacity (GB)",
+			
+			"required": "Required",
+			"optional": "Optional"
+		},
+		
+		"delete_device_confirm_title": "Delete \"%{name}\"?",
+		"delete_device_confirm_body": "<p>Are you sure you want to delete \"%{name}\"?<br>This action cannot be undone.<br><br>Associated Reviews will also be deleted.</p>"
+	},
+	
+	"reviews": {
+		"last_updated": "Last updated",
+		"messages_placeholder": "Type a message",
+		
+		"delete_review_confirm_title": "Delete this review?",
+		"delete_review_confirm_body": "<p>Are you sure you want to delete this review?<br>This action cannot be undone.</p>"
+	},
+	
+	"requests": {
+		"type": {
+			"title": "Request Type",
+			"33": "Refund",
+			"34": "User Report",
+			"35": "Application – Developer",
+			"36": "Application – Moderator",
+			"37": "Role Downgrade",
+			"38": "Deletion Request"
+		},
+		"status": {
+			"title": "Status",
+			"-1": "Not reviewed",
+			"0": "Accepted",
+			"1": "Rejected"
+		},
+		"no_items": "No Requests to display",
+		"review_request": "Review Request",
+		"detail_text_header": "Description",
+		"status_text_header": "Status Description",
+		"creator": "Creator",
+		"affected": {
+			"account": "Affected Account",
+			"package": "Affected Package",
+			"review": "Affected Review",
+			"na": "Not available"
+		},
+		
+		"delete_request_confirm_title": "Delete this request?",
+		"delete_request_confirm_body": "<p>Are you sure you want to delete this request?<br>This action cannot be undone.</p>",
+		
+		"role_application": {
+			"title_developer": "Request Developer Role",
+			"title_moderator": "Request Moderator Role",
+			"reason_header": "Tell us why you'd like to apply:",
+			"developer_notice": "When applying as a Developer, you must include a public Git-based repository containing a package and its source code. Failing to include this information will get your application rejected."
+		},
+		"role_downgrade": {
+			"title": "Downgrade Role",
+			"reason_header": "Tell us why you'd like to downgrade your role:",
+			"developer_notice": "If you are a developer and have published packages, those will remain available to download, but you'll not be able to manage them until you reapply as a Developer."
+		},
+		"account_deletion": {
+			"title": "Delete Account",
+			"reason_header": "Tell us why you'd like to delete your account:",
+			"disclaimer": "If your account is deleted, all your Packages, Reviews, linked Devices etc. will also be deleted. Be advised that this action cannot be undone."
+		}
+	},
+	
+	"moderation_log": {
+		"type": {
+			"title": "Log Item Type",
+			"1": "API Startup",
+			"2": "User Registration",
+			"3": "User Login",
+			"4": "User edited",
+			"5": "User role downgraded",
+			"6": "User deleted",
+			"7": "Package created",
+			"8": "Package edited",
+			"9": "Package deleted",
+			"10": "Package version created",
+			"11": "Package version edited",
+			"12": "Package version deleted",
+			"13": "Package version downloaded",
+			"14": "Review created",
+			"15": "Review edited",
+			"16": "Review deleted",
+			"17": "Review message added",
+			"18": "Review message edited",
+			"19": "Review message deleted",
+			"20": "Device created",
+			"21": "Device linked",
+			"22": "Device updated",
+			"23": "Device deleted"
+		},
+		
+		"view_log_item": "View log item"
 	},
 	
 	"profile": {

@@ -5,7 +5,7 @@
 			
 			<div class="container">
 				<div class="row justify-content-around">
-					<div class="col-md-4">
+					<div class="col col-12 col-md-6 col-xl-4">
 						<nav class="mb-5">
 							<div class="nav-logo pb-0">
 								<div class="nav-link">

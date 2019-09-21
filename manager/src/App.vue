@@ -39,8 +39,8 @@
 							</template>
 						</MetroNavigationViewItem>
 					</router-link>
-					<router-link tag="div" to="/log" v-if="isModerator || isAdministrator">
-						<MetroNavigationViewItem :content="$t('root.item_moderation_log')" page-id="logs" :disabled="true">
+					<router-link tag="div" to="/logs" v-if="isModerator || isAdministrator">
+						<MetroNavigationViewItem :content="$t('root.item_moderation_log')" page-id="logs">
 							<template slot="icon">
 								<MetroSymbolIcon icon="clipboard-list" />
 							</template>

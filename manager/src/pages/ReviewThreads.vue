@@ -152,7 +152,7 @@ export default {
 							</MetroStackPanel>
 						</div>
 						
-						<MetroMessages messages={messages} disabled={!this._isParticipatingReview(reviewObj)} onMessageSent={(text) => this.addMessage(reviewObj, text)} />
+						<MetroMessages placeholder-text={this.$t('reviews.messages_placeholder')} messages={messages} disabled={!this._isParticipatingReview(reviewObj)} onMessageSent={(text) => this.addMessage(reviewObj, text)} />
 					</div>
 				)
 			});

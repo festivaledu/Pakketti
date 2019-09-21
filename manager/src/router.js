@@ -51,6 +51,11 @@ const router = new Router({
 			name: 'requests',
 			component: () => import(/* webpackChunkName: "Requests" */ './pages/Requests.vue')
 		},
+		{
+			path: '/logs',
+			name: 'logs',
+			component: () => import(/* webpackChunkName: "ModerationLog" */ './pages/ModerationLog.vue')
+		},
 		
 		{
 			path: '/profile',

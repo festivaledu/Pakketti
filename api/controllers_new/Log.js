@@ -39,7 +39,7 @@ router.get("/", async (req, res) => {
 		where: Object.assign((req.query.logitem || {}).filter(["id", "type"]), {
 			status: LogItemStatus.LOG_USAGE
 		}),
-		raw: true
+		order: [["createdAt", "DESC"]]
 	});
 	
 	return res.status(httpStatus.OK).send(logItemList);

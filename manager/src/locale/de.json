@@ -10,6 +10,7 @@
 		
 		"actions": {
 			"add": "Hinzufügen",
+			"close": "Schließen",
 			"edit": "Bearbeiten",
 			"delete": "Löschen",
 			"dont_save": "Nicht speichern",
@@ -114,92 +115,6 @@
 		
 		"delete_package_confirm_title": "„%{name}“ löschen?",
 			"delete_package_confirm_body": "<p>Möchtest du „%{name}“ wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.<br><br>Zugehörige Rezensionen werden dadurch ebenfalls gelöscht.</p>"
-	},
-	
-	"reviews": {
-		"last_updated": "Zuletzt aktualisiert",
-		
-		"messages_placeholder": "Eine Nachricht eingeben",
-		
-		"delete_review_confirm_title": "Diese Rezension löschen?",
-		"delete_review_confirm_body": "<p>Möchtest du diese Rezension wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>"
-	},
-	
-	"devices": {
-		"unnamed_device": "Unbenanntes Gerät",
-		"unknown_product": "Unbekanntes Modell",
-		"unknown_platform": "Unbekannte Plattform",
-		
-		"add_device": "Gerät hinzufügen",
-		"add_device_iphoneos": "iOS-Gerät hinzufügen",
-		"edit_device": {
-			"add_title": "Gerät hinzufügen",
-			"edit_title": "Gerät bearbeiten",
-			"device_name_header": "Geräte-Name",
-			"product_header": "Produkt-ID / Modellnummer",
-			"product_placeholder": "z.B. iPhone8,1",
-			"os_header": "Betriebssystemversion",
-			"os_placeholder": "z.B. 12.2",
-			"udid_header": "UDID / Seriennummer",
-			"variant_header": "Variante",
-			"variant_placeholder": "Variante auswählen",
-			"capacity_header": "Kapazität (GB)",
-			
-			"required": "Erforderlich",
-			"optional": "Optional"
-		},
-		
-		"delete_device_confirm_title": "„%{name}“ löschen?",
-		"delete_device_confirm_body": "<p>Möchtest du „%{name}“ wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.<br><br>Zugehörige Rezensionen werden dadurch ebenfalls gelöscht.</p>"
-	},
-	
-	"requests": {
-		"type": {
-			"title": "Anfrage-Typ",
-			"33": "Rückerstattung",
-			"34": "Benutzer-Meldung",
-			"35": "Bewerbung – Entwickler",
-			"36": "Bewerbung – Moderator",
-			"37": "Rollenherabstufung",
-			"38": "Lösch-Anfrage"
-		},
-		"status": {
-			"title": "Status",
-			"-1": "Nicht überprüft",
-			"0": "Akzeptiert",
-			"1": "Abgelehnt"
-		},
-		"no_items": "Es gibt keine Anfragen, die angezeigt werden können",
-		"review_request": "Anfrage überprüfen",
-		"detail_text_header": "Beschreibung",
-		"status_text_header": "Status-Beschreibung",
-		"creator": "Ersteller",
-		"affected": {
-			"account": "Betroffener Account",
-			"package": "Betroffenes Paket",
-			"review": "Betroffene Bewertung",
-			"na": "Nicht verfügbar"
-		},
-		
-		"delete_request_confirm_title": "Diese Anfrage löschen?",
-		"delete_request_confirm_body": "<p>Möchtest du diese Anfrage wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>",
-		
-		"role_application": {
-			"title_developer": "Als Entwickler bewerben",
-			"title_moderator": "Als Moderator bewerben",
-			"reason_header": "Sag uns, warum du dich bewerben möchtest:",
-			"developer_notice": "Wenn du dich als Entwickler bewirbst, musst du eine öffentliche, Git-basierte Repo angeben, die ein Paket und den dazu gehörigen Quellcode enthält. Wenn du diese Infos nicht bereitstellst, wird deine Bewerbung wahrscheinlich abgelehnt."
-		},
-		"role_downgrade": {
-			"title": "Rolle herabstufen",
-			"reason_header": "Sag uns, warum du deine Rolle herabstufen möchtest:",
-			"developer_notice": "Wenn du als Entwickler veröffentlichte Pakete hast, werden diese weiterhin zum Download zur Verfügung stehen. Du wirst diese allerdings nicht mehr verwalten können, bis du dich wieder als Entwickler bewirbst."
-		},
-		"account_deletion": {
-			"title": "Account löschen",
-			"reason_header": "Sag uns, warum du deinen Account löschen möchtest:",
-			"disclaimer": "Wenn dein Account gelöscht wird, werden all deine Pakete, Rezensionen, verbundenen Geräte etc. ebenfalls gelöscht. Sei also gewarnt, dass diese Aktion nicht rückgängig gemacht werden kann."
-		}
 	},
 	
 	"package_creator": {
@@ -316,6 +231,122 @@
 			},
 			"release_notes": "Versionshinweise"
 		}
+	},
+	
+	"devices": {
+		"unnamed_device": "Unbenanntes Gerät",
+		"unknown_product": "Unbekanntes Modell",
+		"unknown_platform": "Unbekannte Plattform",
+		
+		"add_device": "Gerät hinzufügen",
+		"add_device_iphoneos": "iOS-Gerät hinzufügen",
+		"edit_device": {
+			"add_title": "Gerät hinzufügen",
+			"edit_title": "Gerät bearbeiten",
+			"device_name_header": "Geräte-Name",
+			"product_header": "Produkt-ID / Modellnummer",
+			"product_placeholder": "z.B. iPhone8,1",
+			"os_header": "Betriebssystemversion",
+			"os_placeholder": "z.B. 12.2",
+			"udid_header": "UDID / Seriennummer",
+			"variant_header": "Variante",
+			"variant_placeholder": "Variante auswählen",
+			"capacity_header": "Kapazität (GB)",
+			
+			"required": "Erforderlich",
+			"optional": "Optional"
+		},
+		
+		"delete_device_confirm_title": "„%{name}“ löschen?",
+		"delete_device_confirm_body": "<p>Möchtest du „%{name}“ wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.<br><br>Zugehörige Rezensionen werden dadurch ebenfalls gelöscht.</p>"
+	},
+	
+	"reviews": {
+		"last_updated": "Zuletzt aktualisiert",
+		"messages_placeholder": "Eine Nachricht eingeben",
+		
+		"delete_review_confirm_title": "Diese Rezension löschen?",
+		"delete_review_confirm_body": "<p>Möchtest du diese Rezension wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>"
+	},
+	
+	"requests": {
+		"type": {
+			"title": "Anfrage-Typ",
+			"33": "Rückerstattung",
+			"34": "Benutzer-Meldung",
+			"35": "Bewerbung – Entwickler",
+			"36": "Bewerbung – Moderator",
+			"37": "Rollenherabstufung",
+			"38": "Lösch-Anfrage"
+		},
+		"status": {
+			"title": "Status",
+			"-1": "Nicht überprüft",
+			"0": "Akzeptiert",
+			"1": "Abgelehnt"
+		},
+		"no_items": "Es gibt keine Anfragen, die angezeigt werden können",
+		"review_request": "Anfrage überprüfen",
+		"detail_text_header": "Beschreibung",
+		"status_text_header": "Status-Beschreibung",
+		"creator": "Ersteller",
+		"affected": {
+			"account": "Betroffener Account",
+			"package": "Betroffenes Paket",
+			"review": "Betroffene Bewertung",
+			"na": "Nicht verfügbar"
+		},
+		
+		"delete_request_confirm_title": "Diese Anfrage löschen?",
+		"delete_request_confirm_body": "<p>Möchtest du diese Anfrage wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>",
+		
+		"role_application": {
+			"title_developer": "Als Entwickler bewerben",
+			"title_moderator": "Als Moderator bewerben",
+			"reason_header": "Sag uns, warum du dich bewerben möchtest:",
+			"developer_notice": "Wenn du dich als Entwickler bewirbst, musst du eine öffentliche, Git-basierte Repo angeben, die ein Paket und den dazu gehörigen Quellcode enthält. Wenn du diese Infos nicht bereitstellst, wird deine Bewerbung wahrscheinlich abgelehnt."
+		},
+		"role_downgrade": {
+			"title": "Rolle herabstufen",
+			"reason_header": "Sag uns, warum du deine Rolle herabstufen möchtest:",
+			"developer_notice": "Wenn du als Entwickler veröffentlichte Pakete hast, werden diese weiterhin zum Download zur Verfügung stehen. Du wirst diese allerdings nicht mehr verwalten können, bis du dich wieder als Entwickler bewirbst."
+		},
+		"account_deletion": {
+			"title": "Account löschen",
+			"reason_header": "Sag uns, warum du deinen Account löschen möchtest:",
+			"disclaimer": "Wenn dein Account gelöscht wird, werden all deine Pakete, Rezensionen, verbundenen Geräte etc. ebenfalls gelöscht. Sei also gewarnt, dass diese Aktion nicht rückgängig gemacht werden kann."
+		}
+	},
+	
+	"moderation_log": {
+		"type": {
+			"title": "Log-Typ",
+			"1": "API-Start",
+			"2": "Benutzer registriert",
+			"3": "Benutzer angemeldet",
+			"4": "Benutzer bearbeitet",
+			"5": "Benutzer herabgestuft",
+			"6": "Benutzer gelöscht",
+			"7": "Paket erstellt",
+			"8": "Paket bearbeitet",
+			"9": "Paket gelöscht",
+			"10": "Paket-Version erstellt",
+			"11": "Paket-Version bearbeitet",
+			"12": "Paket-Version gelöscht",
+			"13": "Paket-Version heruntergeladen",
+			"14": "Rezension erstellt",
+			"15": "Rezension bearbeitet",
+			"16": "Rezension gelöscht",
+			"17": "Rezension: Nachricht hinzugefügt",
+			"18": "Rezension: Nachricht bearbeitet",
+			"19": "Rezension: Nachricht gelöscht",
+			"20": "Gerät erstellt",
+			"21": "Gerät verknüpft",
+			"22": "Gerät aktualisiert",
+			"23": "Gerät gelöscht"
+		},
+		
+		"view_log_item": "Log-Objekt ansehen"
 	},
 	
 	"profile": {
