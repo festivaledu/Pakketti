@@ -5,6 +5,7 @@ import minify from 'rollup-plugin-babel-minify';
 
 export default {
 	input: 'src/index.js',
+	sourceMap: false,
 	output: {
 		name: 'metroUI-vue',
 		exports: 'named',
@@ -13,16 +14,18 @@ export default {
 		lessModules({
 			output: "dist/metroui-vue.css",
 			options: {
-				javascriptEnabled: true
+				javascriptEnabled: true,
 			},
-			minify: true,
-			sourcemap: false
+			sourcemap: false,
+			minify: true
 		}),
 		commonjs(),
 		vue({
 			css: true,
 			compileTemplate: true,
 		}),
-		minify()
+		minify({
+			comments: false
+		})
 	],
 };
