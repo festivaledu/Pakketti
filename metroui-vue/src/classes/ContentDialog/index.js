@@ -31,6 +31,8 @@ class ContentDialog {
 		const dialog = this;
 		
 		dialog.params = {
+			className: "",
+			style: {},
 			title: null,
 			content: null,
 			commands: []
@@ -41,7 +43,7 @@ class ContentDialog {
 		dialog.background.className = "content-dialog-background";
 		
 		dialog.container = document.createElement("div");
-		dialog.container.className = "content-dialog";
+		dialog.container.className = ["content-dialog"].concat(dialog.params.className.split(" ")).join(" ");
 		
 		let content = document.createElement("div");
 		content.className = "content-dialog-content";
@@ -99,6 +101,7 @@ class ContentDialog {
 						} else {
 							dialog._promiseResolve(ContentDialogResult.None);
 						}
+						dialog._promiseResolve = null;
 					}
 					
 					dialog.hide();
@@ -157,6 +160,11 @@ class ContentDialog {
 	
 	hide() {
 		const dialog = this;
+		
+		if (dialog._promiseResolve) {
+			dialog._promiseResolve(ContentDialogResult.None);
+			dialog._promiseResolve = null;
+		}
 		
 		window.removeEventListener("resize", dialog.eventListener, true);
 
