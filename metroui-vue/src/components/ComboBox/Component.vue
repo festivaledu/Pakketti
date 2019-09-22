@@ -8,8 +8,8 @@
 		</select>
 		
 		<div class="combo-box-content" @click="_openDropDown($event)" ref="content">
-			<MetroTextBlock v-if="placeholderText && !this.$data._value">{{ placeholderText }}</MetroTextBlock>
-			<MetroTextBlock v-if="this.$data._value">{{ items[this.$data._value] }}</MetroTextBlock>
+			<MetroTextBlock v-if="placeholderText && (!this.$data._value || !items[this.$data._value])">{{ placeholderText }}</MetroTextBlock>
+			<MetroTextBlock v-else>{{ items[this.$data._value] }}</MetroTextBlock>
 			
 			<div class="drop-down-glyph"></div>
 		</div>
