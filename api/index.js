@@ -194,6 +194,149 @@ if (!process.argv.includes("--no-storefront")) {
 }
 //#endregion
 
+//#region APT/Cydia endpoints
+const { Bzip2, Stream } = require("compressjs");
+
+const repoInfo = require('./config.json').repoInfo;
+const getPackages = async (platform) => {
+	let packageList = await db.models.Package.findAll({
+		where: {
+			platform: platform,
+			visible: true
+		},
+		include: [{
+			model: db.models.PackageVersion,
+			as: "versions",
+			where: { visible: true },
+			separate: true,
+			order: [["createdAt", "DESC"]]
+		}]
+	});
+	
+	let packages = packageList.map(async packageObj => {
+		let accountData = await db.models.Account.findOne({
+			where: { id: packageObj.accountId }
+		});
+		
+		let entries = packageObj.versions.map(versionObj => {
+			let keys = JSON.parse(JSON.stringify({
+				"Package": packageObj.identifier,
+				"Name": packageObj.name,
+				"Depiction": `${process.env.BASE_URL}/package/${packageObj.identifier}`,
+				"Description": packageObj.shortDescription,
+				"Version": versionObj.version,
+				"Author": `${accountData.username} <${accountData.email}>`,
+				"Maintainer": `${accountData.username} <${accountData.email}>`,
+				"Architecture": packageObj.architecture,
+				"Depends": Object.keys(versionObj.depends || {}).map(key => {
+					return key + (versionObj.depends[key] !== true ? ` (${versionObj.depends[key]})` : "")
+				}).join(", "),
+				"Conflicts": Object.keys(versionObj.conflicts || {}).map(key => {
+					return key + (versionObj.depends[key] !== true ? ` (${versionObj.depends[key]})` : "")
+				}).join(", "),
+				"Filename": versionObj.filename,
+				"MD5Sum": versionObj.md5Sum,
+				"SHA1": versionObj.sha1,
+				"SHA256": versionObj.sha256,
+				"Section": packageObj.section,
+				"Size": versionObj.size,
+				"Installed-Size": versionObj.installedSize
+			}));
+			
+			return Object.keys(keys).map(key => `${key}: ${keys[key]}`).join("\n");
+		});
+		
+		return entries.join("\n\n");
+	});
+	
+	return Promise.all(packages).then((packages) => {
+		return packages.join("\n\n");
+	});
+}
+
+httpServer.use(['/cydia/Release', '/cydia/./Release'], async (req, res) => {
+	res.header("Content-Type", "text/plain");
+	
+	let _repoInfo = Object.keys(Object.assign(repoInfo, {
+		"Architectures": "iphoneos-arm"
+	})).map(key => `${key}: ${repoInfo[key]}`).join("\n");
+	
+	return res.status(httpStatus.OK).send(_repoInfo);
+});
+
+httpServer.use(['/cydia/Packages', '/cydia/./Packages'], async (req, res) => {
+	res.setHeader("Content-Type", "text/plain");
+	res.removeHeader('Content-Encoding');
+	
+	let packageList = await getPackages("iphoneos");
+	return res.status(httpStatus.OK).send(packageList);
+});
+
+httpServer.use(['/cydia/Packages.bz2', '/cydia/./Packages.bz2'], async (req, res) => {
+	res.removeHeader('Content-Encoding');
+	
+	let packages = await getPackages("iphoneos");
+	let buffer = Buffer.from(packages, "utf8");
+	
+	let writable = new Stream();
+	writable.buffer = Buffer.alloc(buffer.length);
+	writable.pos = 0;
+	writable.flush = function() {
+		res.write(this.buffer, "binary");
+		res.end(null, "binary");
+		this.pos = 0;
+	}
+	writable.writeByte = function(_byte) {
+		if (this.pos >= this.buffer.length) this.flush();
+		this.buffer[this.pos++] = _byte;
+	}
+	writable.buffer.fill(0);
+	
+	let compressedData = await Bzip2.compressFile(buffer, writable);
+});
+
+httpServer.use(['/apt/Release', '/apt/./Release'], async (req, res) => {
+	res.header("Content-Type", "text/plain");
+	
+	let _repoInfo = Object.keys(Object.assign(repoInfo, {
+		"Architectures": "x86 x86_64 i386 amd64"
+	})).map(key => `${key}: ${repoInfo[key]}`).join("\n");
+	
+	return res.status(httpStatus.OK).send(_repoInfo);
+});
+
+httpServer.use(['/apt/Packages', '/apt/./Packages'], async (req, res) => {
+	res.setHeader("Content-Type", "text/plain");
+	res.removeHeader('Content-Encoding');
+	
+	let packageList = await getPackages("iphoneos");
+	return res.status(httpStatus.OK).send(packageList);
+});
+
+httpServer.use(['/apt/Packages.bz2', '/apt/./Packages.bz2'], async (req, res) => {
+	res.removeHeader('Content-Encoding');
+	
+	let packages = await getPackages("iphoneos");
+	let buffer = Buffer.from(packages, "utf8");
+	
+	let writable = new Stream();
+	writable.buffer = Buffer.alloc(buffer.length);
+	writable.pos = 0;
+	writable.flush = function() {
+		res.write(this.buffer, "binary");
+		res.end(null, "binary");
+		this.pos = 0;
+	}
+	writable.writeByte = function(_byte) {
+		if (this.pos >= this.buffer.length) this.flush();
+		this.buffer[this.pos++] = _byte;
+}
+	writable.buffer.fill(0);
+	
+	let compressedData = await Bzip2.compressFile(buffer, writable);
+});
+//#endregion
+
 httpServer.listen(process.env.SERVER_PORT, () => {
 	console.log(`\x1b[34m[INFO]\x1b[0m Server is up on port ${process.env.SERVER_PORT}`);
 });
