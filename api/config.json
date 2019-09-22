@@ -1,4 +1,4 @@
-module.exports = {
+{
 	"development": {
 		"storage": "database.sqlite3",
 		"dialect": "sqlite",
@@ -9,5 +9,13 @@ module.exports = {
 		"dialect": "mysql",
 		"operatorAliases": false,
 		"logging": false
+	},
+	"repoInfo": {
+		"Origin": "Team FESTIVAL",
+		"Label": "Team FESTIVAL",
+		"Version": "1.0",
+		"Codename": "pakketti",
+		"Components": "main",
+		"Description": "The Team FESTIVAL APT/Cydia repository"
 	}
 }

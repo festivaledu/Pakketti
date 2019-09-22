@@ -15,7 +15,7 @@ const Path = require('path');
 const Sequelize = require('sequelize');
 const models = require("./models");
 const env = process.env.NODE_ENV || 'development';
-const config = require('./config')[env];
+const config = require('./config.json')[env];
 const db = {};
 
 let sequelize;
@@ -49,7 +49,7 @@ db.Sequelize = Sequelize;
 
 //#region Database Seed
 db.sequelize.sync({
-	force: env === "development"
+	// force: env === "development"
 }).then(() => {
 	db.models.Account.findOrCreate({
 		where: {
@@ -75,6 +75,7 @@ db.sequelize.sync({
 });
 //#endregion
 
+//#region HTTP Server
 const httpServer = express();
 const controllers = require("./controllers");
 const url = require('url');
@@ -183,14 +184,15 @@ httpServer.use("/media/:category/:mediaId", (req, res, next) => {
 if (!process.argv.includes("--no-dashboard")) {
 	httpServer.use("/dashboard", serveStatic(Path.join(__dirname, "../manager/dist")));
 } else {
-	console.log("'--no-admin' is set, not serving /admin");
+	console.log("\x1b[33m[WARN]\x1b[0m  '--no-dashboard' is set, not serving Dashboard (/dashboard)");
 }
 
 if (!process.argv.includes("--no-storefront")) {
 	httpServer.use("/", serveStatic(Path.join(__dirname, "../storefront/dist")));
 } else {
-	console.log("'--no-client' is set, not serving /");
+	console.log("\x1b[33m[WARN]\x1b[0m '--no-storefront' is set, not serving Storefront (/)");
 }
+//#endregion
 
 httpServer.listen(process.env.SERVER_PORT, () => {
 	console.log(`\x1b[34m[INFO]\x1b[0m Server is up on port ${process.env.SERVER_PORT}`);
