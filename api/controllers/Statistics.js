@@ -5,7 +5,7 @@ const Sequelize = require("sequelize");
 const moment = require("moment");
 
 const ErrorHandler = require("../helpers/ErrorHandler");
-const { UserRole, LogItemType } = require("../helpers/Enumerations");
+const { UserRole, LogItemType, LogItemStatus } = require("../helpers/Enumerations");
 
 const keys = ["USER_REGISTRATION", "USER_LOGIN", "PACKAGE_CREATED", "VERSION_CREATED", "VERSION_DOWNLOADED", "REVIEW_CREATED"];
 

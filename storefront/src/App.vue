@@ -44,7 +44,7 @@
 						
 						<template slot="icon" v-if="accountData">
 							<MetroPersonPicture :display-name="accountData.username" v-if="!accountData.profileImageMime" />
-							<MetroPersonPicture :profile-picture="`http://localhost:3000/media/avatar/${accountData.id}`" v-if="accountData.profileImageMime" />
+							<MetroPersonPicture :profile-picture="`/media/avatar/${accountData.id}`" v-if="accountData.profileImageMime" />
 						</template>
 						<span v-if="accountData">{{ accountData.username }}</span>
 					</MetroNavigationViewItem>

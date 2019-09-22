@@ -22,12 +22,12 @@
 			<section class="package-header-section">
 				<div class="package-header">
 					<div class="hero-image-container" v-if="packageData.headerImageMime">
-						<div class="hero-image" :style="`background-image: url(http://localhost:3000/media/hero/${packageData.id})`" />
+						<div class="hero-image" :style="`background-image: url(/media/hero/${packageData.id})`" />
 					</div>
 					
 					<div class="package-header-content">
 						<div class="icon-container">
-							<img :src="`http://localhost:3000/media/icon/${packageData.id}`" v-if="packageData.iconMime" />
+							<img :src="`/media/icon/${packageData.id}`" v-if="packageData.iconMime" />
 							<MetroTextBlock class="contrast-text" style="position: relative; width: 32px; height: 32px" v-if="!packageData.iconMime">
 								<MetroFontIcon glyph="&#xE739;" font-size="32px" style="position: absolute" />
 								<MetroFontIcon glyph="&#xE894;" font-size="32px" style="position: absolute" />
@@ -105,7 +105,7 @@
 						
 						<div class="screenshot-wrapper">
 							<div class="screenshot-container" v-for="(screenshotObj, index) in packageData.screenshots" :key="index" @click="screenshotClicked(screenshotObj)">
-								<img :src="`http://localhost:3000/media/screenshot/${screenshotObj.id}`" />
+								<img :src="`/media/screenshot/${screenshotObj.id}`" />
 							</div>
 						</div>
 					</section>
@@ -353,7 +353,7 @@ export default {
 						<MetroFlipView initial-index={initialIndex}>
 							{this.packageData.screenshots.map((screenshotObj, index) => (
 								<MetroFlipViewItem>
-									<img src={`http://localhost:3000/media/screenshot/${screenshotObj.id}`} />
+									<img src={`/media/screenshot/${screenshotObj.id}`} />
 								</MetroFlipViewItem>
 							))}
 						</MetroFlipView>

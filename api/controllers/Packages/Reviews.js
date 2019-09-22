@@ -4,7 +4,9 @@ const httpStatus = require("http-status");
 const Sequelize = require("sequelize");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
-const { UserRole, LogItemType } = require("../../helpers/Enumerations");
+const { UserRole, LogItemType, LogItemStatus } = require("../../helpers/Enumerations");
+
+
 
 /**
  * GET /packages/reviews
@@ -13,204 +15,165 @@ const { UserRole, LogItemType } = require("../../helpers/Enumerations");
  */
 router.get("/reviews", async (req, res) => {
 	const { account } = req;
-
-	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
-	});
-
 	const { Package, PackageReview, PackageReviewMessage, PackageRating, Device } = req.models;
-
-	let packageReviewList = await PackageReview.findAll({
-		attributes: {
-			exclude: ["deviceId"]
-		},
-		order: [["createdAt", "DESC"]],
+	
+	let packageList = await Package.findAll({
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
+			req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+				visible: true
+			}
+		),
 		include: [{
-			model: PackageReviewMessage,
-			as: "messages",
-			separate: true,
-			order: [["createdAt", "ASC"]]
-		}, {
-			model: PackageRating,
-			as: "rating"
-		}, {
-			model: Device,
+			model: PackageReview,
+			as: "reviews",
+			where: (req.query.review || {}).filter(["id"]),
 			attributes: {
-				exclude: ["id", "udid", "variant", "capacity"]
+				exclude: ["deviceId"]
 			},
-			as: "device"
+			order: [["createdAt", "DESC"]],
+			include: [{
+				model: PackageReviewMessage,
+				as: "messages",
+				separate: true,
+				order: [["createdAt", "ASC"]]
+			}, {
+				model: PackageRating,
+				as: "rating"
+			}, {
+				model: Device,
+				as: "device",
+				attributes: {
+					exclude: ["id", "udid", "variant", "capacity"]
+				}
+			}]
 		}]
 	});
 	
-	// if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
-	// 	name: httpStatus[httpStatus.NOT_FOUND],
-	// 	code: httpStatus.NOT_FOUND,
-	// 	message: "Could not find any reviews"
-	// });
-
-	let packageReviewData = packageReviewList;
-
-	if (account.role < UserRole.DEVELOPER) {
-		packageReviewData = packageReviewList.filter(packageReviewObj => packageReviewObj.accountId == account.id);
-	} else if (account.role < UserRole.MODERATOR) {
-		let packageList = await Package.findAll({
-			where: {
-				accountId: account.id
-			}
-		});
-
-		packageReviewData = packageReviewList.filter(packageReviewObj => {
-			return packageReviewObj.accountId == account.id || packageList.map(packageObj => packageObj.id).includes(packageReviewObj.packageId);
-		});
-	}
-
-	// if (!packageReviewData || !packageReviewData.length) return res.status(httpStatus.NOT_FOUND).send({
-	// 	name: httpStatus[httpStatus.NOT_FOUND],
-	// 	code: httpStatus.NOT_FOUND,
-	// 	message: "Could not find any reviews"
-	// });
-
-	return res.status(httpStatus.OK).send(packageReviewData);
-});
-
-
-
-/**
- * GET /packages/:packageId/reviews
- * 
- * Gets a list of every Review associated to a specified Package
- */
-router.get("/:packageId/reviews", async (req, res) => {
-	const { Package, PackageReview, PackageReviewMessage, PackageRating, Device } = req.models;
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			},
-			visible: true
+	if (!packageList || !packageList.length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package"
 		}
 	});
 	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageReviewList = await PackageReview.findAll({
-		where: {
-			packageId: packageObj.id
-		},
-		attributes: {
-			exclude: ["deviceId"]
-		},
-		order: [["createdAt", "DESC"]],
-		include: [{
-			model: PackageReviewMessage,
-			as: "messages",
-			separate: true,
-			order: [["createdAt", "ASC"]]
-		}, {
-			model: PackageRating,
-			as: "rating"
-		}, {
-			model: Device,
-			attributes: {
-				exclude: ["id", "udid", "variant", "capacity"]
-			},
-			as: "device"
-		}]
-	});
-		
-	// if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
-	// 	name: httpStatus[httpStatus.NOT_FOUND],
-	// 	code: httpStatus.NOT_FOUND,
-	// 	message: `Package ${req.params.packageId} does not have any reviews`
-	// });
-
-	return res.status(httpStatus.OK).send(packageReviewList);
+	let packageReviewData = packageList.map(packageObj => packageObj.reviews).reduce((list, obj) => list.concat(obj), []);
+	
+	if (account) {
+		if (account.role < UserRole.DEVELOPER) {
+			packageReviewData = packageReviewData.filter(packageReviewObj => packageReviewObj.accountId == account.id);
+		} else if (account.role < UserRole.MODERATOR) {
+			let _packageList = packageList.filter(packageObj => packageObj.accountId == account.id);
+			
+			packageReviewData = packageReviewData.filter(packageReviewObj => {
+				return packageReviewObj.accountId == account.id || _packageList.map(packageObj => packageObj.id).includes(packageReviewObj.packageId);
+			});
+		}
+	}
+	
+	res.status(200).send(packageReviewData);
 });
 
 /**
- * POST /packages/:packageId/reviews/new
+ * POST /packages/reviews/new
  * 
  * Creates a new Review and associates it to a specified Package
  */
-router.post("/:packageId/reviews/new", async (req, res) => {
+router.post("/reviews/new", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
-	});
-
-	const { Package, PackageVersion, PackageReview, PackageReviewMessage, PackageRating, LogItem } = req.models;
-
-	const reviewData = req.body;
-
-	if (!reviewData.title || !reviewData.text || !reviewData.value) return res.status(httpStatus.BAD_REQUEST).send({
-		name: httpStatus[httpStatus.BAD_REQUEST],
-		code: httpStatus.BAD_REQUEST,
-		message: "Review title, text or rating value missing"
-	});
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			},
-			visible: true
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
 		}
 	});
 	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	if (packageObj.accountId == account.id) return res.status(httpStatus.FORBIDDEN).send({
-		name: httpStatus[httpStatus.FORBIDDEN],
-		code: httpStatus.FORBIDDEN,
-		message: "Package developers cannot add a review to their own package"
-	});
-
-	let packageVersionObj = await PackageVersion.findOne({
-		where: {
-			packageId: packageObj.id,
-			visible: true
-		},
-		attributes: { exclude: ["fileData"] },
-		order: [["createdAt", "DESC"]]
-	});
-		
-	if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any versions`
-	});
-
-	let packageReviewObj = await PackageReview.findOne({
-		where: {
-			accountId: account.id
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
+	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package specified"
 		}
 	});
-			
-	if (packageReviewObj) return res.status(httpStatus.FORBIDDEN).send({
-		name: httpStatus[httpStatus.FORBIDDEN],
-		code: httpStatus.FORBIDDEN,
-		message: "User did already review this package"
+	
+	const { Package, PackageRating, PackageReview, PackageReviewMessage, PackageVersion, LogItem } = req.models;
+	let reviewData = req.body;
+	
+	if (!reviewData.title || !reviewData.text || !reviewData.value) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "Review title, text or rating value missing",
+			detail: {
+				title: !reviewData.title,
+				text: !reviewData.text,
+				value: !reviewData.value
+			}
+		}
 	});
-
-	return PackageReview.create(Object.assign(reviewData, {
-		id: String.prototype.concat(packageVersionObj.packageId, packageVersionObj.id, new Date().getTime()),
-		packageId: packageVersionObj.packageId,
+	
+	let packageObj = await Package.findOne({
+		where: Object.assign(query || {},
+			req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+				visible: true
+			},
+		),
+		include: [{
+			model: PackageReview,
+			as: "reviews",
+			order: [["createdAt", "DESC"]]
+		}, {
+			model: PackageVersion,
+			as: "versions",
+			where: Object.assign((req.query.version || {}).filter(["id", "version"]), 
+				req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+					visible: true
+				}
+			),
+			order: [["createdAt", "DESC"]]
+		}]
+	});
+	
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package"
+		}
+	});
+	
+	if (packageObj.accountId == account.id) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "Package developers cannot add a review to their own package"
+		}
+	});
+	
+	if (!packageObj.versions.length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package versions"
+		}
+	});
+	
+	let packageVersionObj = packageObj.versions[0];
+	
+	if (packageObj.reviews.find(packageReviewObj => packageReviewObj.accountId == account.id)) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "User did already review this package"
+		}
+	});
+	
+	PackageReview.create(Object.assign(reviewData, {
+		id: String.prototype.concat(packageObj.id, packageVersionObj.id, new Date().getTime()),
+		packageId: packageObj.id,
 		packageVersionId: packageVersionObj.id,
 		accountId: account.id
 	})).then(packageReviewObj => {
@@ -238,122 +201,94 @@ router.post("/:packageId/reviews/new", async (req, res) => {
 			affectedPackageId: packageObj.id,
 			affectedReviewId: packageReviewObj.id,
 			detailText: `User ${account.username} <${account.email}> created review ${packageReviewObj.id}`,
-			status: 2
+			status: LogItemStatus.LOG_USAGE
 		});
-
+		
 		return res.status(httpStatus.OK).send(packageReviewObj);
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
 /**
- * GET /packages/:packageId/reviews/:reviewId
- * 
- * Gets a specific Review of a specified Package
- */
-router.get("/:packageId/reviews/:reviewId", async (req, res) => {
-	const { Package, PackageReview, PackageReviewMessage, PackageRating, Device } = req.models;
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			},
-			visible: true
-		},
-	});
-	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageReviewObj = await PackageReview.findOne({
-		where: {
-			id: req.params.reviewId,
-			packageId: packageObj.id
-		},
-		attributes: {
-			exclude: ["deviceId"]
-		},
-		order: [["createdAt", "DESC"]],
-		include: [{
-			model: PackageReviewMessage,
-			as: "messages",
-			separate: true,
-			order: [["createdAt", "ASC"]]
-		}, {
-			model: PackageRating,
-			as: "rating"
-		}, {
-			model: Device,
-			attributes: {
-				exclude: ["id", "udid", "variant", "capacity"]
-			},
-			as: "device"
-		}]
-	});
-		
-	if (!packageReviewObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any review with identifier ${req.params.reviewId}`
-	});
-
-	return res.status(httpStatus.OK).send(packageReviewObj);
-});
-
-/**
- * DELETE /packages/:packageId/reviews/:reviewId
+ * DELETE /packages/review
  * 
  * Deletes a specific Review associated to a specified Package
  * Reviews can only be deleted by their creator, the Package Developer or a User with a Moderator role or higher
  */
-router.delete("/:packageId/reviews/:reviewId", async (req, res) => {
+router.delete("/review", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
-	});
-
-	const { Package, PackageReview, LogItem } = req.models;
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			},
-			visible: true
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
 		}
 	});
 	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageReviewObj = await PackageReview.findOne({
-		where: {
-			id: req.params.reviewId,
-			packageId: packageObj.id,
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
+	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package specified"
 		}
 	});
-		
-	if (account.id != packageObj.accountId &&	// Developer
+	
+	let reviewQuery = (req.query.review || {}).filter(["id"]);
+	if (!reviewQuery || !Object.keys(reviewQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No review specified"
+		}
+	});
+	
+	const { Package, PackageReview, LogItem } = req.models;
+	
+	let packageObj = await Package.findOne({
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
+			req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
+				visible: true
+			}
+		),
+		include: [{
+			model: PackageReview,
+			as: "reviews",
+			where: reviewQuery,
+			order: [["createdAt", "DESC"]]
+		}]
+	});
+	
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package"
+		}
+	});
+	
+	if (!packageObj.reviews.length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package reviews"
+		}
+	});
+	
+	let packageReviewObj = packageObj.reviews[0];
+	
+	if (account.id != packageObj.accountId &&		// Developer
 		account.id != packageReviewObj.accountId &&	// Review Author
-		account.role < UserRole.MODERATOR) {
+		account.role < UserRole.MODERATOR) {		// Moderator
 		return res.status(httpStatus.FORBIDDEN).send({
-			name: httpStatus[httpStatus.FORBIDDEN],
-			code: httpStatus.FORBIDDEN,
-			message: "You are not allowed to perform this action"
+			error: {
+				name: httpStatus[httpStatus.FORBIDDEN],
+				code: httpStatus.FORBIDDEN,
+				message: "You are not allowed to perform this action"
+			}
 		});
 	}
-
+	
 	return packageReviewObj.destroy().then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
@@ -362,81 +297,109 @@ router.delete("/:packageId/reviews/:reviewId", async (req, res) => {
 			affectedPackageId: packageObj.id,
 			affectedReviewId: packageReviewObj.id,
 			detailText: `User ${account.username} <${account.email}> deleted review ${packageReviewObj.id}`,
-			status: 2
+			status: LogItemStatus.LOG_USAGE
 		});
 
 		return res.status(httpStatus.OK).send({
-			name: httpStatus[httpStatus.OK],
-			code: httpStatus.OK
+			success: {
+				name: httpStatus[httpStatus.OK],
+				code: httpStatus.OK,
+				message: "Review successfully deleted"
+			}
 		});
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
-
-
 /**
- * POST /packages/:packageId/reviews/:reviewId/message
+ * POST /packages/review/message
  * 
  * Adds a new Message to a specific Review associated to a specified Package
  * Messages can only be added by the Review creator or the Package Developer
  */
-router.post("/:packageId/reviews/:reviewId/message", async (req, res) => {
+router.post("/review/message", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
-	});
-
-	const { Package, PackageReview, PackageReviewMessage, LogItem } = req.models;
-	const reviewData = req.body;
-
-	if (!reviewData || !reviewData.text || !reviewData.text.length) return res.status(httpStatus.BAD_REQUEST).send({
-		name: httpStatus[httpStatus.BAD_REQUEST],
-		code: httpStatus.BAD_REQUEST,
-		message: "No review message specified"
-	});
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			},
-			visible: true
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
 		}
 	});
 	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageReviewObj = await PackageReview.findOne({
-		where: {
-			id: req.params.reviewId,
-			packageId: packageObj.id,
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
+	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package specified"
 		}
 	});
-		
-	if (!packageReviewObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any review with identifier ${req.params.reviewId}`
+	
+	let reviewQuery = (req.query.review || {}).filter(["id"]);
+	if (!reviewQuery || !Object.keys(reviewQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No review specified"
+		}
 	});
-
-	if (account.id != packageObj.accountId &&	// Developer
-		account.id != packageReviewObj.accountId &&	// Review Author
-		account.role < UserRole.MODERATOR) {
+	
+	const { Package, PackageReview, PackageReviewMessage, LogItem } = req.models;
+	let reviewData = req.body;
+	
+	if (!reviewData || !reviewData.text || !reviewData.text.length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "Review text missing"
+		}
+	});
+	
+	let packageObj = await Package.findOne({
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
+			req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
+				visible: true
+			}
+		),
+		include: [{
+			model: PackageReview,
+			as: "reviews",
+			where: reviewQuery,
+			separate: true,
+			order: [["createdAt", "DESC"]]
+		}]
+	});
+	
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package"
+		}
+	});
+	
+	if (!packageObj.reviews || !packageObj.reviews.length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package reviews"
+		}
+	});
+	
+	let packageReviewObj = packageObj.reviews[0];
+	
+	if (account.id != packageObj.accountId &&		// Developer
+		account.id != packageReviewObj.accountId) {	// Review Author
 		return res.status(httpStatus.FORBIDDEN).send({
-			name: httpStatus[httpStatus.FORBIDDEN],
-			code: httpStatus.FORBIDDEN,
-			message: "You are not allowed to perform this action"
+			error: {
+				name: httpStatus[httpStatus.FORBIDDEN],
+				code: httpStatus.FORBIDDEN,
+				message: "You are not allowed to perform this action"
+			}
 		});
 	}
-
+	
 	return PackageReviewMessage.create(Object.assign(reviewData, {
 		id: String.prototype.concat(packageReviewObj.packageId, packageReviewObj.packageVersionId, packageReviewObj.id, new Date().getTime()),
 		packageId: packageReviewObj.packageId,
@@ -452,7 +415,7 @@ router.post("/:packageId/reviews/:reviewId/message", async (req, res) => {
 			affectedPackageId: packageObj.id,
 			affectedReviewId: packageReviewObj.id,
 			detailText: `User ${account.username} <${account.email}> added message to review ${packageReviewObj.id}`,
-			status: 2
+			status: LogItemStatus.LOG_USAGE
 		});
 
 		return res.status(httpStatus.OK).send(packageReviewObj);
@@ -460,339 +423,275 @@ router.post("/:packageId/reviews/:reviewId/message", async (req, res) => {
 });
 
 /**
- * PUT /packages/:packageId/reviews/:reviewId/:messageId
+ * PUT /packages/review/message
  * 
  * Updates a Message of a specific Review associated to a specified Package
  * Messages can only be updated by their creator
  */
-router.put("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
+router.put("/review/message", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
-	});
-
-	const { Package, PackageReview, PackageReviewMessage } = req.models;
-	const reviewData = req.body;
-
-	if (!reviewData || !reviewData.text) return res.status(httpStatus.BAD_REQUEST).send({
-		name: httpStatus[httpStatus.BAD_REQUEST],
-		code: httpStatus.BAD_REQUEST,
-		message: "No review message specified"
-	});
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			},
-			visible: true
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
 		}
 	});
 	
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
+	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package specified"
+		}
+	});
+	
+	let reviewQuery = (req.query.review || {}).filter(["id"]);
+	if (!reviewQuery || !Object.keys(reviewQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No review specified"
+		}
+	});
+	
+	let messageQuery = (req.query.message || {}).filter(["id"]);
+	if (!messageQuery || !Object.keys(messageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No review message specified"
+		}
+	});
+	
+	const { Package, PackageReview, PackageReviewMessage, LogItem } = req.models;
+	let reviewData = req.body;
+	
+	if (!reviewData || !reviewData.text || !reviewData.text.length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "Review text missing",
+			detail: {
+				title: !reviewData.title,
+				text: !reviewData.text,
+				value: !reviewData.value
+			}
+		}
+	});
+	
+	let packageObj = await Package.findOne({
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
+			req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
+				visible: true
+			}
+		),
+		include: [{
+			model: PackageReview,
+			as: "reviews",
+			where: reviewQuery,
+			separate: true,
+			include: [{
+				model: PackageReviewMessage,
+				as: "messages",
+				where: messageQuery,
+				separate: true,
+			}]
+		}]
+	});
+	
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageReviewObj = await PackageReview.findOne({
-		where: {
-			id: req.params.reviewId,
-			packageId: packageObj.id,
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package"
 		}
 	});
-		
-	if (!packageReviewObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any review with identifier ${req.params.reviewId}`
-	});
-
-	if (account.id != packageReviewObj.accountId) return res.status(httpStatus.FORBIDDEN).send({
-		name: httpStatus[httpStatus.FORBIDDEN],
-		code: httpStatus.FORBIDDEN,
-		message: "You are not allowed to perform this action"
-	});
-
-	let reviewMessageObj = await PackageReviewMessage.findOne({
-		where: {
-			id: req.params.messageId,
-			packageId: packageReviewObj.packageId,
-			packageReviewId: packageReviewObj.id
+	
+	if (!packageObj.reviews || !packageObj.reviews.length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package reviews"
 		}
 	});
-			
-	if (!reviewMessageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Review ${req.params.reviewId} does not have any review with identifier ${req.params.messageId}`
+	
+	if (!packageObj.reviews[0].messages || !packageObj.reviews[0].messages.length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package review messages"
+		}
 	});
-
-	return reviewMessageObj.update({
+	
+	let packageReviewMessageObj = packageObj.reviews[0].messages[0];
+	
+	if (account.id != packageReviewMessageObj.accountId) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+	
+	return packageReviewMessageObj.update({
 		text: reviewData.text
-	}).then(packageReviewObj => {
+	}).then(packageReviewMessageObj => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.REVIEW_MESSAGE_CREATED,
 			accountId: account.id,
 			affectedPackageId: packageObj.id,
-			affectedReviewId: packageReviewObj.id,
-			detailText: `User ${account.username} <${account.email}> edited message ${reviewMessageObj.id} of review ${packageReviewObj.id}`,
-			status: 2
+			affectedReviewId: packageReviewMessageObj.packageReviewId,
+			detailText: `User ${account.username} <${account.email}> edited message ${packageReviewMessageObj.id} of review ${packageReviewMessageObj.packageReviewId}`,
+			status: LogItemStatus.LOG_USAGE
 		});
 
-		return res.status(httpStatus.OK).send(packageReviewObj);
+		return res.status(httpStatus.OK).send(packageReviewMessageObj);
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
 /**
- * DELETE /packages/:packageId/reviews/:reviewId/:messageId
+ * DELETE /packages/review/message
  * 
  * Deletes a Message of a specific Review associated to a specified Package
  * Messages can only be deleted by their creator, the Package Developer or a User with a Moderator role or higher
  */
-router.delete("/:packageId/reviews/:reviewId/:messageId", async (req, res) => {
+router.delete("/review/message", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
-	});
-
-	const { Package, PackageReview, PackageReviewMessage, LogItem } = req.models;
-	const reviewData = req.body;
-
-	if (!reviewData || !reviewData.text) return res.status(httpStatus.BAD_REQUEST).send({
-		name: httpStatus[httpStatus.BAD_REQUEST],
-		code: httpStatus.BAD_REQUEST,
-		message: "No review message specified"
-	});
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			},
-			visible: true
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
 		}
 	});
 	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageReviewObj = await PackageReview.findOne({
-		where: {
-			id: req.params.reviewId,
-			packageId: packageObj.id,
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
+	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package specified"
 		}
 	});
-		
-	if (!packageReviewObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any review with identifier ${req.params.reviewId}`
+	
+	let reviewQuery = (req.query.review || {}).filter(["id"]);
+	if (!reviewQuery || !Object.keys(reviewQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No review specified"
+		}
 	});
-
-	if (account.id != packageObj.accountId &&	// Developer
-		account.id != packageReviewObj.accountId &&	// Review Author
-		account.role < UserRole.MODERATOR) {
+	
+	let messageQuery = (req.query.message || {}).filter(["id"]);
+	if (!messageQuery || !Object.keys(messageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No review message specified"
+		}
+	});
+	
+	const { Package, PackageReview, PackageReviewMessage, LogItem } = req.models;
+	let reviewData = req.body;
+	
+	if (!reviewData || !reviewData.text || !reviewData.text.length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "Review text missing",
+			detail: {
+				title: !reviewData.title,
+				text: !reviewData.text,
+				value: !reviewData.value
+			}
+		}
+	});
+	
+	let packageObj = await Package.findOne({
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
+			req.account && req.account.role >= UserRole.DEVELOPER ? {} : {
+				visible: true
+			}
+		),
+		include: [{
+			model: PackageReview,
+			as: "reviews",
+			where: reviewQuery,
+			separate: true,
+			include: [{
+				model: PackageReviewMessage,
+				as: "messages",
+				where: messageQuery,
+				separate: true,
+			}]
+		}]
+	});
+	
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package"
+		}
+	});
+	
+	if (!packageObj.reviews || !packageObj.reviews.length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package reviews"
+		}
+	});
+	
+	if (!packageObj.reviews[0].messages || !packageObj.reviews[0].messages.length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package review messages"
+		}
+	});
+	
+	let packageReviewMessageObj = packageObj.reviews[0].messages[0];
+	
+	if (account.id != packageObj.accountId &&				// Developer
+		account.id != packageReviewMessageObj.accountId &&	// Review Author
+		account.role < UserRole.MODERATOR) {				// Moderator
 		return res.status(httpStatus.FORBIDDEN).send({
-			name: httpStatus[httpStatus.FORBIDDEN],
-			code: httpStatus.FORBIDDEN,
-			message: "You are not allowed to perform this action"
+			error: {
+				name: httpStatus[httpStatus.FORBIDDEN],
+				code: httpStatus.FORBIDDEN,
+				message: "You are not allowed to perform this action"
+			}
 		});
 	}
-
-	let reviewMessageObj = await PackageReviewMessage.findOne({
-		where: {
-			id: req.params.messageId,
-			packageId: packageReviewObj.packageId,
-			packageReviewId: packageReviewObj.id
-		}
-	});
-			
-	if (!reviewMessageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Review ${req.params.reviewId} does not have any review with identifier ${req.params.messageOd}`
-	});
-
-	return reviewMessageObj.destroy().then(() => {
+	
+	packageReviewMessageObj.destroy().then(packageReviewMessageObj => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.REVIEW_MESSAGE_DELETED,
 			accountId: account.id,
 			affectedPackageId: packageObj.id,
-			affectedReviewId: packageReviewObj.id,
-			detailText: `User ${account.username} <${account.email}> deleted message ${reviewMessageObj.id} of review ${packageReviewObj.id}`,
-			status: 2
+			affectedReviewId: packageReviewMessageObj.packageReviewId,
+			detailText: `User ${account.username} <${account.email}> deleted message ${packageReviewMessageObj.id} of review ${packageReviewMessageObj.packageReviewId}`,
+			status: LogItemStatus.LOG_USAGE
 		});
 
 		return res.status(httpStatus.OK).send({
-			name: httpStatus[httpStatus.OK],
-			code: httpStatus.OK
+			success: {
+				name: httpStatus[httpStatus.OK],
+				code: httpStatus.OK,
+				message: "Package Review Message successfully deleted"
+			}
 		});
 	}).catch(error => ErrorHandler(req, res, error));
 });
 
 
-
-/**
- * GET /packages/:packageId/versions/latest/reviews
- * 
- * Gets a list of every Review associated to the latest Version of a specified Package
- */
-router.get("/:packageId/versions/latest/reviews", async (req, res) => {
-	const { Package, PackageVersion, PackageReview, PackageReviewMessage, PackageRating, Device } = req.models;
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			},
-			visible: true
-		}
-	});
-	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageVersionObj = await PackageVersion.findOne({
-		where: {
-			packageId: packageObj.id,
-			visible: true
-		},
-		attributes: { exclude: ["fileData"] },
-		order: [["createdAt", "DESC"]]
-	});
-
-	if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any versions`
-	});
-
-	let packageReviewList = await PackageReview.findAll({
-		where: {
-			packageId: packageVersionObj.packageId,
-			packageVersionId: packageVersionObj.id
-		},
-		attributes: {
-			exclude: ["deviceId"]
-		},
-		order: [["createdAt", "DESC"]],
-		include: [{
-			model: PackageReviewMessage,
-			as: "messages",
-			separate: true,
-			order: [["createdAt", "ASC"]]
-		}, {
-			model: PackageRating,
-			as: "rating"
-		}, {
-			model: Device,
-			attributes: {
-				exclude: ["id", "udid", "variant", "capacity"]
-			},
-			as: "device"
-		}]
-	});
-		
-	// if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
-	// 	name: httpStatus[httpStatus.NOT_FOUND],
-	// 	code: httpStatus.NOT_FOUND,
-	// 	message: `Package ${req.params.packageId} does not have any reviews`
-	// });
-
-	return res.status(httpStatus.OK).send(packageReviewList);
-});
-
-/**
- * GET /packages/:packageId/versions/:versionId/reviews
- * 
- * Gets a list of every Review associated to a specific Version of a specified Package
- */
-router.get("/:packageId/versions/:versionId/reviews", async (req, res) => {
-	const { Package, PackageVersion, PackageReview, PackageReviewMessage, PackageRating, Device } = req.models;
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			},
-			visible: true
-		}
-	});
-	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageVersionObj = await PackageVersion.findOne({
-		where: {
-			id: req.params.versionId,
-			packageId: packageObj.id,
-			visible: true
-		},
-		attributes: { exclude: ["fileData"] },
-		order: [["createdAt", "DESC"]]
-	});
-
-	if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any versions`
-	});
-
-	let packageReviewList = await PackageReview.findAll({
-		where: {
-			packageId: packageVersionObj.packageId,
-			packageVersionId: packageVersionObj.id
-		},
-		attributes: {
-			exclude: ["deviceId"]
-		},
-		order: [["createdAt", "DESC"]],
-		include: [{
-			model: PackageReviewMessage,
-			as: "messages",
-			separate: true,
-			order: [["createdAt", "ASC"]]
-		}, {
-			model: PackageRating,
-			as: "rating"
-		}, {
-			model: Device,
-			attributes: {
-				exclude: ["id", "udid", "variant", "capacity"]
-			},
-			as: "device"
-		}]
-	});
-		
-	// if (!packageReviewList || !packageReviewList.length) return res.status(httpStatus.NOT_FOUND).send({
-	// 	name: httpStatus[httpStatus.NOT_FOUND],
-	// 	code: httpStatus.NOT_FOUND,
-	// 	message: `Package ${req.params.packageId} does not have any reviews`
-	// });
-
-	return res.status(httpStatus.OK).send(packageReviewList);
-});
 
 module.exports = router;

@@ -17,7 +17,7 @@
 				<div class="lockup-collection-view">
 					<router-link tag="div" :to="`/package/${packageObj.identifier}`" class="lockup-collection-cell" v-for="(packageObj, index) in packageData" :key="index">
 						<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" class="icon-container">
-							<img :src="`http://localhost:3000/media/icon/${packageObj.id}`" v-if="packageObj.iconMime" />
+							<img :src="`/media/icon/${packageObj.id}`" v-if="packageObj.iconMime" />
 							<MetroTextBlock class="contrast-text" style="position: relative; width: 32px; height: 32px" v-if="!packageObj.iconMime">
 								<MetroFontIcon glyph="&#xE739;" font-size="32px" style="position: absolute" />
 								<MetroFontIcon glyph="&#xE894;" font-size="32px" style="position: absolute" />

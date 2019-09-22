@@ -15,12 +15,12 @@ const Path = require('path');
 const Sequelize = require('sequelize');
 const models = require("./models");
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/config/config.json')[env];
+const config = require('./config')[env];
 const db = {};
 
 let sequelize;
 if (config.use_env_variable) {
-	sequelize = new Sequelize(process.env[config.use_env_variable], config);
+	sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, config);
 } else {
 	sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
@@ -76,7 +76,7 @@ db.sequelize.sync({
 //#endregion
 
 const httpServer = express();
-const controllers = require("./controllers_new");
+const controllers = require("./controllers");
 const url = require('url');
 const serveStatic = require("serve-static");
 const httpStatus = require("http-status");
@@ -91,13 +91,18 @@ httpServer.use(cookieParser());
 httpServer.use(fileupload());
 
 // API Route
+if (!process.argv.includes("--no-api")) {
 httpServer.use("/api", (req, res, next) => {
 	req.models = db.models;
 	return next();
 });
 httpServer.use("/api", controllers);
+} else {
+	console.log("\x1b[33m[WARN]\x1b[0m '--no-api' is set, not serving '/api'");
+}
 
 // Files Route
+if (!process.argv.includes("--no-static")) {
 httpServer.use("/files", async (req, res, next) => {	
 	const serve = serveStatic(Path.join(__dirname, "../files"));
 	
@@ -110,6 +115,15 @@ httpServer.use("/files", async (req, res, next) => {
 		
 		if (packageVersionObj) {
 			packageVersionObj.increment("downloadCount");
+				
+				db.models.LogItem.create({
+					id: String.prototype.concat(new Date().getTime, Math.random()),
+					type: LogItemType.VERSION_DOWNLOADED,
+					affectedPackageId: packageVersionObj.packageId,
+					affectedPackageVersionId: packageVersionObj.id,
+					detailText: `Package version ${packageVersionObj.version} <${packageVersionObj.id}> has been downloaded`,
+					status: LogItemStatus.LOG_USAGE
+				});
 		}
 		
 		return serve(req, res);
@@ -161,8 +175,22 @@ httpServer.use("/media/:category/:mediaId", (req, res, next) => {
 			break;
 		default: break;
 	}
-	// res.status(200).send("OK");
 });
+} else {
+	console.log("\x1b[33m[WARN]\x1b[0m '--no-static' is set, not serving static routes");
+}
+
+if (!process.argv.includes("--no-dashboard")) {
+	httpServer.use("/dashboard", serveStatic(Path.join(__dirname, "../manager/dist")));
+} else {
+	console.log("'--no-admin' is set, not serving /admin");
+}
+
+if (!process.argv.includes("--no-storefront")) {
+	httpServer.use("/", serveStatic(Path.join(__dirname, "../storefront/dist")));
+} else {
+	console.log("'--no-client' is set, not serving /");
+}
 
 httpServer.listen(process.env.SERVER_PORT, () => {
 	console.log(`\x1b[34m[INFO]\x1b[0m Server is up on port ${process.env.SERVER_PORT}`);

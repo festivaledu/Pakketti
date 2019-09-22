@@ -4,7 +4,7 @@ const httpStatus = require("http-status");
 const Sequelize = require("sequelize");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
-const { LogItemType } = require("../../helpers/Enumerations");
+const { UserRole, LogItemType, LogItemStatus } = require("../../helpers/Enumerations");
 
 const emptyRatingsObject = () => {
 	let _ratings = {
@@ -25,11 +25,11 @@ const emptyRatingsObject = () => {
 	return _ratings;
 }
 
-const getRatings = (_ratings, ratings) => {
-	ratings.forEach(rating => {
-		_ratings.ratings[rating.value - 1].count += 1;
+const getRatings = (_ratings, rating) => {
+	// ratings.forEach(rating => {
+		_ratings.ratings[5 - rating.value].count += 1;
 		_ratings.total += 1;
-	});
+	// });
 
 	_ratings.average = 0;
 	_ratings.ratings.forEach(rating => {
@@ -43,280 +43,215 @@ const getRatings = (_ratings, ratings) => {
 	return _ratings;
 }
 
+
+
 /**
- * GET /packages/:packageId/ratings
+ * GET /packages/ratings
  * 
  * Gets the Rating values of a specified Package
  */
-router.get("/:packageId/ratings", async (req, res) => {
-	const { Package, PackageVersion, PackageRating } = req.models;
-
+router.get("/ratings", async (req, res) => {
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
+	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package specified"
+		}
+	});
+	
+	const { Package, PackageRating, PackageReview, PackageVersion } = req.models;
+	
 	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			},
-			visible: true
-		},
-		include: {
+		where: Object.assign(query || {},
+			req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+				visible: true
+			}
+		),
+		include: [{
 			model: PackageVersion,
 			as: "versions",
-			where: {
-				visible: true
-			},
-			attributes: { exclude: ["fileData"] },
-			include: {
-				model: PackageRating,
-				as: "ratings"
-			}
-		}
+			where: Object.assign((req.query.version || {}).filter(["version"]), 
+				req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+					visible: true
+				}
+			),
+			separate: true,
+			order: [["createdAt", "DESC"]],
+			include: [{
+				model: PackageReview,
+				as: "reviews",
+				where: (req.query.review || {}).filter(["id"]),
+				separate: true,
+				attributes: {
+					exclude: ["deviceId"]
+				},
+				order: [["createdAt", "DESC"]],
+				include: [{
+					model: PackageRating,
+					as: "rating"
+				}]
+			}]
+		}]
 	});
 	
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package"
+		}
 	});
-
+	
 	if (!packageObj.versions.length) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any versions`
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package versions"
+		}
 	});
-
+	
+	if (!packageObj.versions.map(v => v.reviews.length).reduce((t, c) => t += c)) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package reviews"
+		}
+	});
+	
 	let ratings = emptyRatingsObject();
 	packageObj.versions.forEach(version => {
-		ratings = getRatings(ratings, version.ratings);
+		version.reviews.forEach(review => {
+			ratings = getRatings(ratings, review.rating);
+		});
 	});
 
 	return res.status(httpStatus.OK).send(ratings);
 });
 
 /**
- * GET /packages/:packageId/versions/latest/ratings
- * 
- * Gets the Rating values from the latest Version of a specified Package
- */
-router.get("/:packageId/versions/latest/ratings", async (req, res) => {
-	const { Package, PackageVersion, PackageRating } = req.models;
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId,
-			},
-			visible: true
-		}
-	});
-	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageVersionObj = await PackageVersion.findOne({
-		where: {
-			packageId: packageObj.id,
-			visible: true
-		},
-		include: {
-			model: PackageRating,
-			as: "ratings"
-		},
-		attributes: { exclude: ["fileData"] },
-		order: [["createdAt", "DESC"]]
-	});
-	
-	if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any versions`
-	});
-
-	let ratings = getRatings(emptyRatingsObject(), packageVersionObj.ratings);
-
-	return res.status(httpStatus.OK).send(ratings);
-});
-
-
-
-/**
- * GET /packages/:packageId/versions/:versionId/ratings
- * 
- * Gets the Rating values from a specific Version of a specified Package
- */
-router.get("/:packageId/versions/:versionId/ratings", async (req, res) => {
-	const { Package, PackageVersion, PackageRating } = req.models;
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			}
-		}
-	});
-	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageVersionObj = await PackageVersion.findOne({
-		where: {
-			packageId: packageObj.id,
-			[Sequelize.Op.or]: {
-				id: req.params.versionId,
-				version: req.params.versionId
-			},
-			visible: true
-		},
-		include: {
-			model: PackageRating,
-			as: "ratings"
-		},
-		attributes: { exclude: ["fileData"] },
-		order: [["createdAt", "DESC"]]
-	});
-
-	if (!packageVersionObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have a version ${req.params.versionId}`
-	});
-
-	let ratings = getRatings(emptyRatingsObject(), packageVersionObj.ratings);
-
-	return res.status(httpStatus.OK).send(ratings);
-});
-
-
-
-/**
- * GET /packages/:packageId/reviews/:reviewId/rating
- * 
- * Gets the Rating value of a specified Review
- */
-router.get("/:packageId/reviews/:reviewId/rating", async (req, res) => {
-	const { Package, PackageReview, PackageRating } = req.models;
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			}
-		}
-	});
-	
-	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
-	});
-
-	let packageReviewObj = await PackageReview.findOne({
-		where: {
-			id: req.params.reviewId,
-			packageId: packageObj.id,
-		},
-		include: {
-			model: PackageRating,
-			as: "rating"
-		},
-	});
-	
-	if (!packageReviewObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any review with id ${req.params.reviewId}`
-	});
-
-	return res.status(httpStatus.OK).send(packageReviewObj.rating);
-});
-
-/**
- * PUT /packages/:packageId/reviews/:reviewId/rating
+ * PUT /packages/rating
  * 
  * Updates the Rating value of a specified Review 
  */
-router.put("/:packageId/reviews/:reviewId/rating", async (req, res) => {
+router.put("/rating", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
-	});
-
-	const { Package, PackageReview, PackageRating, LogItem } = req.models;
-	const ratingData = req.body;
-
-	if (!ratingData || isNaN(ratingData.value)) return res.status(httpStatus.BAD_REQUEST).send({
-		name: httpStatus[httpStatus.BAD_REQUEST],
-		code: httpStatus.BAD_REQUEST,
-		message: "Invalid or no rating data specified"
-	});
-
-	let packageObj = await Package.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.packageId,
-				identifier: req.params.packageId
-			}
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
 		}
 	});
 	
+	let packageQuery = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
+	if (!packageQuery || !Object.keys(packageQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package specified"
+		}
+	});
+	
+	let reviewQuery = (req.query.review || {}).filter(["id"]);
+	if (!reviewQuery || !Object.keys(reviewQuery).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package review specified"
+		}
+	});
+	
+	const { Package, PackageRating, PackageReview, PackageVersion, LogItem } = req.models;
+	let ratingData = req.body;
+	
+	if (!ratingData || isNaN(ratingData.value)) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "Invalid or no rating data specified"
+		}
+	});
+	
+	let packageObj = await Package.findOne({
+		where: Object.assign(packageQuery || {},
+			req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+				visible: true
+			}
+		),
+		include: [{
+			model: PackageVersion,
+			as: "versions",
+			where: req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+				visible: true
+			},
+			separate: true,
+			order: [["createdAt", "DESC"]],
+			include: [{
+				model: PackageReview,
+				as: "reviews",
+				where: reviewQuery,
+				separate: true,
+				attributes: {
+					exclude: ["deviceId"]
+				},
+				order: [["createdAt", "DESC"]],
+				include: [{
+					model: PackageRating,
+					as: "rating"
+				}]
+			}]
+		}]
+	});
+	
 	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `No package with identifier ${req.params.packageId} found`
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package"
+		}
 	});
-
-	let packageReviewObj = await PackageReview.findOne({
-		where: {
-			id: req.params.reviewId,
-			packageId: packageObj.id,
-		},
-		include: {
-			model: PackageRating,
-			as: "rating"
-		},
+	
+	if (!packageObj.versions.map(v => v.reviews.length).reduce((t, c) => t += c)) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package reviews"
+		}
 	});
-
-	if (!packageReviewObj) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: `Package ${req.params.packageId} does not have any review with id ${req.params.reviewId}`
-	});
-
-	if (packageReviewObj.accountId != account.id) {
-		return res.status(httpStatus.FORBIDDEN).send({
+	
+	if (packageObj.versions[0].reviews[0].id.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,
 			message: "You are not allowed to perform this action"
-		});
-	}
-
-	return packageReviewObj.rating.update({
+		}
+	});
+	
+	return packageObj.versions[0].reviews[0].rating.update({
 		value: ratingData.value
-	}).then(packageRatingObj => {
+	}).then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
 			type: LogItemType.REVIEW_EDITED,
 			accountId: account.id,
 			affectedPackageId: packageObj.id,
-			affectedReviewId: packageReviewObj.id,
-			detailText: `User ${account.username} <${account.email}> edited rating value of review ${packageReviewObj.id} to ${ratingData.value}`,
-			status: 2
+			affectedReviewId: packageObj.versions[0].reviews[0].id,
+			detailText: `User ${account.username} <${account.email}> edited rating value of review ${packageObj.versions[0].reviews[0].id} to ${ratingData.value}`,
+			status: LogItemStatus.LOG_USAGE
 		});
 
-		return res.status(httpStatus.OK).send(packageRatingObj);
+		return res.status(httpStatus.OK).send({
+			success: {
+				name: httpStatus[httpStatus.OK],
+				code: httpStatus.OK,
+				message: "Rating successfully updated"
+			}
+		});
 	}).catch(error => ErrorHandler(req, res, error));
 });
+
+
 
 module.exports = router;

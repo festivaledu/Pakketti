@@ -275,7 +275,7 @@
 				<div class="mb-4">
 					<MetroTextBlock text-style="sub-title mb-2">{{ $t('package_editor.media.app_icon_title') }}</MetroTextBlock>
 					<MediaItemSelector
-						:defaultImgSrc="`http://localhost:3000/media/icon/${packageData.id}`"
+						:defaultImgSrc="`/media/icon/${packageData.id}`"
 						v-model="packageData.iconMime"
 						@fileChanged="packageIconChanged"
 						:disabled="!this.isOwnedPackage"
@@ -285,7 +285,7 @@
 				<div class="mb-4">
 					<MetroTextBlock text-style="sub-title mb-2">{{ $t('package_editor.media.header_image_title') }}</MetroTextBlock>
 					<MediaItemSelector
-						:defaultImgSrc="`http://localhost:3000/media/hero/${packageData.id}`"
+						:defaultImgSrc="`/media/hero/${packageData.id}`"
 						v-model="packageData.headerImageMime"
 						@fileChanged="packageHeaderChanged"
 						:disabled="!this.isOwnedPackage"
@@ -295,7 +295,7 @@
 				<div class="mb-4">
 					<MetroTextBlock text-style="sub-title mb-2">{{ $t('package_editor.media.screenshots_title') }}</MetroTextBlock>
 					<MediaGroupSelector
-						defaultImgSrc="http://localhost:3000/media/screenshot"
+						defaultImgSrc="`/media/screenshot`"
 						v-model="packageData.screenshots"
 						@fileChanged="screenshotAdded"
 						@fileDeleted="screenshotDeleted"

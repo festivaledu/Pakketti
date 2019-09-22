@@ -169,7 +169,7 @@ export default {
 			}
 		},
 		addiOSDevice() {
-			window.location.href = "http://localhost:3000/api/link"
+			window.location.href = `/api/link`
 		},
 		async deviceEditButtonClicked(deviceObj) {
 			let _deviceObj = {...deviceObj};

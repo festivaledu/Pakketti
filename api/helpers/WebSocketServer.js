@@ -1,7 +1,7 @@
 const SocketIO = require("socket.io");
 const HttpRequestWrapper = require("./HttpRequestWrapper");
 
-const controllers = require("../controllers_new");
+const controllers = require("../controllers");
 const authHelper = require("./AuthHelper");
 const includeHelper = require("./IncludeHelper");
 

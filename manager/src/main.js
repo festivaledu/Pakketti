@@ -35,7 +35,7 @@ Vue.config.productionTip = false
 import { SocketService } from '@/scripts/SocketService'
 
 (async () => {
-	await SocketService.connect("ws://localhost:62486");
+	await SocketService.connect(`ws://${window.location.hostname}:62486`);
 	
 	new Vue({
 		router,

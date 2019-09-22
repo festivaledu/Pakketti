@@ -5,7 +5,7 @@
 		<template v-if="accountData">
 			<MetroTextBlock text-style="sub-title">{{ $t('profile.avatar') }}</MetroTextBlock>
 			<MetroPersonPicture class="my-5" :display-name="accountData.username" v-if="!accountData.profileImageMime" />
-			<MetroPersonPicture class="my-5" :profile-picture="`http://localhost:3000/media/avatar/${accountData.id}`" v-if="accountData.profileImageMime" />
+			<MetroPersonPicture class="my-5" :profile-picture="`/media/avatar/${accountData.id}`" v-if="accountData.profileImageMime" />
 			
 			<input type="file" ref="file-selector" accept="image/png,image/jpeg" @change="fileChanged" />
 			<MetroStackPanel class="mb-4" orientation="vertical" horizontal-alignment="left">

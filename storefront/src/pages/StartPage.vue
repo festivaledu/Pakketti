@@ -10,7 +10,7 @@
 			<MetroFlipView class="promo-flip-view" v-show="featuredPackages.length">
 				<template v-for="(packageObj, index) in featuredPackages">
 					<MetroFlipViewItem :key="index">
-						<router-link tag="div" :to="`/package/${packageObj.identifier}`" class="editorial-item-container" :style="`background-image: url(http://localhost:3000/media/hero/${packageObj.id})`">
+						<router-link tag="div" :to="`/package/${packageObj.identifier}`" class="editorial-item-container" :style="`background-image: url(/media/hero/${packageObj.id})`">
 							<MetroStackPanel horizontal-alignment="center" vertical-alignment="bottom">
 								<MetroTextBlock text-style="sub-title">{{ packageObj.name }}</MetroTextBlock>
 								<MetroTextBlock text-style="caption">{{ packageObj.shortDescription }}</MetroTextBlock>

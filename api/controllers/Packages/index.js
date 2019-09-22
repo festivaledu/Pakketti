@@ -6,153 +6,243 @@ const express = require("express");
 const router = express.Router();
 const httpStatus = require("http-status");
 const Sequelize = require("sequelize");
-const cryptoBuiltin = require("crypto");
 
 const ErrorHandler = require("../../helpers/ErrorHandler");
-const { UserRole, LogItemType } = require("../../helpers/Enumerations");
-const ArchiveParser = require("../../helpers/ArchiveParser");
+const { UserRole, LogItemType, LogItemStatus } = require("../../helpers/Enumerations");
 
-Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ [k]: v })));
-
-router.use((req, res, next) => {
-	if (req.query) {
-		Object.keys(req.query).forEach(query => {
-			const keys = query.split('.');
-			const lastKey = keys.pop();
-			const lastObj = keys.reduce((obj, key) => 
-				obj[key] = obj[key] || {}, req.query); 
-			lastObj[lastKey] = req.query[query];
-			delete req.query[query];
-		});
-	}
-	
-	return next();
+Object.defineProperty(Object.prototype, 'filter', {
+    value: function(values) {
+        return Object.keys(this).filter(k => values.includes(k)).reduce((r, k) => { r[k] = this[k]; return r; }, {});
+    },
+    enumerable: false
 });
+
+let asyncForEach = async (array, callback) => {
+	for (let index = 0; index < array.length; index++) {
+		await callback(array[index], index)
+	}
+}
+
+
 
 /**
  * GET /packages
- * 
- * Gets a list of available (visible) packages, including the latest version and screenshot metadata
+ *
+ * Gets a list of available (visible) packages with optional includable metadata
  */
-/*router.get("/", async (req, res) => {
-	const { Package, PackageVersion, PackageScreenshot } = req.models;
-	let packageList = await Package.findAll({
-		where: req.account && req.account.role >= UserRole.MODERATOR ? {} : {
-			[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
-					visible: true,
-					accountId: req.developer !== undefined ? req.developer.id : undefined
-				}))
-			)()
-		},
-		attributes: { exclude: ["icon"] },
-		order: [["createdAt", "DESC"]],
-		include: [{
-			model: PackageVersion,
-			as: "versions",
-			separate: true,
-			attributes: { exclude: ["fileData"] },
-			visible: { [Sequelize.Op.gte]: req.developer === undefined },
-			order: [["createdAt", "DESC"]],
-			// limit: 1
-		}, {
-			model: PackageScreenshot,
-			as: "screenshots",
-			attributes: { exclude: ["fileData"] },
-			order: [["createdAt", "ASC"]]
-		}]
-	});
-	
-	// if (!packageList || !packageList.length) return res.status(httpStatus.NOT_FOUND).send({
-	// 	name: httpStatus[httpStatus.NOT_FOUND],
-	// 	code: httpStatus.NOT_FOUND,
-	// 	message: "No packages found"
-	// });
-
-	packageList.forEach(packageObj => {
-		if (packageObj.versions.length) {
-			packageObj.dataValues.latestVersion = packageObj.versions[0];
-			
-			packageObj.dataValues.downloadCount = packageObj.versions.map(item => item.dataValues.downloadCount).reduce((a, b) => a + b);
-		}
-		delete packageObj.versions;
-
-		if (packageObj.screenshots.length) {
-			packageObj.screenshots = packageObj.screenshots.reduce((obj, item) => ({
-				...obj,
-				[item["screenClass"]]: (obj[item["screenClass"]] || []).concat(item)
-			}), {});
-		}
-	});
-
-	return res.status(httpStatus.OK).send(packageList);
-});*/
 router.get("/", async (req, res) => {
-	const { Package, PackageVersion, PackageScreenshot } = req.models;
-	
-	let packageQuery = req.query.package || {};
+	const { Package, PackageVersion } = req.models;
 
-	if (Object.keys(packageQuery).length) {
-		if (!Object.keys(packageQuery).some(r => Object.keys(Package.rawAttributes).includes(r))) return res.status(httpStatus.FORBIDDEN).send({
-			error: {
-				name: httpStatus[httpStatus.BAD_REQUEST],
-				code: httpStatus.BAD_REQUEST,
-				message: `Bad attribute '${Object.keys(packageQuery).find(r => !Object.keys(Package.rawAttributes).includes(r))}' in model 'Packages'`
+	let packageList = await Package.findAll({
+		where: Object.assign((req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]),
+			req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+				[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
+						visible: true,
+						accountId: req.developer !== undefined ? req.developer.id : undefined
+					}))
+				)()
+			},
+		),
+		include: req.includes,
+		attributes: { exclude: ["icon", "headerImage"] }
+	});
+	
+	await asyncForEach(packageList, async packageObj => {
+		await PackageVersion.findAll({
+			where: Object.assign({
+				packageId: packageObj.id
+			}, req.account && req.account.role >= UserRole.MODERATOR ? {} : {
+					[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
+							visible: true,
+							accountId: req.developer !== undefined ? req.developer.id : undefined
+						}))
+					)()
+				}
+			)
+		}).then(versionList => {
+			if (versionList) {
+				packageObj.dataValues.downloadCount = versionList.map(_ => _.downloadCount).reduce((a, b) => a + b);
+			}
+		}).catch(error => ErrorHandler(req, res, error));
+	});
+
+	res.status(httpStatus.OK).send(packageList);
+});
+
+/**
+ * PUT /packages
+ *
+ * Updates the metadata of a Package using specified attributes (id, identifier, name)
+ */
+router.put("/", async (req, res) => {
+	const { account } = req;
+
+	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
+		}
+	});
+
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER || !req.developer) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+
+	const { Package, LogItem } = req.models;
+	const packageData = req.body;
+
+	if (!packageData) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package data specified"
+		}
+	});
+
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
+	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package specified"
+		}
+	});
+
+	let packageObj = await Package.findOne({
+		where: query
+	});
+
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package"
+		}
+	});
+
+	if (packageObj.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+
+	
+	return packageObj.update(packageData.filter([
+		"name",
+		"shortDescription",
+		"detailedDescription",
+		"platform",
+		"architecture",
+		"minOSVersion",
+		"maxOSVersion",
+		"section",
+		"deviceFamilies",
+		"visible",
+		"status",
+		"issueURL"
+	])).then(packageObj => {
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.PACKAGE_EDITED,
+			accountId: account.id,
+			affectedPackageId: packageObj.id,
+			detailText: `Package ${packageObj.identifier} <${packageObj.id}> was edited by ${account.username} <${account.email}>`,
+			status: LogItemStatus.LOG_USAGE
+		});
+
+		return res.status(httpStatus.OK).send(packageObj);
+	}).catch(error => ErrorHandler(req, res, error));
+});
+
+/**
+ * DELETE /packages
+ *
+ * Updates the metadata of a Package using specified attributes (id, identifier, name)
+ */
+router.delete("/", async (req, res) => {
+	const { account } = req;
+
+	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
+		}
+	});
+
+	if ((account.role & UserRole.DEVELOPER) != UserRole.DEVELOPER || !req.developer) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+
+	const { Package, LogItem } = req.models;
+
+	let query = (req.query.package || {}).filter(["id", "identifier", "name", "platform", "architecture", "section"]);
+	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No package specified"
+		}
+	});
+
+	let packageObj = await Package.findOne({
+		where: query
+		// TODO: delete package files
+	});
+
+	if (!packageObj) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "Could not find any package"
+		}
+	});
+
+	if (packageObj.accountId != account.id) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+
+	return packageObj.destroy().then(() => {
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.PACKAGE_DELETED,
+			accountId: account.id,
+			affectedPackageId: packageObj.id,
+			detailText: `Package ${packageObj.identifier} <${packageObj.id}> was deleted by ${account.username} <${account.email}>`,
+			status: LogItemStatus.LOG_USAGE
+		});
+		
+		// TODO: delete package files
+
+		return res.status(httpStatus.OK).send({
+			success: {
+				name: httpStatus[httpStatus.OK],
+				code: httpStatus.OK,
+				message: "Package successfully deleted"
 			}
 		});
-	}
-	
-	let packageList = await Package.findAll({
-		where: Object.assign(packageQuery, req.account && req.account.role >= UserRole.MODERATOR ? {} : {
-			[Sequelize.Op.or]: (() => JSON.parse(JSON.stringify({
-					visible: true,
-					accountId: req.developer !== undefined ? req.developer.id : undefined
-				}))
-			)()
-		}),
-		attributes: { exclude: ["icon"] },
-		order: [["createdAt", "DESC"]],
-		include: [{
-			model: PackageVersion,
-			as: "versions",
-			separate: true,
-			attributes: { exclude: ["fileData"] },
-			visible: { [Sequelize.Op.gte]: req.developer === undefined },
-			order: [["createdAt", "DESC"]],
-			// limit: 1
-		}, {
-			model: PackageScreenshot,
-			as: "screenshots",
-			attributes: { exclude: ["fileData"] },
-			order: [["createdAt", "ASC"]]
-		}]
-	});
-	
-	packageList.forEach(packageObj => {
-		if (packageObj.versions.length) {
-			packageObj.dataValues.latestVersion = packageObj.versions[0];
-			packageObj.dataValues.downloadCount = packageObj.versions.map(item => item.dataValues.downloadCount).reduce((a, b) => a + b);
-		} else {
-			packageObj.dataValues.latestVersion = {};
-			packageObj.dataValues.downloadCount = 0;
-		}
-		delete packageObj.dataValues.versions;
-
-		if (packageObj.screenshots.length) {
-			packageObj.screenshots = packageObj.screenshots.reduce((obj, item) => ({
-				...obj,
-				[item["screenClass"]]: (obj[item["screenClass"]] || []).concat(item)
-			}), {});
-		}
-	});
-	
-	return res.status(httpStatus.OK).send(packageList);
+	}).catch(error => ErrorHandler(req, res, error));
 });
 
 /**
  * POST /packages/new
- * 
- * Creates a new Package and a Package Version by parsing file contents
- * Supported package files are .deb (DPKG packages), .zip and (.tar).gz
+ *
+ * Creates a new Package
  */
 router.post("/new", async (req, res) => {
 	const { account } = req;
@@ -173,9 +263,9 @@ router.post("/new", async (req, res) => {
 		}
 	});
 
-	const { Package, PackageVersion, LogItem } = req.models;
-	let packageData = req.body;
-	
+	const { Package, LogItem } = req.models;
+	const packageData = req.body;
+
 	if (!packageData.identifier || !packageData.name) return res.status(httpStatus.BAD_REQUEST).send({
 		error: {
 			name: httpStatus[httpStatus.BAD_REQUEST],
@@ -197,99 +287,31 @@ router.post("/new", async (req, res) => {
 		error: {
 			name: httpStatus[httpStatus.CONFLICT],
 			code: httpStatus.CONFLICT,
-			message: `Package with identifier ${packageData.identifier} or name ${packageData.name} already exists`
+			message: `Package with identifier \"${packageData.identifier}\" or name \"${packageData.name}\" already exists`
 		}
 	});
-	
+
 	return Package.create(Object.assign(packageData, {
 		id: String.prototype.concat(packageData.name, packageData.identifier, new Date().getTime()),
 		accountId: account.id,
 		screenshots: {},
 	})).then(packageObj => {
 		delete packageObj.dataValues.icon;
-		
+
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.PACKAGE_CREATED,
+			accountId: account.id,
+			affectedPackageId: packageObj.id,
+			detailText: `Package ${packageObj.identifier} <${packageObj.id}> was created by ${account.username} <${account.email}>`,
+			status: LogItemStatus.LOG_USAGE
+		});
+
 		return res.status(httpStatus.OK).send(packageObj);
 	}).catch(error => ErrorHandler(req, res, error));
-
-	/*if (!req.files || !req.files.file) return res.status(httpStatus.BAD_REQUEST).send({
-		name: httpStatus[httpStatus.BAD_REQUEST],
-		code: httpStatus.BAD_REQUEST,
-		message: "No package file specified"
-	});
-
-	let packageFile = req.files.file;
-	let iconFile = req.files.icon;
-
-	let archiveData = await ArchiveParser.parseArchive(packageFile, req.body.identifier, req.body.name, req.body.architecture);
-
-	if (!archiveData) return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-		name: httpStatus[httpStatus.INTERNAL_SERVER_ERROR],
-		code: httpStatus.INTERNAL_SERVER_ERROR,
-		message: "Failed to parse archive data"
-	});
-
-	// Parsing the archive data resulted in an error, so we send that error as a response
-	if (archiveData.code) {
-		return res.status(archiveData.code).send(archiveData);
-	}
-
-	return Package.create(Object.assign(packageData, {
-		id: String.prototype.concat(packageData.name, packageData.identifier, new Date().getTime()),
-		accountId: account.id,
-		icon: iconFile ? iconFile.data : null,
-		screenshots: {},
-	})).then(packageObj => {
-		PackageVersion.create(Object.assign(archiveData, {
-			id: String.prototype.concat(packageObj.id, account.id, new Date().getTime()),
-			packageId: packageObj.id,
-			version: archiveData["version"] || packageData.version,
-			changeText: packageData.releaseText,
-			visible: true,
-			depends: (() => {
-				if (!archiveData || !archiveData.depends) return {};
-
-				return archiveData.depends.split(", ").map(item => {
-					let match = item.match(/(^\S*)(?:.\((.+)\))?/);
-					return { [match[1]]: match[2] };
-				}).reduce((obj, item) => (obj[Object.keys(item)[0]] = item[Object.keys(item)[0]] || true, obj), {});
-			})(),
-			conflicts: (() => {
-				if (!archiveData || !archiveData.conflicts) return {};
-
-				return archiveData.conflicts.split(", ").map(item => {
-					let match = item.match(/(^\S*)(?:.\((.+)\))?/);
-					return { [match[1]]: match[2] };
-				}).reduce((obj, item) => (obj[Object.keys(item)[0]] = item[Object.keys(item)[0]] || true, obj), {});
-			})(),
-			filename: `/files/${packageFile.name}`,
-			//fileData: packageFile.data,
-			fileMime: packageFile.mimetype,
-			md5sum: cryptoBuiltin.createHash("md5").update(packageFile.data).digest("hex"),
-			sha1: cryptoBuiltin.createHash("sha1").update(packageFile.data).digest("hex"),
-			sha256: cryptoBuiltin.createHash("sha256").update(packageFile.data).digest("hex"),
-			size: packageFile.size
-		})).then(packageVersionObj => {
-			delete packageObj.dataValues.icon;
-			delete packageVersionObj.dataValues.fileData;
-
-			LogItem.create({
-				id: String.prototype.concat(new Date().getTime, Math.random()),
-				type: LogItemType.PACKAGE_CREATED,
-				accountId: account.id,
-				affectedPackageId: packageObj.id,
-				detailText: `Package ${packageObj.identifier} <${packageObj.id}> was created by ${account.username} <${account.email}>`,
-				status: 2
-			});
-			
-			packageFile.mv(path.join(path.dirname(require.main.filename), "../", "files", packageFile.name));
-
-			return res.status(httpStatus.OK).send({
-				package: packageObj,
-				packageVersion: packageVersionObj
-			});
-		}).catch(error => ErrorHandler(req, res, error));
-	}).catch(error => ErrorHandler(req, res, error));*/
 });
+
+
 
 /**
  * Additional routes

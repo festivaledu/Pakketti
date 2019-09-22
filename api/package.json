@@ -20,7 +20,6 @@
     "cors": "^2.8.5",
     "crypto-js": "^3.1.9-1",
     "debian-control-parser": "git+https://github.com/ioscreatix/debian-control-parser.git",
-    "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.5",
     "gunzip-maybe": "^1.4.1",

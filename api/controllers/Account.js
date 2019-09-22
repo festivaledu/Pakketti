@@ -4,7 +4,11 @@ const Sequelize = require("sequelize");
 const httpStatus = require("http-status");
 
 const ErrorHandler = require("../helpers/ErrorHandler");
-const { UserRole, LogItemType } = require("../helpers/Enumerations");
+const { UserRole, LogItemType, LogItemStatus } = require("../helpers/Enumerations");
+
+const bcrypt = require("bcryptjs");
+
+
 
 /**
  * GET /account/me
@@ -15,9 +19,11 @@ router.get("/me", (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
+		}
 	});
 
 	return res.status(httpStatus.OK).send(account);
@@ -29,32 +35,43 @@ router.get("/me", (req, res) => {
  * Updates information for the currently signed in User
  */
 router.put("/me", async (req, res) => {
-
 	const { account } = req;
+	
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
+		}
 	});
 
 	let { Account, LogItem } = req.models;
 
-	let existing = await Account.findOne({
-		where: Object.assign(JSON.parse(JSON.stringify({
-			username: req.body.username || undefined,
-			email: req.body.email || undefined,
-		})), {
+	if (req.body.username || req.body.email) {
+		let existing = await Account.findOne({
+			where: Object.assign(JSON.parse(JSON.stringify({
+				username: req.body.username || undefined,
+				email: req.body.email || undefined,
+			})), {
 				id: {
 					[Sequelize.Op.ne]: account.id,
 				}
 			})
-	});
+		});
 
-	if (existing) return res.status(httpStatus.CONFLICT).send({
-		name: httpStatus[httpStatus.CONFLICT],
-		code: httpStatus.CONFLICT,
-		message: "Username or E-Mail address already in use"
-	});
+		if (existing) return res.status(httpStatus.CONFLICT).send({
+			error: {
+				name: httpStatus[httpStatus.CONFLICT],
+				code: httpStatus.CONFLICT,
+				message: "Username or E-Mail address already in use"
+			}
+		});
+	}
+	
+	if (req.body.password) {
+		const salt = bcrypt.genSaltSync(10);
+		req.body.password = bcrypt.hashSync(req.body.password, salt);
+	}
 
 	return account.update(Object.assign(req.body, {
 		id: account.id,
@@ -71,7 +88,7 @@ router.put("/me", async (req, res) => {
 			accountId: account.id,
 			affectedAccountId: accountObj.id,
 			detailText: `User ${accountObj.username} <${accountObj.email}> has been edited`,
-			status: 2
+			status: LogItemStatus.LOG_USAGE
 		});
 		return res.status(httpStatus.OK).send({
 			id: accountObj.id,
@@ -91,13 +108,16 @@ router.put("/me", async (req, res) => {
  */
 router.delete("/me", async (req, res) => {
 	const { account } = req;
-	const { Package, LogItem } = req.models;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
+		}
 	});
+	
+	const { Package, LogItem } = req.models;
 
 	let packageObj = await Package.findOne({
 		where: {
@@ -106,9 +126,11 @@ router.delete("/me", async (req, res) => {
 	});
 	
 	if (packageObj) return res.status(httpStatus.FORBIDDEN).send({
-		name: httpStatus[httpStatus.FORBIDDEN],
-		code: httpStatus.FORBIDDEN,
-		message: "One or more packages are associated to your account. You may request your deletion in the User Control Panel."
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "One or more packages are associated to your account. You may request your deletion in the User Control Panel."
+		}
 	});
 
 	return account.destroy().then(() => {
@@ -118,7 +140,7 @@ router.delete("/me", async (req, res) => {
 			accountId: account.id,
 			affectedAccountId: accountObj.id,
 			detailText: `User ${accountObj.username} <${accountObj.email}> has been deleted`,
-			status: 2
+			status: LogItemStatus.LOG_USAGE
 		});
 
 		return res.status(httpStatus.OK).send({
@@ -139,9 +161,11 @@ router.get("/me/avatar", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
+		}
 	});
 
 	const { Account } = req.models;
@@ -154,9 +178,11 @@ router.get("/me/avatar", async (req, res) => {
 	});
 	
 	if (!accountObj.profileImage) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: "User does not have any profile image"
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "User does not have any profile image"
+		}
 	});
 
 	res.header("Content-Type", accountObj.profileImageMime);
@@ -173,26 +199,30 @@ router.put("/me/avatar", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
+		}
 	});
 
 	const { Account, LogItem } = req.models;
-
-	if (!req.files || !req.files.file) return res.status(httpStatus.BAD_REQUEST).send({
-		name: httpStatus[httpStatus.BAD_REQUEST],
-		code: httpStatus.BAD_REQUEST,
-		message: "No avatar file specified"
-	});
 	let avatarFile = req.files.file;
+
+	if (!avatarFile) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No avatar file specified"
+		}
+	});
 
 	let accountObj = await Account.findOne({
 		where: {
 			id: account.id
 		},
 	});
-	
+
 	return accountObj.update({
 		profileImage: avatarFile.data,
 		profileImageMime: avatarFile.mimetype
@@ -203,12 +233,15 @@ router.put("/me/avatar", async (req, res) => {
 			accountId: account.id,
 			affectedAccountId: accountObj.id,
 			detailText: `User ${accountObj.username} <${accountObj.email}> has received a new avatar`,
-			status: 2
+			status: LogItemStatus.LOG_USAGE
 		});
 
 		return res.status(httpStatus.OK).send({
-			name: "OK",
-			code: httpStatus.OK
+			success: {
+				name: "OK",
+				code: httpStatus.OK,
+				message: "Account successfully updated"
+			}
 		});
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -227,7 +260,7 @@ router.delete("/me/avatar", async (req, res) => {
 		message: "Invalid authorization token"
 	});
 
-	const { Account } = req.models;
+	const { Account, LogItem } = req.models;
 
 	let accountObj = await Account.findOne({
 		where: {
@@ -245,7 +278,7 @@ router.delete("/me/avatar", async (req, res) => {
 			accountId: account.id,
 			affectedAccountId: accountObj.id,
 			detailText: `User ${accountObj.username} <${accountObj.email}> has deleted their avatar`,
-			status: 2
+			status: LogItemStatus.LOG_USAGE
 		});
 
 		return res.status(httpStatus.OK).send({
@@ -258,83 +291,192 @@ router.delete("/me/avatar", async (req, res) => {
 
 
 /**
- * GET /account/:userId
+ * GET /account
  * 
  * Gets public information about a specified User
  */
-router.get("/:userId", async (req, res) => {
+router.get("/", async (req, res) => {
+	let query = (req.query.account || {}).filter(["id", "username", "email"]);
+	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No account specified"
+		}
+	});
+	
 	const { Account } = req.models;
 
 	let accountObj = await Account.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.userId,
-				username: req.params.userId,
-				email: req.params.userId
-			}
-		},
-		attributes: ["id", "username", [Sequelize.fn("COUNT", Sequelize.col('profileImage')), "profileImage"], "role", "createdAt"]
+		where: query,
+		attributes: ["id", "username", "profileImageMime", "role", "createdAt"]
 	});
 	
-	if (!accountObj || !accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: "User not found"
+	if (!accountObj || !Object.keys(accountObj).length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "User not found"
+		}
 	});
 
 	return res.status(httpStatus.OK).send(accountObj);
 });
 
 /**
- * DELETE /account/:userId
+ * PUT /account
+ * 
+ * Updates a specified user
+ * Restricted to Moderators and Administrators
+ * Restricted to Users with a role lower than the own role
+ */
+router.put("/account", async (req, res) => {
+	const { account } = req;
+
+	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
+		}
+	});
+	
+	if (account.role < UserRole.MODERATOR) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+	
+	let query = (req.query.account || {}).filter(["id", "username", "email"]);
+	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No account specified"
+		}
+	});
+	
+	const { Account, LogItem } = req.models;
+	
+	let accountObj = await Account.findOne({
+		where: query,
+		attributes: ["id", "username", "profileImageMime", "role", "createdAt"]
+	});
+	
+	if (!accountObj || !Object.keys(accountObj).length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "User not found"
+		}
+	});
+	
+	if (accountObj.id == account.id) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You cannot edit your acount via PUT /account. Please update your account using PUT /account/me"
+		}
+	});
+	
+	if (accountObj.role > account.role || accountObj.role == UserRole.MIGRATE) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+	
+	return account.update((req.body || {}).filter([
+		"role"
+	])).then(accountObj => {
+		LogItem.create({
+			id: String.prototype.concat(new Date().getTime, Math.random()),
+			type: LogItemType.USER_EDITED,
+			accountId: account.id,
+			affectedAccountId: accountObj.id,
+			detailText: `User ${accountObj.username} <${accountObj.email}> has been edited by ${account.username}`,
+			status: LogItemStatus.LOG_USAGE
+		});
+		return res.status(httpStatus.OK).send({
+			id: accountObj.id,
+			username: accountObj.username,
+			email: accountObj.email,
+			role: accountObj.role,
+			lastLogin: accountObj.lastLogin,
+			createdAt: accountObj.createdAt
+		});
+	}).catch(error => ErrorHandler(req, res, error));
+});
+
+/**
+ * DELETE /account
  * 
  * Deletes a specified User
  * Users can only be deleted by Users with a Moderator role or higher
+ * Users cannot be deleted if their role is equal or higher than the currently signed in User
  */
-router.delete("/:userId", async (req, res) => {
+router.delete("/", async (req, res) => {
 	const { account } = req;
-	const { Account } = req.models;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
-		name: httpStatus[httpStatus.UNAUTHORIZED],
-		code: httpStatus.UNAUTHORIZED,
-		message: "Invalid authorization token"
-	});
-
-	if (account.id == req.params.userId) return res.status(httpStatus.FORBIDDEN).send({
-		name: httpStatus[httpStatus.FORBIDDEN],
-		code: httpStatus.FORBIDDEN,
-		message: "You cannot delete your acount via DELETE /account/:userId. Please check if you can delete your account using DELETE /account/me"
-	});
-
-	if (account.role < UserRole.MODERATOR) return res.status(httpStatus.FORBIDDEN).send({
-		name: httpStatus[httpStatus.FORBIDDEN],
-		code: httpStatus.FORBIDDEN,
-		message: "You are not allowed to perform this action"
-	});
-
-	let accountObj = await Account.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.userId,
-				username: req.params.userId,
-				email: req.params.userId
-			}
-		},
+		error: {
+			name: httpStatus[httpStatus.UNAUTHORIZED],
+			code: httpStatus.UNAUTHORIZED,
+			message: "Invalid authorization token"
+		}
 	});
 	
-	if (!accountObj || !accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: "User not found"
+	if (account.role < UserRole.MODERATOR) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
 	});
-
-	if (accountObj.role >= account.role || accountObj.role == 1) return res.status(httpStatus.FORBIDDEN).send({
-		name: httpStatus[httpStatus.FORBIDDEN],
-		code: httpStatus.FORBIDDEN,
-		message: "You are not allowed to perform this action"
+	
+	let query = (req.query.account || {}).filter(["id", "username", "email"]);
+	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No account specified"
+		}
 	});
-
+	
+	const { Account, LogItem } = req.models;
+	
+	let accountObj = await Account.findOne({
+		where: query,
+		attributes: ["id", "username", "profileImageMime", "role", "createdAt"]
+	});
+	
+	if (!accountObj || !Object.keys(accountObj).length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "User not found"
+		}
+	});
+	
+	if (accountObj.id == account.id) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You cannot delete your acount via DELETE /account. Please check if you can delete your account using DELETE /account/me"
+		}
+	});
+	
+	if (accountObj.role >= account.role || accountObj.role == UserRole.MIGRATE) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+	
 	return accountObj.destroy().then(() => {
 		LogItem.create({
 			id: String.prototype.concat(new Date().getTime, Math.random()),
@@ -342,12 +484,15 @@ router.delete("/:userId", async (req, res) => {
 			accountId: account.id,
 			affectedAccountId: accountObj.id,
 			detailText: `User ${accountObj.username} <${accountObj.email}> was deleted by ${account.username}`,
-			status: 2
+			status: LogItemStatus.LOG_USAGE
 		});
 
 		return res.status(httpStatus.OK).send({
-			name: httpStatus[httpStatus.OK],
-			code: httpStatus.OK
+			success: {
+				name: httpStatus[httpStatus.OK],
+				code: httpStatus.OK,
+				message: "User successfully deleted"
+			}
 		});
 	}).catch(error => ErrorHandler(req, res, error));
 });
@@ -355,39 +500,48 @@ router.delete("/:userId", async (req, res) => {
 
 
 /**
- * GET /account/:userId/avatar
+ * GET /account/avatar
  * 
  * Gets the binary file for the Avatar of a specified User
  */
-router.get("/:userId/avatar", async (req, res) => {
+router.get("/avatar", async (req, res) => {
+	let query = (req.query.account || {}).filter(["id", "username", "email"]);
+	if (!query || !Object.keys(query).length) return res.status(httpStatus.BAD_REQUEST).send({
+		error: {
+			name: httpStatus[httpStatus.BAD_REQUEST],
+			code: httpStatus.BAD_REQUEST,
+			message: "No account specified"
+		}
+	});
+	
 	const { Account } = req.models;
 
 	let accountObj = await Account.findOne({
-		where: {
-			[Sequelize.Op.or]: {
-				id: req.params.userId,
-				username: req.params.userId,
-				email: req.params.userId
-			}
-		},
+		where: query,
 		attributes: ["profileImage", "profileImageMime"]
 	});
 	
-	if (!accountObj || accountObj.id) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: "User not found"
+	if (!accountObj || !Object.keys(accountObj).length) return res.status(httpStatus.NOT_FOUND).send({
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "User not found"
+		}
 	});
-
+	
 	if (!accountObj.profileImage) return res.status(httpStatus.NOT_FOUND).send({
-		name: httpStatus[httpStatus.NOT_FOUND],
-		code: httpStatus.NOT_FOUND,
-		message: "User does not have any profile image"
+		error: {
+			name: httpStatus[httpStatus.NOT_FOUND],
+			code: httpStatus.NOT_FOUND,
+			message: "User does not have any profile image"
+		}
 	});
 
 	res.header("Content-Type", accountObj.profileImageMime);
 	res.write(accountObj.profileImage, "binary");
 	return res.end(undefined, "binary");
 });
+
+
 
 module.exports = router;

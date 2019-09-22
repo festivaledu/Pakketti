@@ -3,7 +3,7 @@
 		<template v-if="profileData">
 			<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="top" class="profile-container">
 				<MetroPersonPicture :display-name="profileData.username" v-if="!profileData.profileImageMime" />
-				<MetroPersonPicture :profile-picture="`http://localhost:3000/media/avatar/${profileData.id}`" v-if="profileData.profileImageMime" />
+				<MetroPersonPicture :profile-picture="`/media/avatar/${profileData.id}`" v-if="profileData.profileImageMime" />
 				
 				<div class="profile-text-container">
 					<MetroTextBlock text-style="base">{{ profileData.username }}</MetroTextBlock>
