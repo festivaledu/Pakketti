@@ -7,6 +7,8 @@
 		"connection_interrupted_message": "The WebSocket connection has been interrupted. Click here to reconnect.",
 		"connection_failure_title": "Connection failed",
 		"connection_failure_message": "The WebSocket connection could not be established. Click here to try again.",
+		"generic_error_title": "Try that again",
+		"generic_error_message": "Page could not be loaded. Please try again later.",
 		
 		"actions": {
 			"add": "Add",
@@ -77,7 +79,9 @@
 		"item_statistics": "Statistics",
 		
 		"item_profile": "Profile",
-		"item_settings": "Settings"
+		"item_settings": "Settings",
+		
+		"error": "Error"
 	},
 	
 	"dashboard": {

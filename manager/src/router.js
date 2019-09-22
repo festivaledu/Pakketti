@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from './store'
 
 import { AuthAPI } from "@/scripts/ApiUtil";
 import { SocketService } from "@/scripts/SocketService";
+import { UserRole } from '@/scripts/Enumerations'
 
 Vue.use(Router)
 
@@ -24,17 +26,26 @@ const router = new Router({
 		{
 			path: '/packages',
 			name: 'packages',
-			component: () => import(/* webpackChunkName: "PackagesList" */ './pages/PackagesList.vue')
+			component: () => import(/* webpackChunkName: "PackagesList" */ './pages/PackagesList.vue'),
+			meta: {
+				minimumRole: UserRole.DEVELOPER
+			}
 		},
 		{
-			path: '/package/new',
+			path: '/packages/new',
 			name: 'package-creator',
-			component: () => import(/* webpackChunkName: "PackageCreator" */ './pages/PackageCreator.vue')
+			component: () => import(/* webpackChunkName: "PackageCreator" */ './pages/PackageCreator.vue'),
+			meta: {
+				minimumRole: UserRole.DEVELOPER
+			}
 		},
 		{
 			path: '/package/:packageId',
 			name: 'package-editor',
-			component: () => import(/* webpackChunkName: "PackageEditor" */ './pages/PackageEditor.vue')
+			component: () => import(/* webpackChunkName: "PackageEditor" */ './pages/PackageEditor.vue'),
+			meta: {
+				minimumRole: UserRole.DEVELOPER
+			}
 		},
 		{
 			path: '/reviews/:reviewId?',
@@ -47,21 +58,31 @@ const router = new Router({
 			component: () => import(/* webpackChunkName: "Devices" */ './pages/Devices.vue')
 		},
 		{
-			path: '/requests',
+			path: '/requests/:requestId?',
 			name: 'requests',
 			component: () => import(/* webpackChunkName: "Requests" */ './pages/Requests.vue')
 		},
 		{
 			path: '/logs',
 			name: 'logs',
-			component: () => import(/* webpackChunkName: "ModerationLog" */ './pages/ModerationLog.vue')
+			component: () => import(/* webpackChunkName: "ModerationLog" */ './pages/ModerationLog.vue'),
+			meta: {
+				minimumRole: UserRole.MODERATOR
+			}
 		},
 		
 		{
 			path: '/profile',
 			name: 'profile',
 			component: () => import(/* webpackChunkName: "Profile" */ './pages/Profile.vue')
-		}
+		},
+		
+		{
+			path: '/error/:error?',
+			name: 'error',
+			component: () => import(/* webpackChunkName: "ErrorPage" */ './pages/ErrorPage.vue')
+		},
+		{ path: '*', redirect: '/error/404' }
 	]
 });
 
@@ -94,6 +115,17 @@ router.beforeEach(async (to, from, next) => {
 					replace: true
 				});
 			}
+		}
+	}
+	
+	if (to.matched.some(_ => _.meta.minimumRole)) {
+		let minimumRole = to.matched.map(_ => _.meta.minimumRole)[0];
+		
+		if ((store.getters.role & minimumRole) != minimumRole) {
+			return next({
+				path: "/error/403",
+				replace: true
+			})
 		}
 	}
 	

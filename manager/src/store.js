@@ -18,7 +18,8 @@ export default new Vuex.Store({
 			state.role = role;
 		}
 	},
-	actions: {
-
+	getters: {
+		accountId: state => state.accountId,
+		role: state => state.role
 	}
 })
