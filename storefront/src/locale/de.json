@@ -36,6 +36,7 @@
 		"register_success_message": "<p>Dein Account wurde erfolgreich erstellt.<br>Danke, dass du dich für @:(app.name) angemeldet hast!<p>"
 	},
 	"section": {
+		"all": "Alle Kategorien",
 		"Administration": "Administration",
 		"Apps": "Apps",
 		"Archiving": "Archivierung",
@@ -64,9 +65,15 @@
 		"button_sign_out": "Abmelden"
 	},
 	"start": {
-		"most_downloaded_title": "Am meisten heruntergeladen",
-		"recently_updated_title": "Zuletzt aktualisiert",
+		"most_popular": "Beliebteste",
+		"most_downloaded": "Am meisten heruntergeladen",
+		"recently_updated": "Zuletzt aktualisiert",
 		"see_all": "Alle anzeigen"
+	},
+	"sections": {
+		"charts": "Charts",
+		"category_title": "Kategorie",
+		"category_placeholder": "Kategorie wählen"
 	},
 	"package": {
 		"more_button": "Mehr",

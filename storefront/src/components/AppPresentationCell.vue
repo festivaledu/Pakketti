@@ -3,7 +3,7 @@
 		<MetroStackPanel style="margin-top: 40px; margin-bottom: 16px">
 			<MetroStackPanel orientation="horizontal" horizontal-alignment="left" vertical-alignment="top">
 				<MetroTextBlock text-style="sub-title">{{ title }}</MetroTextBlock>
-				<MetroHyperlinkButton v-if="appData.length > 12" style="margin-left: 12px; white-space: nowrap; line-height: 27px">{{ $t('start.see_all') }}: {{ appData.length >= 100 ? "99+" : appData.length }}</MetroHyperlinkButton>
+				<router-link :to="`/sections?order=${orderBy}`" class="hyperlink-button" v-if="appData.length > 12 || true" style="margin-left: 12px; white-space: nowrap; line-height: 27px">{{ $t('start.see_all') }}: {{ appData.length >= 100 ? "99+" : appData.length }}</router-link>
 			</MetroStackPanel>
 		</MetroStackPanel>
 		
@@ -27,12 +27,12 @@
 				</MetroStackPanel>
 			</router-link>
 			
-			<div class="lockup-collection-cell" v-if="appData.length > 12">
+			<router-link tag="div" :to="`/sections?order=${orderBy}`" class="lockup-collection-cell" v-if="appData.length > 12">
 				<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" style="height: 100%">
 					<MetroFontIcon font-size="12px" glyph="&#xE0E3;" style="margin-bottom: 20px" />
 					<MetroTextBlock text-style="base" style="margin-bottom: -39px">{{ $t('start.see_all') }}: {{ appData.length >= 100 ? "99+" : appData.length }}</MetroTextBlock>
 				</MetroStackPanel>
-			</div>
+			</router-link>
 		</MetroStackPanel>
 	</div>
 </template>
@@ -45,7 +45,7 @@ export default {
 	components: {
 		CurrentRating
 	},
-	props: ["appData", "title", "sectionUrl"],
+	props: ["appData", "title", "sectionUrl", "orderBy"],
 	computed: {
 		limitedData() {
 			return [...this.appData].splice(0,12);

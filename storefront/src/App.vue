@@ -13,10 +13,10 @@
 						<MetroNavigationViewItem :content="$t('root.header.start')" page-id="start" />
 					</router-link>
 					
-					<router-link tag="div" to="/section/Apps">
+					<router-link tag="div" to="/sections?section=Apps">
 						<MetroNavigationViewItem :content="$t('section.Apps')" page-id="apps" />
 					</router-link>
-					<router-link tag="div" to="/section/Tweaks">
+					<router-link tag="div" to="/sections?section=Tweaks">
 						<MetroNavigationViewItem :content="$t('section.Tweaks')" page-id="tweaks" />
 					</router-link>
 					

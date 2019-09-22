@@ -36,6 +36,7 @@
 		"register_success_message": "<p>Your account has been successfully created.<br>Thank you for registering with @:(app.name)!<p>"
 	},
 	"section": {
+		"all": "All categories",
 		"Administration": "Administration",
 		"Apps": "Apps",
 		"Archiving": "Archiving",
@@ -64,9 +65,15 @@
 		"button_sign_out": "Sign out"
 	},
 	"start": {
-		"most_downloaded_title": "Most Downloaded",
-		"recently_updated_title": "Recently Updated",
+		"most_popular": "Most Popular",
+		"most_downloaded": "Most Downloaded",
+		"recently_updated": "Recently Updated",
 		"see_all": "See all"
+	},
+	"sections": {
+		"charts": "Charts",
+		"category_title": "Category",
+		"category_placeholder": "Select a category"
 	},
 	"package": {
 		"more_button": "More",

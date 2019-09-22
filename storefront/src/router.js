@@ -21,8 +21,8 @@ export default new Router({
 			component: () => import(/* webpackChunkName: "DeveloperPage" */ './pages/DeveloperPage.vue')
 		},
 		{
-			path: '/section/:sectionId',
-			name: 'section',
+			path: '/sections/:sectionId?',
+			name: 'sections',
 			component: () => import(/* webpackChunkName: "SectionPage" */ './pages/SectionPage.vue')
 		},
 		{

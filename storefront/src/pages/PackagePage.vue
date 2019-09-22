@@ -44,7 +44,7 @@
 								
 								<MetroTextBlock text-style="base" style="padding: 0 8px;">&bull;</MetroTextBlock>
 								
-								<router-link :to="`/section/${packageData.section}`" class="hyperlink-button">
+								<router-link :to="`/sections?section=${packageData.section}`" class="hyperlink-button">
 									<MetroTextBlock text-style="base">{{ $t(`section.${packageData.section}`) }}</MetroTextBlock>
 								</router-link>
 							</MetroStackPanel>
@@ -144,7 +144,7 @@
 							<div class="col col-12 col-md-6 col-lg-3 info-column">
 								<div class="info-item">
 									<MetroTextBlock text-style="base">{{ $t('package.additional_info.category') }}</MetroTextBlock>
-									<router-link :to="`/section/${packageData.section}`" class="hyperlink-button">
+									<router-link :to="`/sections?section=${packageData.section}`" class="hyperlink-button">
 										<MetroTextBlock text-style="base">{{ $t(`section.${packageData.section}`) }}</MetroTextBlock>
 									</router-link>
 								</div>
