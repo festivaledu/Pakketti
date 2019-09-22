@@ -6,7 +6,7 @@
 			<MetroCommandBar>
 				<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" @click="refresh()" />
 				<MetroAppBarSeparator />
-				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click="navigate('/package/new')" />
+				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click="navigate('/packages/new')" />
 			</MetroCommandBar>
 		</template>
 		
@@ -61,9 +61,9 @@
 						<div class="tr row">
 							<div class="td cell">
 								<MetroTextBlock text-style="caption">{{ $t('packages.no_items') }}</MetroTextBlock>
-								<MetroHyperlinkButton>
+								<router-link to="/packages/new" class="hyperlink-button">
 									<MetroTextBlock text-style="caption">{{ $t('packages.create') }}</MetroTextBlock>
-								</MetroHyperlinkButton>
+								</router-link>
 							</div>
 						</div>
 					</div>
@@ -159,13 +159,13 @@ export default {
 			return this.$store.state.accountId;
 		},
 		isDeveloper() {
-			return this.$store.state.role & UserRole.DEVELOPER == UserRole.DEVELOPER;
+			return (this.$store.state.role & UserRole.DEVELOPER) == UserRole.DEVELOPER;
 		},
 		isModerator() {
-			return this.$store.state.role & UserRole.MODERATOR == UserRole.MODERATOR;
+			return (this.$store.state.role & UserRole.MODERATOR) == UserRole.MODERATOR;
 		},
 		isAdministrator() {
-			return this.$store.state.role & UserRole.ADMINISTRATOR == UserRole.ADMINISTRATOR;
+			return (this.$store.state.role & UserRole.ADMINISTRATOR) == UserRole.ADMINISTRATOR;
 		}
 	},
 	filters: {

@@ -119,8 +119,11 @@ module.exports = (Sequelize, DataTypes) => {
 	/**
 	 * Define this model's association to other models
 	 */
-	LogItem.associate = ({}) => {
-		// associations can be defined here
+	LogItem.associate = ({ Account }) => {
+		LogItem.belongsTo(Account, {
+			foreignKey: "accountId",
+			onDelete: "CASCADE"
+		});
 	};
 	
 	return LogItem;

@@ -273,7 +273,7 @@ export default {
 	},
 	computed: {
 		isRoot() {
-			return Boolean(this.$store.state.role & UserRole.ROOT == UserRole.ROOT);
+			return (this.$store.state.role & UserRole.ROOT) == UserRole.ROOT;
 		}
 	}
 }

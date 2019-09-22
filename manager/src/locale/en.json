@@ -50,6 +50,21 @@
 		"register_success_message": "<p>Your account has been successfully created.<br>You will now be redirected to the Dashboard.<p>"
 	},
 	
+	"section": {
+		"Administration": "Administration",
+		"Apps": "Apps",
+		"Archiving": "Archiving",
+		"Development": "Development",
+		"Fonts": "Fonts",
+		"Networking": "Networking",
+		"Packaging": "Packaging",
+		"Security": "Security",
+		"System": "System",
+		"Tweaks": "Tweaks",
+		"Utilities": "Utilities",
+		"Wallpaper": "Wallpaper"
+	},
+	
 	"root": {
 		"pane_title": "@:(app.name)",
 		"item_dashboard": "Dashboard",
@@ -87,7 +102,11 @@
 		"devices_serial_number": "Serial Number",
 		"devices_no_items": "No Devices to display",
 		"devices_create": "Link a Device",
-		"devices_see_all": "See all Devices"
+		"devices_see_all": "See all Devices",
+		
+		"requests_header": "Requests",
+		"requests_no_items": "No Requests to display",
+		"requests_see_all": "Show all Requests"
 	},
 	
 	"packages": {
@@ -299,6 +318,10 @@
 		
 		"delete_request_confirm_title": "Delete this request?",
 		"delete_request_confirm_body": "<p>Are you sure you want to delete this request?<br>This action cannot be undone.</p>",
+		"delete_account_confirm_title": "Delete \"%{username}\"?",
+		"delete_account_confirm_body": "<p>Are you sure you want to delete \"${username}\"?<br>This action cannot be undone.</p>",
+		
+		"actions_title": "Actions",
 		
 		"role_application": {
 			"title_developer": "Request Developer Role",
@@ -315,6 +338,13 @@
 			"title": "Delete Account",
 			"reason_header": "Tell us why you'd like to delete your account:",
 			"disclaimer": "If your account is deleted, all your Packages, Reviews, linked Devices etc. will also be deleted. Be advised that this action cannot be undone."
+		},
+		
+		"account_roles": {
+			"title": "Assign Roles",
+			"developer": "Developer",
+			"moderator": "Moderator",
+			"administrator": "Administrator"
 		}
 	},
 	

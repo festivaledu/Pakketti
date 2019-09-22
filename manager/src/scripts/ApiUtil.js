@@ -82,6 +82,16 @@ export class AccountAPI {
 
 		return await SocketService.get(`/account?${query}`);
 	}
+	
+	static async updateUser(parameters, data) {
+		const query = parseUrlFromObject(flattenObject(parameters));
+
+		return await SocketService.put(`/account?${query}`, data, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+			}
+		});
+	}
 
 	static async deleteUser(parameters) {
 		const query = parseUrlFromObject(flattenObject(parameters));

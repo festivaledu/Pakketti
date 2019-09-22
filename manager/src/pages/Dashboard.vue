@@ -2,30 +2,32 @@
 	<MetroPage page-id="dashboard">
 		<vue-headful :title="`${$t('root.item_dashboard')} - ${$t('app.name')}`" />
 		
-		<div class="mb-2" v-if="(isModerator || isAdministrator)">
-			<MetroTextBlock text-style="sub-title">{{ $t('dashboard.overview_header') }}</MetroTextBlock>
-		</div>
-		
-		<div class="row no-margin" v-if="statisticsData && (isModerator || isAdministrator)">
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard :name="$t('dashboard.overview_downloads')" :dataset="this.statisticsData.items.map(item => item['versionDownloaded'])" />
+		<template v-if="statisticsData && (isModerator || isAdministrator)">
+			<div class="mb-2">
+				<MetroTextBlock text-style="sub-title">{{ $t('dashboard.overview_header') }}</MetroTextBlock>
 			</div>
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard :name="$t('dashboard.overview_packages_created')" :dataset="this.statisticsData.items.map(item => item['packageCreated'])" />
+			
+			<div class="row no-margin">
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard :name="$t('dashboard.overview_downloads')" :dataset="this.statisticsData.items.map(item => item['versionDownloaded'])" />
+				</div>
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard :name="$t('dashboard.overview_packages_created')" :dataset="this.statisticsData.items.map(item => item['packageCreated'])" />
+				</div>
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard :name="$t('dashboard.overview_packages_updated')" :dataset="this.statisticsData.items.map(item => item['versionCreated'])" />
+				</div>
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard :name="$t('dashboard.overview_reviews')" :dataset="this.statisticsData.items.map(item => item['reviewCreated'])" />
+				</div>
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard :name="$t('dashboard.overview_registrations')" :dataset="this.statisticsData.items.map(item => item['userRegistration'])" />
+				</div>
+				<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
+					<Statcard :name="$t('dashboard.overview_logins')" :dataset="this.statisticsData.items.map(item => item['userLogin'])" />
+				</div>
 			</div>
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard :name="$t('dashboard.overview_packages_updated')" :dataset="this.statisticsData.items.map(item => item['versionCreated'])" />
-			</div>
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard :name="$t('dashboard.overview_reviews')" :dataset="this.statisticsData.items.map(item => item['reviewCreated'])" />
-			</div>
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard :name="$t('dashboard.overview_registrations')" :dataset="this.statisticsData.items.map(item => item['userRegistration'])" />
-			</div>
-			<div class="col-6 col-md-2 p-0 px-md-2 mb-3 mb-md-4">
-				<Statcard :name="$t('dashboard.overview_logins')" :dataset="this.statisticsData.items.map(item => item['userLogin'])" />
-			</div>
-		</div>
+		</template>
 		
 		<div class="mb-2" v-if="(isDeveloper || isModerator)">
 			<MetroTextBlock text-style="sub-title">{{ $t('packages.header') }}</MetroTextBlock>
@@ -43,7 +45,7 @@
 							<div class="th column-header-item">{{ $t('packages.updated') }}</div>
 							<div class="th column-header-item align-right">{{ $t('packages.actions') }}</div>
 						</div>
-						<div class="row-wrapper" v-for="(packageObj, index) in packageData.slice(0, 5)" :key="index">
+						<div class="row-wrapper" v-for="(packageObj, index) in filteredPackageData" :key="index">
 							<div class="tr row">
 								<div class="td cell">
 									<MetroTextBlock>{{ packageObj.name }}</MetroTextBlock>
@@ -91,9 +93,9 @@
 				</div>
 			</div>
 			
-			<MetroHyperlinkButton v-if="packageData && packageData.length > 5">
+			<router-link to="/packages" class="hyperlink-button" v-if="packageData && packageData.length > 5">
 				<MetroTextBlock text-style="caption">{{ $t('packages.see_all') }}</MetroTextBlock>
-			</MetroHyperlinkButton>
+			</router-link>
 		</div>
 		
 		<div class="row">
@@ -113,7 +115,7 @@
 								<div class="th column-header-item">{{ $t('dashboard.reviews_date') }}</div>
 								<div class="th column-header-item">{{ $t('dashboard.reviews_rating') }}</div>
 							</div>
-							<router-link tag="div" :to="`/reviews/${reviewObj.id}`" class="row-wrapper" v-for="(reviewObj, index) in reviewData.slice(0,5)" :key="index">
+							<router-link tag="div" :to="`/reviews/${reviewObj.id}`" class="row-wrapper" v-for="(reviewObj, index) in filteredReviewData" :key="index">
 								<div class="tr row">
 									<div class="td cell">
 										<MetroTextBlock>{{ reviewObj.title }}</MetroTextBlock>
@@ -140,9 +142,9 @@
 					</div>
 				</div>
 				
-				<MetroHyperlinkButton v-if="reviewData && reviewData.length > 5">
+				<router-link to="/reviews" class="hyperlink-button" v-if="reviewData && reviewData.length > 5">
 					<MetroTextBlock text-style="caption">{{ $t('dashboard.reviews_see_all') }}</MetroTextBlock>
-				</MetroHyperlinkButton>
+				</router-link>
 			</div>
 			
 			<div class="col-12 col-md-6">
@@ -162,7 +164,7 @@
 								<div class="th column-header-item">{{ $t('dashboard.devices_serial_number') }}</div>
 							</div>
 							
-							<router-link tag="div" :to="`/devices/${deviceObj.id}`" class="row-wrapper" v-for="(deviceObj, index) in deviceData.slice(0,5)" :key="index">
+							<router-link tag="div" :to="`/devices/${deviceObj.id}`" class="row-wrapper" v-for="(deviceObj, index) in filteredDeviceData" :key="index">
 								<div class="tr row">
 									<div class="td cell">
 										<MetroStackPanel orientation="horizontal" vertical-alignment="center">
@@ -200,16 +202,62 @@
 					</div>
 				</div>
 				
-				<MetroHyperlinkButton v-if="deviceData && deviceData.length > 5">
+				<router-link to="/devices" class="hyperlink-button" v-if="deviceData && deviceData.length > 5">
 					<MetroTextBlock text-style="caption">{{ $t('dashboard.devices_see_all') }}</MetroTextBlock>
-				</MetroHyperlinkButton>
+				</router-link>
+			</div>
+		</div>
+		
+		<div class="row" v-if="isModerator || isAdministrator">
+			<div class="col-12 col-md-6">
+				<MetroTextBlock text-style="sub-title">{{ $t('dashboard.requests_header') }}</MetroTextBlock>
+				
+				<MetroStackPanel horizontal-alignment="center" v-if="!requestData">
+					<MetroProgressRing :active="true" style="width: 50px; height: 50px" />
+				</MetroStackPanel>
+				
+				<div class="data-grid request-list" v-if="requestData">
+					<div class="data-grid-wrapper">
+						<div class="table">
+							<div class="column-headers-border" />
+							<div class="tr column-headers">
+								<div class="th column-header-item">{{ $t('requests.type.title') }}</div>
+								<div class="th column-header-item">{{ $t('requests.status.title') }}</div>
+							</div>
+							<router-link tag="div" :to="`/requests/${requestObj.id}`" class="row-wrapper" v-for="(requestObj, index) in filteredRequestData" :key="index">
+								<div class="tr row">
+									<div class="td cell">
+										<MetroTextBlock>{{ $t(`requests.type.${requestObj.type}`) }}</MetroTextBlock>
+										<MetroTextBlock text-style="caption">{{ requestObj.detailText }}</MetroTextBlock>
+									</div>
+									<div class="td cell">
+										<MetroTextBlock>{{ $t(`requests.status.${requestObj.status}`) }}</MetroTextBlock>
+									</div>
+								</div>
+								<div class="row-background" :style="{'top': `${(index * 47) + 32}px`}" />
+							</router-link>
+							
+							<div class="row-wrapper" v-if="!reviewData.length">
+								<div class="tr row">
+									<div class="td cell">
+										<MetroTextBlock text-style="caption">{{ $t('dashboard.requests_no_items') }}</MetroTextBlock>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<router-link to="/requests" class="hyperlink-button" v-if="requestData && requestData.length > 5">
+					<MetroTextBlock text-style="caption">{{ $t('dashboard.requests_see_all') }}</MetroTextBlock>
+				</router-link>
 			</div>
 		</div>
 	</MetroPage>
 </template>
 
 <script>
-import { DeviceAPI, PackageAPI, StatisticsAPI } from '@/scripts/ApiUtil'
+import { DeviceAPI, PackageAPI, RequestAPI, StatisticsAPI } from '@/scripts/ApiUtil'
 import { UserRole } from "@/scripts/Enumerations"
 import Platforms from '../../../platforms.json'
 import DeviceStrings from '../../../deviceStrings.json'
@@ -226,6 +274,8 @@ export default {
 		statisticsData: null,
 		reviewData: null,
 		deviceData: null,
+		requestData: null,
+		
 		Platforms: Platforms,
 		DeviceStrings: DeviceStrings
 	}),
@@ -237,12 +287,14 @@ export default {
 		let _statisticsData = await StatisticsAPI.getMonth();
 		let _reviewData = await PackageAPI.getReviews();
 		let _deviceData = await DeviceAPI.getDevices();
+		let _requestData = await RequestAPI.getRequests();
 		
 		next(vm => {
 			vm.packageData = _packageData;
 			vm.statisticsData = _statisticsData
 			vm.reviewData = _reviewData;
 			vm.deviceData = _deviceData;
+			vm.requestData = _requestData;
 			
 			vm.$parent.setHeader(vm.$t('root.item_dashboard'));
 			vm.$parent.setSelectedMenuItem("dashboard");
@@ -305,17 +357,30 @@ export default {
 		}
 	},
 	computed: {
+		filteredPackageData() {
+			return [...this.packageData].slice(0,5);
+		},
+		filteredReviewData() {
+			return [...this.reviewData].slice(0,5);
+		},
+		filteredDeviceData() {
+			return [...this.deviceData].slice(0,5);
+		},
+		filteredRequestData() {
+			return [...this.requestData].slice(0,5);
+		},
+		
 		accountId() {
 			return this.$store.state.accountId;
 		},
 		isDeveloper() {
-			return this.$store.state.role & UserRole.DEVELOPER == UserRole.DEVELOPER;
+			return (this.$store.state.role & UserRole.DEVELOPER) == UserRole.DEVELOPER;
 		},
 		isModerator() {
-			return this.$store.state.role & UserRole.MODERATOR == UserRole.MODERATOR;
+			return (this.$store.state.role & UserRole.MODERATOR) == UserRole.MODERATOR;
 		},
 		isAdministrator() {
-			return this.$store.state.role & UserRole.ADMINISTRATOR == UserRole.ADMINISTRATOR;
+			return (this.$store.state.role & UserRole.ADMINISTRATOR) == UserRole.ADMINISTRATOR;
 		}
 	},
 	filters: {
@@ -340,7 +405,8 @@ export default {
 		
 		&.package-list,
 		&.review-list,
-		&.device-list {
+		&.device-list,
+		&.request-list {
 			.table {
 				width: 100%;
 			}

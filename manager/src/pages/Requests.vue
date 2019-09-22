@@ -6,7 +6,7 @@
 			<MetroCommandBar>
 				<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" @click="refresh" />
 				<MetroAppBarSeparator />
-				<MetroAppBarButton label="Upgrade" icon="shield" @click.native="upgradeButtonClicked" />
+				<MetroAppBarButton :label="$t('requests.actions_title')" icon="shield" @click.native="upgradeButtonClicked" />
 			</MetroCommandBar>
 		</template>
 		
@@ -40,7 +40,7 @@
 					<div class="row-wrapper" v-if="!requestData.length">
 						<div class="tr row">
 							<div class="td cell">
-								<MetroTextBlock text-style="caption">{{ $t('requests.no_items') }}</MetroTextBlock>
+								<MetroTextBlock text-style="caption">{{ $t('dashboard.requests_no_items') }}</MetroTextBlock>
 							</div>
 						</div>
 					</div>
@@ -89,27 +89,27 @@ export default {
 		async viewRequest(requestObj) {
 			let _requestObj = {...requestObj};
 			
-			let requestCreatorData = await AccountAPI.getUser({
+			let _requestCreatorData = await AccountAPI.getUser({
 				"account.id": requestObj.accountId
 			});
 			
-			let accountData = null;
+			let _accountData = null;
 			if (requestObj.affectedAccountId) {
-				accountData = await AccountAPI.getUser({
+				_accountData = await AccountAPI.getUser({
 					"account.id": requestObj.affectedAccountId
 				})
 			}
 			
-			let packageData = null;
-			let reviewData = null;
+			let _packageData = null;
+			let _reviewData = null;
 			if (requestObj.affectedPackageId) {
-				packageData = (await PackageAPI.getPackages({
+				_packageData = (await PackageAPI.getPackages({
 					"package.id": requestObj.affectedPackageId,
 					include: "reviews"
 				}))[0];
 				
 				if (requestObj.affectedReviewId) {
-					reviewData = packageData.reviews.find(_ => _.id == requestObj.affectedReviewId);
+					_reviewData = packageData.reviews.find(_ => _.id == requestObj.affectedReviewId);
 				}
 			}
 			
@@ -150,20 +150,25 @@ export default {
 						<div class="col-12 col-md-6">
 							<div class="mb-5">
 								<MetroTextBlock text-style="base">{this.$t('requests.creator')}</MetroTextBlock>
-								<MetroTextBlock>{`${requestCreatorData.username} (${requestCreatorData.email || this.$t('requests.affected.na')})` || this.$t('requests.affected.na')}</MetroTextBlock>
+								<MetroTextBlock>{`${_requestCreatorData.username} (${_requestCreatorData.email || this.$t('requests.affected.na')})` || this.$t('requests.affected.na')}</MetroTextBlock>
 							</div>
 							<div class="mb-4">
 								<MetroTextBlock text-style="base">{this.$t('requests.affected.account')}</MetroTextBlock>
-								<MetroTextBlock>{accountData ? `${accountData.username} (${accountData.email || this.$t('requests.affected.na')})` : this.$t('requests.affected.na')}</MetroTextBlock>
+								<MetroTextBlock>{_accountData ? `${_accountData.username} (${_accountData.email || this.$t('requests.affected.na')})` : this.$t('requests.affected.na')}</MetroTextBlock>
 							</div>
 							<div class="mb-4">
 								<MetroTextBlock text-style="base">{this.$t('requests.affected.package')}</MetroTextBlock>
-								<MetroTextBlock>{packageData ? `${packageData.name} (${packageData.identifier})` : this.$t('requests.affected.na')}</MetroTextBlock>
+								<MetroTextBlock>{_packageData ? `${_packageData.name} (${_packageData.identifier})` : this.$t('requests.affected.na')}</MetroTextBlock>
 							</div>
 							<div class="mb-4">
 								<MetroTextBlock text-style="base">{this.$t('requests.affected.review')}</MetroTextBlock>
-								<MetroTextBlock>{reviewData ? `${reviewData.title} (${new Date(reviewData.createdAt).toLocaleString()})` : this.$t('requests.affected.na')}</MetroTextBlock>
+								<MetroTextBlock>{_reviewData ? `${_reviewData.title} (${new Date(_reviewData.createdAt).toLocaleString()})` : this.$t('requests.affected.na')}</MetroTextBlock>
 							</div>
+							
+							{(this.isModerator || this.isAdministrator) && requestObj.affectedAccountId && (
+								<MetroButton
+									onclick={(e) => this.manageUserButtonClicked(e, _accountData.id)} disabled={requestObj.status >= 0 || requestObj.accountId == this.accountId}>{this.$t('requests.manage_user')}</MetroButton>
+							)}
 						</div>
 					</div>
 				),
@@ -350,6 +355,84 @@ export default {
 				}
 			}
 		},
+		async manageUserButtonClicked(e, accountId) {
+			let accountData = await AccountAPI.getUser({
+				"account.id": accountId
+			});
+			
+			let flyout = new metroUI.MenuFlyout({
+				items: [{
+					text: this.$t('requests.account_roles.title'),
+					disabled: accountData.role & UserRole.DEVELOPER == UserRole.DEVELOPER,
+					action: async () => {
+						let _accountData = {...accountData};
+						
+						let dialog = new metroUI.ContentDialog({
+							title: this.$t('requests.account_roles.title'),
+							content: () => (
+								<div>
+									<MetroCheckbox
+										content={this.$t('requests.account_roles.developer')}
+										oninput={() => { _accountData.role ^= UserRole.DEVELOPER }}
+										value={Boolean(_accountData.role & UserRole.DEVELOPER)}
+									/>
+									<MetroCheckbox
+										content={this.$t('requests.account_roles.moderator')}
+										disabled={accountData.role > this.accountRole}
+										oninput={() => { _accountData.role ^= UserRole.MODERATOR }}
+										value={Boolean(_accountData.role & UserRole.MODERATOR)}
+									/>
+								</div>
+							),
+							commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+						});
+						
+						if (await dialog.showAsync() == metroUI.ContentDialogResult.Primary) {
+							let result = await AccountAPI.updateUser({
+								"account.id": accountData.id
+							}, {
+								role: _accountData.role
+							});
+							
+							if (result.error) {
+								console.log(result.error);
+							} else {
+								this.refresh();
+							}
+							
+						}
+					}
+				}, {
+					text: this.$t('requests.account_deletion.title'),
+					disabled: accountData.role >= this.accountRole,
+					action: async () => {
+						let deleteDialog = new metroUI.ContentDialog({
+							title: this.$t('requests.delete_account_confirm_title', { username: accountData.username }),
+							content: this.$t('requests.delete_account_confirm_body', { username: accountData.username }),
+							commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
+						});
+						
+						if (await deleteDialog.showAsync() === metroUI.ContentDialogResult.Primary) {
+							let result = await AccountAPI.deleteUser({
+								"account.id": accountData.id
+							});
+							
+							if (result.error) {
+								new metroUI.ContentDialog({
+									title: this.$t('app.operational_error_title'),
+									content: this.$t('app.operational_error_message', { code: result.error.code, name: result.error.name, message: result.error.message }),
+									commands: [{ text: this.$t('app.ok'), primary: true }]
+								}).show();
+							} else {
+								this.refresh();
+							}
+						}
+					}
+				}]
+			});
+			
+			flyout.showAt(e.target);
+		},
 		async refresh() {
 			this.requestData = await RequestAPI.getRequests();
 		}
@@ -358,17 +441,20 @@ export default {
 		accountId() {
 			return this.$store.state.accountId;
 		},
+		accountRole() {
+			return this.$store.state.role;
+		},
 		isDeveloper() {
-			return this.$store.state.role & UserRole.DEVELOPER == UserRole.DEVELOPER;
+			return (this.$store.state.role & UserRole.DEVELOPER) == UserRole.DEVELOPER;
 		},
 		isModerator() {
-			return this.$store.state.role & UserRole.MODERATOR == UserRole.MODERATOR;
+			return (this.$store.state.role & UserRole.MODERATOR) == UserRole.MODERATOR;
 		},
 		isAdministrator() {
-			return this.$store.state.role & UserRole.ADMINISTRATOR == UserRole.ADMINISTRATOR;
+			return (this.$store.state.role & UserRole.ADMINISTRATOR) == UserRole.ADMINISTRATOR;
 		},
 		isRoot() {
-			return this.$store.state.role & UserRole.ROOT == UserRole.ROOT;
+			return (this.$store.state.role & UserRole.ROOT) == UserRole.ROOT;
 		}
 	}
 }

@@ -183,7 +183,20 @@
 							
 							<MetroComboBox
 								:placeholder-text="$t('package_editor.info.section_placeholder')"
-								:items-source="['Apps', 'Tweaks']"
+								:items-source="{
+									'Administration': $t('section.Administration'),
+									'Apps': $t('section.Apps'),
+									'Archiving': $t('section.Archiving'),
+									'Development': $t('section.Development'),
+									'Fonts': $t('section.Fonts'),
+									'Networking': $t('section.Networking'),
+									'Packaging': $t('section.Packaging'),
+									'Security': $t('section.Security'),
+									'System': $t('section.System'),
+									'Tweaks': $t('section.Tweaks'),
+									'Utilities': $t('section.Utilities'),
+									'Wallpaper': $t('section.Wallpaper'),
+								}"
 								v-model="packageData.section"
 								@input="$v.packageData.section.$touch()"
 								:disabled="!isOwnedPackage || isExistingPackage"
@@ -524,6 +537,7 @@ export default {
 						commands: [{ text: this.$t('app.ok'), primary: true }]
 					}).show();
 				} else {
+					this.$v.$reset();
 					this.$router.replace("/packages");
 				}
 			}

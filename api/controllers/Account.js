@@ -330,7 +330,7 @@ router.get("/", async (req, res) => {
  * Restricted to Moderators and Administrators
  * Restricted to Users with a role lower than the own role
  */
-router.put("/account", async (req, res) => {
+router.put("/", async (req, res) => {
 	const { account } = req;
 
 	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
@@ -389,7 +389,7 @@ router.put("/account", async (req, res) => {
 		}
 	});
 	
-	return account.update((req.body || {}).filter([
+	return accountObj.update((req.body || {}).filter([
 		"role"
 	])).then(accountObj => {
 		LogItem.create({

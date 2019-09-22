@@ -299,22 +299,28 @@ export default {
 			include: "ratings,reviews,screenshots,versions"
 		});
 		
-		let _developerData = (!Object.keys(_packageData[0]).length || _packageData[0].error) ? null : await AccountAPI.getUser({
-			"account.id": _packageData[0].accountId
-		});
+		let _developerData;
+		if (_packageData.length) {
+			_developerData = (!Object.keys(_packageData[0]).length || _packageData[0].error) ? null : await AccountAPI.getUser({
+				"account.id": _packageData[0].accountId
+			});
+		}
 		
 		next(vm => {
 			if (!_packageData.length || _packageData.error) {
 				vm.packageData = {};
+				
+				vm.$parent.setHeader(null);
+				vm.$parent.setSelectedMenuItem(null);
 			} else {
 				window.packageData = _packageData[0];
 				vm.packageData = _packageData[0];
+				
+				vm.$parent.setHeader(vm.$t(`section.${_packageData[0].section}`));
+				vm.$parent.setSelectedMenuItem(_packageData[0].section.toLowerCase());
 			}
 			
 			vm.developerData = _developerData;
-			
-			vm.$parent.setHeader(vm.$t(`section.${_packageData[0].section}`));
-			vm.$parent.setSelectedMenuItem(_packageData[0].section.toLowerCase());
 		});
 	},
 	methods: {

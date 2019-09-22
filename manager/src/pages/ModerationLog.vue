@@ -146,10 +146,10 @@ export default {
 			return this.$store.state.accountId;
 		},
 		isModerator() {
-			return this.$store.state.role & UserRole.MODERATOR == UserRole.MODERATOR;
+			return (this.$store.state.role & UserRole.MODERATOR) == UserRole.MODERATOR;
 		},
 		isAdministrator() {
-			return this.$store.state.role & UserRole.ADMINISTRATOR == UserRole.ADMINISTRATOR;
+			return (this.$store.state.role & UserRole.ADMINISTRATOR) == UserRole.ADMINISTRATOR;
 		}
 	},
 	filters: {

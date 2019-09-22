@@ -49,13 +49,13 @@ router.get("/reviews", async (req, res) => {
 		}]
 	});
 	
-	if (!packageList || !packageList.length) return res.status(httpStatus.NOT_FOUND).send({
-		error: {
-			name: httpStatus[httpStatus.NOT_FOUND],
-			code: httpStatus.NOT_FOUND,
-			message: "Could not find any package"
-		}
-	});
+	// if (!packageList || !packageList.length) return res.status(httpStatus.NOT_FOUND).send({
+	// 	error: {
+	// 		name: httpStatus[httpStatus.NOT_FOUND],
+	// 		code: httpStatus.NOT_FOUND,
+	// 		message: "Could not find any package"
+	// 	}
+	// });
 	
 	let packageReviewData = packageList.map(packageObj => packageObj.reviews).reduce((list, obj) => list.concat(obj), []);
 	

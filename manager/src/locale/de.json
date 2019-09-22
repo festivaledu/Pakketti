@@ -50,6 +50,21 @@
 		"register_success_message": "<p>Dein Account wurde erfolgreich erstellt.<br>Du wirst jetzt zum Dashboard weitergeleitet.<p>"
 	},
 	
+	"section": {
+		"Administration": "Administration",
+		"Apps": "Apps",
+		"Archiving": "Archivierung",
+		"Development": "Entwicklung",
+		"Fonts": "Schriftarten",
+		"Networking": "Netzwerk",
+		"Packaging": "Paketerstellung",
+		"Security": "Sicherheit",
+		"System": "System",
+		"Tweaks": "Erweiterungen",
+		"Utilities": "Dienstprogramme",
+		"Wallpaper": "Hintergrundbilder"
+	},
+	
 	"root": {
 		"pane_title": "@:(app.name)",
 		"item_dashboard": "Dashboard",
@@ -87,7 +102,11 @@
 		"devices_serial_number": "Seriennummer",
 		"devices_no_items": "Es gibt keine Geräte, die angezeigt werden können",
 		"devices_create": "Verknüpfe ein neues Gerät",
-		"devices_see_all": "Alle Geräte anzeigen"
+		"devices_see_all": "Alle Geräte anzeigen",
+		
+		"requests_header": "Anfragen",
+		"requests_no_items": "Es gibt keine Anfragen, die angezeigt werden können",
+		"requests_see_all": "Alle Anfragen anzeigen"
 	},
 	
 	"packages": {
@@ -132,7 +151,7 @@
 		},
 		
 		"unsaved_changes": {
-			"title": "Ungesicherter Änderungen",
+			"title": "Ungesicherte Änderungen",
 			"body": "<p>Möchtest du deine Änderungen speichern?<br>Deine Änderungen gehen verloren, wenn du sie nicht speicherst.</p>"
 		},
 		
@@ -299,6 +318,10 @@
 		
 		"delete_request_confirm_title": "Diese Anfrage löschen?",
 		"delete_request_confirm_body": "<p>Möchtest du diese Anfrage wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>",
+		"delete_account_confirm_title": "„%{username}“ löschen?",
+		"delete_account_confirm_body": "<p>Möchtest du „%{username}“ wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>",
+		
+		"actions_title": "Aktionen",
 		
 		"role_application": {
 			"title_developer": "Als Entwickler bewerben",
@@ -315,6 +338,13 @@
 			"title": "Account löschen",
 			"reason_header": "Sag uns, warum du deinen Account löschen möchtest:",
 			"disclaimer": "Wenn dein Account gelöscht wird, werden all deine Pakete, Rezensionen, verbundenen Geräte etc. ebenfalls gelöscht. Sei also gewarnt, dass diese Aktion nicht rückgängig gemacht werden kann."
+		},
+		
+		"account_roles": {
+			"title": "Rollen zuweisen",
+			"developer": "Entwickler",
+			"moderator": "Moderator",
+			"administrator": "Administrator"
 		}
 	},
 	

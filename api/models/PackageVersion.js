@@ -32,6 +32,14 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		
 		/**
+		 * The Package creator's Account ID
+		 */
+		accountId: {
+			type: DataTypes.STRING(32),
+			allowNull: false
+		},
+		
+		/**
 		 * The type of this version. Can be "full", "combo" or "delta". Only "full" packages are shown in the storefront
 		 */
 		packageType: { // full, combo, delta
@@ -160,7 +168,12 @@ module.exports = (sequelize, DataTypes) => {
 	/**
 	 * Define this model's association to other models
 	 */
-	PackageVersion.associate = ({ PackageReview, PackageRating }) => {
+	PackageVersion.associate = ({ Account, PackageReview, PackageRating }) => {
+		PackageVersion.belongsTo(Account, {
+			foreignKey: "accountId",
+			onDelete: "CASCADE"
+		});
+		
 		// A Package can have many Reviews (1-n)
 		PackageVersion.hasMany(PackageReview, {
 			as: "reviews",
