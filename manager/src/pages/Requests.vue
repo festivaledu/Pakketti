@@ -65,6 +65,10 @@ export default {
 		next(vm => {
 			vm.requestData = _requestData;
 			
+			if (to.params.requestId && _requestData.find(requestObj => requestObj.id == to.params.requestId)) {
+				vm.viewRequest(_requestData.find(requestObj => requestObj.id == to.params.requestId));
+			}
+			
 			vm.$parent.setHeader(vm.$t('root.item_requests'));
 			vm.$parent.setSelectedMenuItem("requests");
 		});
@@ -130,8 +134,8 @@ export default {
 							<div class="mb-4">
 								<MetroComboBox
 									header={this.$t('requests.status.title')}
+									placeholder-text={this.$t('requests.status.-1')}
 									items-source={{
-										'-1': this.$t('requests.status.-1'),
 										'0': this.$t('requests.status.0'),
 										'1': this.$t('requests.status.1')
 									}}
@@ -167,7 +171,7 @@ export default {
 							
 							{(this.isModerator || this.isAdministrator) && requestObj.affectedAccountId && (
 								<MetroButton
-									onclick={(e) => this.manageUserButtonClicked(e, _accountData.id)} disabled={requestObj.status >= 0 || requestObj.accountId == this.accountId}>{this.$t('requests.manage_user')}</MetroButton>
+									onclick={(e) => this.manageUserButtonClicked(e, _accountData.id)} disabled={requestObj.accountId == this.accountId || _accountData.role > this.accountRole}>{this.$t('requests.manage_user')}</MetroButton>
 							)}
 						</div>
 					</div>
@@ -189,6 +193,10 @@ export default {
 				} else {
 					this.refresh();
 				}
+			}
+			
+			if (this.$route.params.requestId) {
+				this.$router.replace(`/${this.$route.path.split("/")[1]}`);
 			}
 		},
 		async deleteRequest(requestObj) {

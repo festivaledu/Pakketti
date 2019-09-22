@@ -217,7 +217,7 @@ router.post("/new", async (req, res) => {
 	});
 	
 	if ((requestData.type < LogItemType.REFUND) ||
-		(requestData.type >= LogItemType.ROLE_DOWNGRADE && account.role < UserRole.DEVELOPER)) return res.status(httpStatus.FORBIDDEN).send({
+		(requestData.type >= LogItemType.ROLE_DOWNGRADE && requestData.type < LogItemType.DELETE_REQUEST && account.role < UserRole.DEVELOPER)) return res.status(httpStatus.FORBIDDEN).send({
 		error: {
 			name: httpStatus[httpStatus.FORBIDDEN],
 			code: httpStatus.FORBIDDEN,

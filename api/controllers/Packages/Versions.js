@@ -255,6 +255,7 @@ router.post("/versions/new", async (req, res) => {
 	return PackageVersion.create(Object.assign(archiveData, {
 		id: String.prototype.concat(packageObj.id, account.id, new Date().getTime()),
 		packageId: packageObj.id,
+		accountId: account.id,
 		version: archiveData["version"] || versionData.version,
 		changeText: versionData.changeText,
 		visible: versionData.visible,

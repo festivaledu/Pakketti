@@ -237,7 +237,7 @@
 								<div class="row-background" :style="{'top': `${(index * 47) + 32}px`}" />
 							</router-link>
 							
-							<div class="row-wrapper" v-if="!reviewData.length">
+							<div class="row-wrapper" v-if="!requestData.length">
 								<div class="tr row">
 									<div class="td cell">
 										<MetroTextBlock text-style="caption">{{ $t('dashboard.requests_no_items') }}</MetroTextBlock>

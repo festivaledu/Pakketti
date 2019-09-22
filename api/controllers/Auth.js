@@ -52,7 +52,7 @@ router.post("/register", async (req, res) => {
 		email: req.body.email,
 		password: hashedPassword,
 		role: UserRole.USER,
-		lastLogin: new Date().toUTCString
+		lastLogin: new Date()
 	}).then(accountObj => {
 		let token = jwt.sign({
 			userId: accountObj.id,

@@ -349,7 +349,9 @@
 			"developer": "Entwickler",
 			"moderator": "Moderator",
 			"administrator": "Administrator"
-		}
+		},
+		
+		"manage_user": "Benutzer verwalten"
 	},
 	
 	"moderation_log": {
