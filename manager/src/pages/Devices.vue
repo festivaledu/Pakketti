@@ -85,74 +85,72 @@ export default {
 			
 			let deviceDialog = new metroUI.ContentDialog({
 				title: this.$t('devices.edit_device.add_title'),
-				content: () => {
-					return (
-						<div class="row">
-							<div class="col col-12 col-md-6">
-								<div class="mb-4">
-									<MetroTextBox
-										header={this.$t('devices.edit_device.device_name_header')}
-										placeholder-text={this.$t('devices.edit_device.optional')}
-										v-model={_deviceObj.name}
-									/>
-								</div>
-								
-								<div class="mb-4">
-									<MetroTextBox
-										header={this.$t('devices.edit_device.product_header')}
-										placeholder-text={this.$t('devices.edit_device.product_placeholder')}
-										v-model={_deviceObj.product}
-										required={true}
-									/>
-								</div>
-								
-								<div class="mb-4">
-									<MetroComboBox
-										header={this.$t('package_editor.info.platform_title')}
-										placeholder-text={this.$t('package_editor.info.platform_placeholder')}
-										items-source={{
-											'win': this.$t('package_editor.info.platform.win'),
-											'darwin': this.$t('package_editor.info.platform.darwin'),
-											'iphoneos': this.$t('package_editor.info.platform.iphoneos'),
-											'other': this.$t('package_editor.info.platform.other')
-										}}
-										v-model={_deviceObj.platform}
-										no-update={true}
-										required={true}
-									/>
-								</div>
-								
-								<div class="mb-4">
-									<MetroTextBox
-										header={this.$t('devices.edit_device.os_header')}
-										placeholder-text={this.$t('devices.edit_device.os_placeholder')}
-										v-model={_deviceObj.version}
-										required={true}
-									/>
-								</div>
+				content: () => (
+					<div class="row">
+						<div class="col col-12 col-md-6">
+							<div class="mb-4">
+								<MetroTextBox
+									header={this.$t('devices.edit_device.device_name_header')}
+									placeholder-text={this.$t('devices.edit_device.optional')}
+									v-model={_deviceObj.name}
+								/>
 							</div>
 							
-							<div class="col col-12 col-md-6">
-								<div class="mb-4">
-									<MetroTextBox
-										header={this.$t('devices.edit_device.udid_header')}
-										placeholder-text={this.$t('devices.edit_device.required')}
-										v-model={_deviceObj.udid}
-										required={true}
-									/>
-								</div>
-								
-								<div class="mb-4">
-									<MetroTextBox
-										header={this.$t('devices.edit_device.capacity_header')}
-										placeholder-text={this.$t('devices.edit_device.optional')}
-										v-model={_deviceObj.capacity}
-									/>
-								</div>
+							<div class="mb-4">
+								<MetroTextBox
+									header={this.$t('devices.edit_device.product_header')}
+									placeholder-text={this.$t('devices.edit_device.product_placeholder')}
+									v-model={_deviceObj.product}
+									required={true}
+								/>
+							</div>
+							
+							<div class="mb-4">
+								<MetroComboBox
+									header={this.$t('package_editor.info.platform_title')}
+									placeholder-text={this.$t('package_editor.info.platform_placeholder')}
+									items-source={{
+										'win': this.$t('package_editor.info.platform.win'),
+										'darwin': this.$t('package_editor.info.platform.darwin'),
+										'iphoneos': this.$t('package_editor.info.platform.iphoneos'),
+										'other': this.$t('package_editor.info.platform.other')
+									}}
+									v-model={_deviceObj.platform}
+									no-update={true}
+									required={true}
+								/>
+							</div>
+							
+							<div class="mb-4">
+								<MetroTextBox
+									header={this.$t('devices.edit_device.os_header')}
+									placeholder-text={this.$t('devices.edit_device.os_placeholder')}
+									v-model={_deviceObj.version}
+									required={true}
+								/>
 							</div>
 						</div>
-					)
-				},
+						
+						<div class="col col-12 col-md-6">
+							<div class="mb-4">
+								<MetroTextBox
+									header={this.$t('devices.edit_device.udid_header')}
+									placeholder-text={this.$t('devices.edit_device.required')}
+									v-model={_deviceObj.udid}
+									required={true}
+								/>
+							</div>
+							
+							<div class="mb-4">
+								<MetroTextBox
+									header={this.$t('devices.edit_device.capacity_header')}
+									placeholder-text={this.$t('devices.edit_device.optional')}
+									v-model={_deviceObj.capacity}
+								/>
+							</div>
+						</div>
+					</div>
+				),
 				commands: [{ text: "Cancel" }, { text: "Link", primary: true }]
 			});
 			
@@ -192,86 +190,84 @@ export default {
 			
 			let deviceDialog = new metroUI.ContentDialog({
 				title: this.$t('devices.edit_device.edit_title'),
-				content: () => {
-					return (
-						<div class="row">
-							<div class="col col-12 col-md-6">
-								<div class="mb-4">
-									<MetroTextBox
-										header={this.$t('devices.edit_device.device_name_header')}
-										placeholder-text={this.$t('devices.edit_device.optional')}
-										v-model={_deviceObj.name}
-									/>
-								</div>
-								
-								<div class="mb-4">
-									<MetroTextBox
-										header={this.$t('devices.edit_device.product_header')}
-										placeholder-text={this.$t('devices.edit_device.product_placeholder')}
-										v-model={_deviceObj.product}
-										disabled={isiPhoneOSDevice}
-									/>
-								</div>
-								
-								<div class="mb-4">
-									<MetroComboBox
-										header={this.$t('package_editor.info.platform_title')}
-										placeholder-text={this.$t('package_editor.info.platform_placeholder')}
-										items-source={{
-											'win': this.$t('package_editor.info.platform.win'),
-											'darwin': this.$t('package_editor.info.platform.darwin'),
-											'iphoneos': this.$t('package_editor.info.platform.iphoneos'),
-											'other': this.$t('package_editor.info.platform.other')
-										}}
-										v-model={_deviceObj.platform}
-										no-update={true}
-										disabled={isiPhoneOSDevice}
-									/>
-								</div>
-								
-								<div class="mb-4">
-									<MetroTextBox
-										header={this.$t('devices.edit_device.os_header')}
-										placeholder-text={this.$t('devices.edit_device.os_placeholder')}
-										v-model={_deviceObj.version}
-										required={true}
-									/>
-								</div>
+				content: () => (
+					<div class="row">
+						<div class="col col-12 col-md-6">
+							<div class="mb-4">
+								<MetroTextBox
+									header={this.$t('devices.edit_device.device_name_header')}
+									placeholder-text={this.$t('devices.edit_device.optional')}
+									v-model={_deviceObj.name}
+								/>
 							</div>
 							
-							<div class="col col-12 col-md-6">
-								<div class="mb-4">
-									<MetroTextBox
-										header={this.$t('devices.edit_device.udid_header')}
-										placeholder-text={this.$t('devices.edit_device.required')}
-										v-model={_deviceObj.udid}
-										disabled={isiPhoneOSDevice}
-									/>
-								</div>
-								
-								{isiPhoneOSDevice &&
-								<div class="mb-4">
-									<MetroComboBox
-										header={this.$t('devices.edit_device.variant_header')}
-										placeholder-text={this.$t('devices.edit_device.variant_placeholder')}
-										items-source={deviceVariants}
-										no-update={true}
-										v-model={_deviceObj.variant}
-									/>
-								</div>
-								}
-								
-								<div class="mb-4">
-									<MetroTextBox
-										header={this.$t('devices.edit_device.capacity_header')}
-										placeholder-text={this.$t('devices.edit_device.optional')}
-										v-model={_deviceObj.capacity}
-									/>
-								</div>
+							<div class="mb-4">
+								<MetroTextBox
+									header={this.$t('devices.edit_device.product_header')}
+									placeholder-text={this.$t('devices.edit_device.product_placeholder')}
+									v-model={_deviceObj.product}
+									disabled={isiPhoneOSDevice}
+								/>
+							</div>
+							
+							<div class="mb-4">
+								<MetroComboBox
+									header={this.$t('package_editor.info.platform_title')}
+									placeholder-text={this.$t('package_editor.info.platform_placeholder')}
+									items-source={{
+										'win': this.$t('package_editor.info.platform.win'),
+										'darwin': this.$t('package_editor.info.platform.darwin'),
+										'iphoneos': this.$t('package_editor.info.platform.iphoneos'),
+										'other': this.$t('package_editor.info.platform.other')
+									}}
+									v-model={_deviceObj.platform}
+									no-update={true}
+									disabled={isiPhoneOSDevice}
+								/>
+							</div>
+							
+							<div class="mb-4">
+								<MetroTextBox
+									header={this.$t('devices.edit_device.os_header')}
+									placeholder-text={this.$t('devices.edit_device.os_placeholder')}
+									v-model={_deviceObj.version}
+									required={true}
+								/>
 							</div>
 						</div>
-					)
-				},
+						
+						<div class="col col-12 col-md-6">
+							<div class="mb-4">
+								<MetroTextBox
+									header={this.$t('devices.edit_device.udid_header')}
+									placeholder-text={this.$t('devices.edit_device.required')}
+									v-model={_deviceObj.udid}
+									disabled={isiPhoneOSDevice}
+								/>
+							</div>
+							
+							{isiPhoneOSDevice &&
+							<div class="mb-4">
+								<MetroComboBox
+									header={this.$t('devices.edit_device.variant_header')}
+									placeholder-text={this.$t('devices.edit_device.variant_placeholder')}
+									items-source={deviceVariants}
+									no-update={true}
+									v-model={_deviceObj.variant}
+								/>
+							</div>
+							}
+							
+							<div class="mb-4">
+								<MetroTextBox
+									header={this.$t('devices.edit_device.capacity_header')}
+									placeholder-text={this.$t('devices.edit_device.optional')}
+									v-model={_deviceObj.capacity}
+								/>
+							</div>
+						</div>
+					</div>
+				),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.actions.save'), primary: true }]
 			});
 			

@@ -1,5 +1,7 @@
 <template>
 	<MetroPage page-id="section">
+		<vue-headful :title="`${$t(`section.${$route.params.sectionId}`)} – ${$t('app.name')}`" />
+		
 		<template v-if="!packageData">
 			<MetroProgressRing :active="true" style="position: absolute; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: 80px; height: 80px" />
 		</template>

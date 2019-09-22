@@ -1,5 +1,7 @@
 <template>
 	<MetroPage page-id="error">
+		<vue-headful :title="`${$t('root.header.error')} – ${$t('app.name')}`" />
+		
 		<MetroStackPanel orientation="vertical" horizontal-alignment="center" vertical-alignment="center" style="height: calc(100vh - 64px)">
 			<MetroTextBlock text-style="title" text-alignment="center" style="font-size: 34px; font-weight: 500">
 				{{ $t('app.generic_error_title') }}

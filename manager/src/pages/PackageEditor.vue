@@ -681,58 +681,56 @@ export default {
 			
 			let dialog = new metroUI.ContentDialog({
 				title: this.$t('package_editor.versions.add'),
-				content: () => {
-					return (
-						<div>
-							<MetroTextBox
-								header={this.$t('package_editor.versions.version_header')}
-								placeholder-text={this.$t('package_editor.versions.version_placeholder')}
-								v-model={_versionObj.version}
+				content: () => (
+					<div>
+						<MetroTextBox
+							header={this.$t('package_editor.versions.version_header')}
+							placeholder-text={this.$t('package_editor.versions.version_placeholder')}
+							v-model={_versionObj.version}
+							required={true}
+						/>
+						
+						<MetroComboBox
+							header={this.$t('package_editor.versions.package_type.header')}
+							placeholder-text={this.$t('package_editor.versions.package_type.placeholder')}
+							items-source={{
+								"full": this.$t('package_editor.versions.package_type.full'),
+								"combo": this.$t('package_editor.versions.package_type.combo'),
+								"delta": this.$t('package_editor.versions.package_type.delta')
+							}}
+							v-model={_versionObj.packageType}
+							no-update={true}
+							required={true}
+							style="margin-top: 8px"
+						/>
+						
+						<FileSelector class="my-4" content={this.$t('app.select_file')} v-model={_versionObj.file} required={true} />
+						
+						<div class="my-2">
+							<MetroTextBlock style="margin-bottom: 4px">{this.$t('package_editor.versions.release_notes')}</MetroTextBlock>
+							<VueEditor
+								editorToolbar={this.editorToolbar}
+								v-model={_versionObj.changeText}
 								required={true}
-							/>
-							
-							<MetroComboBox
-								header={this.$t('package_editor.versions.package_type.header')}
-								placeholder-text={this.$t('package_editor.versions.package_type.placeholder')}
-								items-source={{
-									"full": this.$t('package_editor.versions.package_type.full'),
-									"combo": this.$t('package_editor.versions.package_type.combo'),
-									"delta": this.$t('package_editor.versions.package_type.delta')
-								}}
-								v-model={_versionObj.packageType}
-								no-update={true}
-								required={true}
-								style="margin-top: 8px"
-							/>
-							
-							<FileSelector class="my-4" content={this.$t('app.select_file')} v-model={_versionObj.file} required={true} />
-							
-							<div class="my-2">
-								<MetroTextBlock style="margin-bottom: 4px">{this.$t('package_editor.versions.release_notes')}</MetroTextBlock>
-								<VueEditor
-									editorToolbar={this.editorToolbar}
-									v-model={_versionObj.changeText}
-									required={true}
-								/>
-							</div>
-							
-							<MetroTextBlock text-style="sub-title" class="mb-2">{this.$t('package_editor.info.publishing_title')}</MetroTextBlock>
-							<MetroRadioButton
-								group-name="version-visibility"
-								name={true}
-								content={this.$t('package_editor.info.version_publishing_now')}
-								v-model={_versionObj.visible}
-							/>
-							
-							<MetroRadioButton
-								group-name="package-visibility"
-								name={false}
-								content={this.$t('package_editor.info.version_publishing_later')}
-								v-model={_versionObj.visible}
 							/>
 						</div>
-					)
-				},
+						
+						<MetroTextBlock text-style="sub-title" class="mb-2">{this.$t('package_editor.info.publishing_title')}</MetroTextBlock>
+						<MetroRadioButton
+							group-name="version-visibility"
+							name={true}
+							content={this.$t('package_editor.info.version_publishing_now')}
+							v-model={_versionObj.visible}
+						/>
+						
+						<MetroRadioButton
+							group-name="package-visibility"
+							name={false}
+							content={this.$t('package_editor.info.version_publishing_later')}
+							v-model={_versionObj.visible}
+						/>
+					</div>
+				),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.actions.save'), primary: true }]
 			});
 			
@@ -757,67 +755,65 @@ export default {
 			
 			let dialog = new metroUI.ContentDialog({
 				title: this.$t('package_editor.versions.edit'),
-				content: () => {
-					return (
-						<div>
-							<MetroTextBox
-								header={this.$t('package_editor.versions.version_header')}
-								placeholder-text={this.$t('package_editor.versions.version_placeholder')}
-								v-model={_versionObj.version}
-								disabled={true}
-							/>
-							
-							<MetroComboBox
-								header={this.$t('package_editor.versions.package_type.header')}
-								placeholder-text={this.$t('package_editor.versions.package_type.placeholder')}
-								items-source={{
-									"full": this.$t('package_editor.versions.package_type.full'),
-									"combo": this.$t('package_editor.versions.package_type.combo'),
-									"delta": this.$t('package_editor.versions.package_type.delta')
-								}}
-								v-model={_versionObj.packageType}
-								no-update={true}
+				content: () => (
+					<div>
+						<MetroTextBox
+							header={this.$t('package_editor.versions.version_header')}
+							placeholder-text={this.$t('package_editor.versions.version_placeholder')}
+							v-model={_versionObj.version}
+							disabled={true}
+						/>
+						
+						<MetroComboBox
+							header={this.$t('package_editor.versions.package_type.header')}
+							placeholder-text={this.$t('package_editor.versions.package_type.placeholder')}
+							items-source={{
+								"full": this.$t('package_editor.versions.package_type.full'),
+								"combo": this.$t('package_editor.versions.package_type.combo'),
+								"delta": this.$t('package_editor.versions.package_type.delta')
+							}}
+							v-model={_versionObj.packageType}
+							no-update={true}
+							required={true}
+							disabled={!this.isOwnedPackage}
+							style="margin-top: 8px"
+						/>
+						
+						<FileSelector
+							content={this.$t('app.select_file')} 
+							oninput={(file) => this._replaceVersionFile(versionObj, file)}
+							disabled={!this.isOwnedPackage}
+							class="my-4"
+						/>
+						
+						<div class="my-2">
+							<MetroTextBlock style="margin-bottom: 4px">{this.$t('package_editor.versions.release_notes')}</MetroTextBlock>
+							<VueEditor
+								editorToolbar={this.editorToolbar}
+								v-model={_versionObj.changeText}
 								required={true}
-								disabled={!this.isOwnedPackage}
-								style="margin-top: 8px"
-							/>
-							
-							<FileSelector
-								content={this.$t('app.select_file')} 
-								oninput={(file) => this._replaceVersionFile(versionObj, file)}
-								disabled={!this.isOwnedPackage}
-								class="my-4"
-							/>
-							
-							<div class="my-2">
-								<MetroTextBlock style="margin-bottom: 4px">{this.$t('package_editor.versions.release_notes')}</MetroTextBlock>
-								<VueEditor
-									editorToolbar={this.editorToolbar}
-									v-model={_versionObj.changeText}
-									required={true}
-									disabled={!this.isOwnedPackage}
-								/>
-							</div>
-							
-							<MetroTextBlock text-style="sub-title" class="mb-2">{this.$t('package_editor.info.visibility_title')}</MetroTextBlock>
-							<MetroRadioButton
-								group-name="version-visibility"
-								name={true}
-								content={this.$t('package_editor.info.version_visibility_visible')}
-								v-model={_versionObj.visible}
-								disabled={!this.isOwnedPackage}
-							/>
-							
-							<MetroRadioButton
-								group-name="version-visibility"
-								name={false}
-								content={this.$t('package_editor.info.version_visibility_hidden')}
-								v-model={_versionObj.visible}
 								disabled={!this.isOwnedPackage}
 							/>
 						</div>
-					)
-				},
+						
+						<MetroTextBlock text-style="sub-title" class="mb-2">{this.$t('package_editor.info.visibility_title')}</MetroTextBlock>
+						<MetroRadioButton
+							group-name="version-visibility"
+							name={true}
+							content={this.$t('package_editor.info.version_visibility_visible')}
+							v-model={_versionObj.visible}
+							disabled={!this.isOwnedPackage}
+						/>
+						
+						<MetroRadioButton
+							group-name="version-visibility"
+							name={false}
+							content={this.$t('package_editor.info.version_visibility_hidden')}
+							v-model={_versionObj.visible}
+							disabled={!this.isOwnedPackage}
+						/>
+					</div>
+				),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.actions.save'), primary: true }]
 			});
 			

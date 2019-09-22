@@ -1,5 +1,8 @@
 <template>
 	<MetroPage page-id="package" ref="page">
+		<vue-headful v-if="packageData" :title="`${packageData.name} – ${$t('app.name')}`" />
+		<vue-headful v-else :title="`${$t('root.header.package')} – ${$t('app.name')}`" />
+		
 		<template v-if="!packageData">
 			<MetroProgressRing :active="true" style="position: absolute; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: 80px; height: 80px" />
 		</template>
@@ -241,6 +244,7 @@
 					<template v-if="!packageData.ratings || !packageData.ratings.length">
 						<MetroTextBlock>{{ $t('package.reviews.no_reviews') }}</MetroTextBlock>
 						
+						<MetroTextBlock v-if="accountId && accountId === packageData.accountId">{{ $t('package.reviews.review_prohibited_developer') }}</MetroTextBlock>
 						<MetroButton class="system-accent-color" style="margin: 16px 0 40px" @click="reviewButtonClicked" :disabled="accountId && accountId === packageData.accountId || !packageData.versions.length">{{ $t('package.reviews.rate_and_review') }}</MetroButton>
 					</template>
 					
@@ -316,16 +320,14 @@ export default {
 	methods: {
 		packageDescriptionMoreClicked() {
 			new metroUI.ContentDialog({
-				content: (() => {
-					return (
-						<div>
-							<MetroTextBlock text-style="title" style="font-weight: 600; margin-bottom: 8px">{packageData.name}</MetroTextBlock>
-							<MetroTextBlock >
-								<span domPropsInnerHTML={packageData.detailedDescription.replace(/\n/g, "<br />")} />
-							</MetroTextBlock>
-						</div>
-					);
-				})(),
+				content: () => (
+					<div>
+						<MetroTextBlock text-style="title" style="font-weight: 600; margin-bottom: 8px">{packageData.name}</MetroTextBlock>
+						<MetroTextBlock >
+							<span domPropsInnerHTML={packageData.detailedDescription.replace(/\n/g, "<br />")} />
+						</MetroTextBlock>
+					</div>
+				),
 				commands: [{
 					text: this.$t('app.close'),
 					primary: true
@@ -339,28 +341,24 @@ export default {
 			let initialIndex = this.packageData.screenshots.indexOf(screenshotObj);
 			
 			new metroUI.ContentDialog({
-				content: (dialog) => {
-					console.log(dialog);
-					return (
-						<div class="screenshot-viewer">
-							<MetroStackPanel orientation="horizontal" class="screenshot-viewer-chrome">
-								<MetroTextBlock>{this.$t('package.screenshots_title')}</MetroTextBlock>
-								<MetroButton onclick={() => dialog.hide.apply(dialog)}>
-									<MetroSymbolIcon symbol="cancel" />
-								</MetroButton>
-							</MetroStackPanel>
-							<MetroFlipView initial-index={initialIndex}>
-								{this.packageData.screenshots.map((screenshotObj, index) => {
-									return (
-										<MetroFlipViewItem>
-											<img src={`http://localhost:3000/media/screenshot/${screenshotObj.id}`} />
-										</MetroFlipViewItem>
-									)
-								})}
-							</MetroFlipView>
-						</div>
-					)
-				}
+				className: "screenshot-content-dialog",
+				content: (dialog) => (
+					<div class="screenshot-viewer">
+						<MetroStackPanel orientation="horizontal" class="screenshot-viewer-chrome">
+							<MetroTextBlock>{this.$t('package.screenshots_title')}</MetroTextBlock>
+							<MetroButton onclick={() => dialog.hide.apply(dialog)}>
+								<MetroSymbolIcon symbol="cancel" />
+							</MetroButton>
+						</MetroStackPanel>
+						<MetroFlipView initial-index={initialIndex}>
+							{this.packageData.screenshots.map((screenshotObj, index) => (
+								<MetroFlipViewItem>
+									<img src={`http://localhost:3000/media/screenshot/${screenshotObj.id}`} />
+								</MetroFlipViewItem>
+							))}
+						</MetroFlipView>
+					</div>
+				)
 			}).show();
 		},
 		async reportPackageButtonClicked() {
@@ -936,7 +934,7 @@ body[data-theme="dark"] {
 	}
 }
 
-.content-dialog {
+.content-dialog.screenshot-content-dialog {
 	max-width: initial;
 	
 	.content-dialog-content {
@@ -975,41 +973,6 @@ body[data-theme="dark"] {
 						max-height: 100%;
 					}
 				}
-			}
-		}
-		
-		& > .review-viewer {
-			margin: -18px -24px;
-			width: 100vw;
-			height: 100vh;
-			max-width: 640px;
-			max-height: 800px;
-			display: flex;
-			flex-direction: column;
-			
-			.review-viewer-chrome {
-				& > .text-block {
-					line-height: 32px;
-					padding: 0 8px;
-				}
-				
-				& > button {
-					&:not(:hover):not(:active) {
-						background-color: transparent;
-					}
-					&:hover:not(:active) {
-						box-shadow: none;
-					}
-				}
-			}
-			
-			.review-viewer-header {
-				padding: 12px;
-			}
-			
-			.messages {
-				flex: 1;
-				min-height: 0;
 			}
 		}
 	}

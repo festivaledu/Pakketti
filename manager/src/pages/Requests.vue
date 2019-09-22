@@ -115,60 +115,58 @@ export default {
 			
 			let dialog = new metroUI.ContentDialog({
 				title: this.$t('requests.review_request'),
-				content: () => {
-					return (
-						<div class="row" style="width: 500px">
-							<div class="col-12 col-md-6">
-								<div class="mb-4">
-									<MetroTextBlock text-style="base">{this.$t('requests.type.title')}</MetroTextBlock>
-									<MetroTextBlock>{this.$t(`requests.type.${requestObj.type}`)}</MetroTextBlock>
-								</div>
-								
-								<div class="mb-4">
-									<MetroTextBox textarea={true} readOnly={this.accountId !== requestObj.accountId} header={this.$t('requests.detail_text_header')} value={requestObj.detailText} />
-								</div>
-								
-								<div class="mb-4">
-									<MetroComboBox
-										header={this.$t('requests.status.title')}
-										items-source={{
-											'-1': this.$t('requests.status.-1'),
-											'0': this.$t('requests.status.0'),
-											'1': this.$t('requests.status.1')
-										}}
-										v-model={_requestObj.status}
-										no-update={true}
-										required={true}
-										disabled={(!this.isModerator && !this.isAdministrator) || requestObj.status >= 0 || requestObj.accountId == this.accountId}
-									/>
-								</div>
-								
-								<div class="mb-4">
-									<MetroTextBox textarea={true} readOnly={(!this.isModerator && !this.isAdministrator) || requestObj.status >= 0 || requestObj.accountId == this.accountId} header={this.$t('requests.status_text_header')} v-model={_requestObj.statusText} required={true} />
-								</div>
+				content: () => (
+					<div class="row" style="width: 500px">
+						<div class="col-12 col-md-6">
+							<div class="mb-4">
+								<MetroTextBlock text-style="base">{this.$t('requests.type.title')}</MetroTextBlock>
+								<MetroTextBlock>{this.$t(`requests.type.${requestObj.type}`)}</MetroTextBlock>
 							</div>
 							
-							<div class="col-12 col-md-6">
-								<div class="mb-5">
-									<MetroTextBlock text-style="base">{this.$t('requests.creator')}</MetroTextBlock>
-									<MetroTextBlock>{`${requestCreatorData.username} (${requestCreatorData.email || this.$t('requests.affected.na')})` || this.$t('requests.affected.na')}</MetroTextBlock>
-								</div>
-								<div class="mb-4">
-									<MetroTextBlock text-style="base">{this.$t('requests.affected.account')}</MetroTextBlock>
-									<MetroTextBlock>{accountData ? `${accountData.username} (${accountData.email || this.$t('requests.affected.na')})` : this.$t('requests.affected.na')}</MetroTextBlock>
-								</div>
-								<div class="mb-4">
-									<MetroTextBlock text-style="base">{this.$t('requests.affected.package')}</MetroTextBlock>
-									<MetroTextBlock>{packageData ? `${packageData.name} (${packageData.identifier})` : this.$t('requests.affected.na')}</MetroTextBlock>
-								</div>
-								<div class="mb-4">
-									<MetroTextBlock text-style="base">{this.$t('requests.affected.review')}</MetroTextBlock>
-									<MetroTextBlock>{reviewData ? `${reviewData.title} (${new Date(reviewData.createdAt).toLocaleString()})` : this.$t('requests.affected.na')}</MetroTextBlock>
-								</div>
+							<div class="mb-4">
+								<MetroTextBox textarea={true} readOnly={this.accountId !== requestObj.accountId} header={this.$t('requests.detail_text_header')} value={requestObj.detailText} />
+							</div>
+							
+							<div class="mb-4">
+								<MetroComboBox
+									header={this.$t('requests.status.title')}
+									items-source={{
+										'-1': this.$t('requests.status.-1'),
+										'0': this.$t('requests.status.0'),
+										'1': this.$t('requests.status.1')
+									}}
+									v-model={_requestObj.status}
+									no-update={true}
+									required={true}
+									disabled={(!this.isModerator && !this.isAdministrator) || requestObj.status >= 0 || requestObj.accountId == this.accountId}
+								/>
+							</div>
+							
+							<div class="mb-4">
+								<MetroTextBox textarea={true} readOnly={(!this.isModerator && !this.isAdministrator) || requestObj.status >= 0 || requestObj.accountId == this.accountId} header={this.$t('requests.status_text_header')} v-model={_requestObj.statusText} required={true} />
 							</div>
 						</div>
-					)
-				},
+						
+						<div class="col-12 col-md-6">
+							<div class="mb-5">
+								<MetroTextBlock text-style="base">{this.$t('requests.creator')}</MetroTextBlock>
+								<MetroTextBlock>{`${requestCreatorData.username} (${requestCreatorData.email || this.$t('requests.affected.na')})` || this.$t('requests.affected.na')}</MetroTextBlock>
+							</div>
+							<div class="mb-4">
+								<MetroTextBlock text-style="base">{this.$t('requests.affected.account')}</MetroTextBlock>
+								<MetroTextBlock>{accountData ? `${accountData.username} (${accountData.email || this.$t('requests.affected.na')})` : this.$t('requests.affected.na')}</MetroTextBlock>
+							</div>
+							<div class="mb-4">
+								<MetroTextBlock text-style="base">{this.$t('requests.affected.package')}</MetroTextBlock>
+								<MetroTextBlock>{packageData ? `${packageData.name} (${packageData.identifier})` : this.$t('requests.affected.na')}</MetroTextBlock>
+							</div>
+							<div class="mb-4">
+								<MetroTextBlock text-style="base">{this.$t('requests.affected.review')}</MetroTextBlock>
+								<MetroTextBlock>{reviewData ? `${reviewData.title} (${new Date(reviewData.createdAt).toLocaleString()})` : this.$t('requests.affected.na')}</MetroTextBlock>
+							</div>
+						</div>
+					</div>
+				),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.actions.save'), primary: true }]
 			});
 			
@@ -244,19 +242,17 @@ export default {
 						return this.$t('requests.role_application.title_moderator');
 					}
 				})(),
-				content: () => {
-					return (
-						<div>
-							<div class="mb-4">
-								<MetroTextBox textarea={true} required={true} header={this.$t('requests.role_application.reason_header')} name="detailText" />
-							</div>
-							
-							<div class="mb-4">
-								<MetroTextBlock text-style="caption">{this.$t('requests.role_application.developer_notice')}</MetroTextBlock>
-							</div>
+				content: () => (
+					<div>
+						<div class="mb-4">
+							<MetroTextBox textarea={true} required={true} header={this.$t('requests.role_application.reason_header')} name="detailText" />
 						</div>
-					)
-				},
+						
+						<div class="mb-4">
+							<MetroTextBlock text-style="caption">{this.$t('requests.role_application.developer_notice')}</MetroTextBlock>
+						</div>
+					</div>
+				),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			
@@ -288,19 +284,17 @@ export default {
 		async requestRoleDowngrade() {
 			let dialog = new metroUI.ContentDialog({
 				title: this.$t('requests.role_downgrade.title'),
-				content: () => {
-					return (
-						<div>
-							<div class="mb-4">
-								<MetroTextBox textarea={true} required={true} header={this.$t('requests.role_downgrade.reason_header')} name="detailText" />
-							</div>
-							
-							<div class="mb-4">
-								<MetroTextBlock text-style="caption">{this.$t('requests.role_downgrade.developer_notice')}</MetroTextBlock>
-							</div>
+				content: () => (
+					<div>
+						<div class="mb-4">
+							<MetroTextBox textarea={true} required={true} header={this.$t('requests.role_downgrade.reason_header')} name="detailText" />
 						</div>
-					)
-				},
+						
+						<div class="mb-4">
+							<MetroTextBlock text-style="caption">{this.$t('requests.role_downgrade.developer_notice')}</MetroTextBlock>
+						</div>
+					</div>
+				),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			
@@ -324,19 +318,17 @@ export default {
 		async requestAccountDeletion() {
 			let dialog = new metroUI.ContentDialog({
 				title: this.$t('requests.account_deletion.title'),
-				content: () => {
-					return (
-						<div>
-							<div class="mb-4">
-								<MetroTextBox textarea={true} required={true} header={this.$t('requests.account_deletion.reason_header')} name="detailText" />
-							</div>
-							
-							<div class="mb-4">
-								<MetroTextBlock text-style="caption">{this.$t('requests.account_deletion.disclaimer')}</MetroTextBlock>
-							</div>
+				content: () => (
+					<div>
+						<div class="mb-4">
+							<MetroTextBox textarea={true} required={true} header={this.$t('requests.account_deletion.reason_header')} name="detailText" />
 						</div>
-					)
-				},
+						
+						<div class="mb-4">
+							<MetroTextBlock text-style="caption">{this.$t('requests.account_deletion.disclaimer')}</MetroTextBlock>
+						</div>
+					</div>
+				),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			

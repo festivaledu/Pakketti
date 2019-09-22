@@ -46,13 +46,6 @@
 							</template>
 						</MetroNavigationViewItem>
 					</router-link>
-					<router-link tag="div" to="/statistics" v-if="isModerator || isAdministrator">
-						<MetroNavigationViewItem :content="$t('root.item_statistics')" page-id="statistics" :disabled="true">
-							<template slot="icon">
-								<MetroSymbolIcon icon="area-chart" />
-							</template>
-						</MetroNavigationViewItem>
-					</router-link>
 				</template>
 				
 				<template slot="pane-footer">

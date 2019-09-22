@@ -51,6 +51,10 @@
 	},
 	"root": {
 		"header": {
+			"developer": "Entwickler",
+			"error": "Fehler",
+			"package": "Paket",
+			"search": "Suche",
 			"start": "Start"
 		},
 		"dashboard_title": "Dashboard",

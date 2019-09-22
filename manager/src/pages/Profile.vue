@@ -127,11 +127,9 @@ export default {
 		async changeUsername() {
 			let dialog = new metroUI.ContentDialog({
 				title: this.$t('profile.edit_account.username.title'),
-				content: () => {
-					return (
-						<MetroTextBox name="username" placeholder-text={this.$t('profile.edit_account.username.placeholder')} required={true} />
-					)
-				},
+				content: () => (
+					<MetroTextBox name="username" placeholder-text={this.$t('profile.edit_account.username.placeholder')} required={true} />
+				),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			
@@ -158,11 +156,9 @@ export default {
 		async changeEmail() {
 			let dialog = new metroUI.ContentDialog({
 				title: this.$t('profile.edit_account.email.title'),
-				content: () => {
-					return (
-						<MetroTextBox name="email" placeholder-text={this.$t('profile.edit_account.email.placeholder')} required={true} />
-					)
-				},
+				content: () => (
+					<MetroTextBox name="email" placeholder-text={this.$t('profile.edit_account.email.placeholder')} required={true} />
+				),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			
@@ -189,32 +185,30 @@ export default {
 		async changePassword() {
 			let dialog = new metroUI.ContentDialog({
 				title: this.$t('profile.edit_account.password.title'),
-				content: () => {
-					return (
-						<div>
-							<MetroPasswordBox
-								class="mb-2"
-								name="password-current"
-								placeholder-text={this.$t('profile.edit_account.password.current_placeholder')}
-								required={true}
-							/>
-							<MetroPasswordBox
-								class="mb-2"
-								name="password-new"
-								placeholder-text={this.$t('profile.edit_account.password.new_placeholder')}
-								required={true}
-								min-length={8}
-							/>
-							<MetroPasswordBox
-								class="mb-2"
-								name="password-confirm"
-								placeholder-text={this.$t('profile.edit_account.password.confirm_placeholder')}
-								required={true}
-								min-length={8}
-							/>
-						</div>
-					)
-				},
+				content: () => (
+					<div>
+						<MetroPasswordBox
+							class="mb-2"
+							name="password-current"
+							placeholder-text={this.$t('profile.edit_account.password.current_placeholder')}
+							required={true}
+						/>
+						<MetroPasswordBox
+							class="mb-2"
+							name="password-new"
+							placeholder-text={this.$t('profile.edit_account.password.new_placeholder')}
+							required={true}
+							min-length={8}
+						/>
+						<MetroPasswordBox
+							class="mb-2"
+							name="password-confirm"
+							placeholder-text={this.$t('profile.edit_account.password.confirm_placeholder')}
+							required={true}
+							min-length={8}
+						/>
+					</div>
+				),
 				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]
 			});
 			

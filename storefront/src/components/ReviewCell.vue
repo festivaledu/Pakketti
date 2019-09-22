@@ -64,21 +64,14 @@ export default {
 	},
 	data: () => ({
 		profileData: null,
-		deviceData: null,
 		
 		Platforms: Platforms,
 		DeviceStrings: DeviceStrings
 	}),
 	async mounted() {
-		let _profileData = await AccountAPI.getUser({
+		this.profileData = await AccountAPI.getUser({
 			"account.id": this.reviewData.accountId
 		});
-		
-		if (_profileData.error) {
-			console.error(_profileData.error);
-		} else {
-			this.profileData = _profileData;
-		}
 	},
 	methods: {
 		async showAllMessages() {
@@ -104,28 +97,44 @@ export default {
 			});
 			
 			new metroUI.ContentDialog({
-				content: (dialog) => {
-					return (
-						<div class="review-viewer">
-							<MetroStackPanel orientation="horizontal" class="review-viewer-chrome">
-								<MetroTextBlock>{this.$t('package.pivot_titles.reviews')}</MetroTextBlock>
-								<MetroButton onclick={() => dialog.hide.apply(dialog)}>
-									<MetroSymbolIcon symbol="cancel" />
-								</MetroButton>
+				className:"review-content-dialog",
+				content: (dialog) => (
+					<div class="review-viewer">
+						<MetroStackPanel orientation="horizontal" class="review-viewer-chrome">
+							<MetroTextBlock>{this.$t('package.pivot_titles.reviews')}</MetroTextBlock>
+							<MetroButton onclick={() => dialog.hide.apply(dialog)}>
+								<MetroSymbolIcon symbol="cancel" />
+							</MetroButton>
+						</MetroStackPanel>
+						
+						<div class="review-viewer-header">
+							<MetroTextBlock>{ packageData[0].name } • { packageData[0].identifier }</MetroTextBlock>
+							<MetroStackPanel orientation="vertical" vertical-alignment="center">
+								<MetroStackPanel orientation="horizontal">
+									<MetroTextBlock text-style="sub-title">{this.reviewData.title}</MetroTextBlock>
+									{this.reviewData.device &&
+									<MetroTextBlock class="mt-2">
+										{ this.reviewData.device.platform == 'iphoneos' ?
+											(DeviceStrings[this.reviewData.device.product] || this.$t('device.unknown_product')) :
+											this.reviewData.device.product
+										},
+										&nbsp;
+										{
+											Platforms.platforms[this.reviewData.device.platform] ||
+											this.$t('device.unknown_platform')
+										}
+										&nbsp;
+										{ this.reviewData.device.version }
+									</MetroTextBlock>
+									}
+								</MetroStackPanel>
+								<MetroRatingControl value={this.reviewData.rating.value} />
 							</MetroStackPanel>
-							<MetroStackPanel orientation="vertical" class="review-viewer-header" style="padding: 0 24px">
-								<MetroTextBlock text-style="header">{this.reviewData.title}</MetroTextBlock>
-								<div class="rating-stars" style="margin-top: 12px">
-									<div class="rating-value" style={{'width': `${(this.reviewData.rating.value / 5) * 100}%`}} />
-								</div>
-							</MetroStackPanel>
-							
-							<MetroMessages show-input={false} messages={messages}>
-							
-							</MetroMessages>
 						</div>
-					)
-				}
+						
+						<MetroMessages show-input={false} messages={messages} />
+					</div>
+				)
 			}).show();
 		},
 		async reportReviewButtonClicked() {
@@ -267,6 +276,54 @@ export default {
 		.rating-cell-content {
 				& > .hyperlink-button {
 				margin-top: 20px;
+			}
+		}
+	}
+}
+
+.content-dialog.review-content-dialog {
+	max-width: initial;
+	
+	.content-dialog-content {
+		position: relative;
+		overflow-x: visible;
+		
+		& > .review-viewer {
+			margin: -18px -24px;
+			width: 100vw;
+			height: 100vh;
+			max-width: 640px;
+			max-height: 800px;
+			display: flex;
+			flex-direction: column;
+			
+			.review-viewer-chrome {
+				& > .text-block {
+					line-height: 32px;
+					padding: 0 8px;
+				}
+				
+				& > button {
+					&:not(:hover):not(:active) {
+						background-color: transparent;
+					}
+					&:hover:not(:active) {
+						box-shadow: none;
+					}
+				}
+			}
+			
+			.review-viewer-header {
+				padding: 12px;
+			}
+			
+			.messages {
+				flex: 1;
+				min-height: 0;
+				
+				.messages-wrapper {
+					padding: 0 14px 24px;
+				}
 			}
 		}
 	}

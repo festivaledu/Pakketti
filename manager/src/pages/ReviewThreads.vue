@@ -88,7 +88,7 @@ export default {
 			vm.reviewData = _reviewData;
 			
 			if (to.params.reviewId && _reviewData.find(reviewObj => reviewObj.id == to.params.reviewId)) {
-				vm.reviewItemClicked(_reviewData.find(reviewObj => reviewObj.id == to.params.reviewId));
+				vm.reviewViewButtonClicked(_reviewData.find(reviewObj => reviewObj.id == to.params.reviewId));
 			}
 			
 			vm.$parent.setHeader(vm.$t('root.item_reviews'));

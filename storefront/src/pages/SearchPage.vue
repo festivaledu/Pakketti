@@ -1,5 +1,7 @@
 <template>
 	<MetroPage page-id="search">
+		<vue-headful :title="`${$t('root.header.search')} – ${$t('app.name')}`" />
+		
 		<template v-if="!packageData">
 			<MetroProgressRing :active="true" style="position: absolute; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: 80px; height: 80px" />
 		</template>
@@ -43,7 +45,7 @@ export default {
 			vm.packageData = _packageData;
 			
 			vm.$parent.setHeader(vm.$t('root.header.start'));
-			vm.$parent.setSelectedMenuItem("Start");
+			vm.$parent.setSelectedMenuItem("start");
 		});
 	},
 	computed: {

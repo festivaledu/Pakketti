@@ -102,38 +102,36 @@ export default {
 			
 			let dialog = new metroUI.ContentDialog({
 				title: this.$t('moderation_log.view_log_item'),
-				content: () => {
-					return (
-						<div class="row" style="width: 500px">
-							<div class="col-12 col-md-6">
-								<div class="mb-4">
-									<MetroTextBlock text-style="base">{this.$t('moderation_log.type.title')}</MetroTextBlock>
-									<MetroTextBlock>{this.$t(`moderation_log.type.${logItemObj.type}`)}</MetroTextBlock>
-								</div>
-								
-								<div class="mb-4">
-									<MetroTextBlock text-style="base">{this.$t('requests.detail_text_header')}</MetroTextBlock>
-									<MetroTextBlock>{logItemObj.detailText}</MetroTextBlock>
-								</div>
+				content: () => (
+					<div class="row" style="width: 500px">
+						<div class="col-12 col-md-6">
+							<div class="mb-4">
+								<MetroTextBlock text-style="base">{this.$t('moderation_log.type.title')}</MetroTextBlock>
+								<MetroTextBlock>{this.$t(`moderation_log.type.${logItemObj.type}`)}</MetroTextBlock>
 							</div>
 							
-							<div class="col-12 col-md-6">
-								<div class="mb-4">
-									<MetroTextBlock text-style="base">{this.$t('requests.affected.account')}</MetroTextBlock>
-									<MetroTextBlock>{accountData ? `${accountData.username} (${accountData.email || this.$t('requests.affected.na')})` : this.$t('requests.affected.na')}</MetroTextBlock>
-								</div>
-								<div class="mb-4">
-									<MetroTextBlock text-style="base">{this.$t('requests.affected.package')}</MetroTextBlock>
-									<MetroTextBlock>{packageData ? `${packageData.name} (${packageData.identifier})` : this.$t('requests.affected.na')}</MetroTextBlock>
-								</div>
-								<div class="mb-4">
-									<MetroTextBlock text-style="base">{this.$t('requests.affected.review')}</MetroTextBlock>
-									<MetroTextBlock>{reviewData ? `${reviewData.title} (${new Date(reviewData.createdAt).toLocaleString()})` : this.$t('requests.affected.na')}</MetroTextBlock>
-								</div>
+							<div class="mb-4">
+								<MetroTextBlock text-style="base">{this.$t('requests.detail_text_header')}</MetroTextBlock>
+								<MetroTextBlock>{logItemObj.detailText}</MetroTextBlock>
 							</div>
 						</div>
-					)
-				},
+						
+						<div class="col-12 col-md-6">
+							<div class="mb-4">
+								<MetroTextBlock text-style="base">{this.$t('requests.affected.account')}</MetroTextBlock>
+								<MetroTextBlock>{accountData ? `${accountData.username} (${accountData.email || this.$t('requests.affected.na')})` : this.$t('requests.affected.na')}</MetroTextBlock>
+							</div>
+							<div class="mb-4">
+								<MetroTextBlock text-style="base">{this.$t('requests.affected.package')}</MetroTextBlock>
+								<MetroTextBlock>{packageData ? `${packageData.name} (${packageData.identifier})` : this.$t('requests.affected.na')}</MetroTextBlock>
+							</div>
+							<div class="mb-4">
+								<MetroTextBlock text-style="base">{this.$t('requests.affected.review')}</MetroTextBlock>
+								<MetroTextBlock>{reviewData ? `${reviewData.title} (${new Date(reviewData.createdAt).toLocaleString()})` : this.$t('requests.affected.na')}</MetroTextBlock>
+							</div>
+						</div>
+					</div>
+				),
 				commands: [{ text: this.$t('app.actions.close'), primary: true }]
 			});
 			
