@@ -44,7 +44,8 @@ router.get("/", async (req, res) => {
 			},
 		),
 		include: req.includes,
-		attributes: { exclude: ["icon", "headerImage"] }
+		attributes: { exclude: ["icon", "headerImage"] },
+		order: [["updatedAt", "DESC"]]
 	});
 	
 	await asyncForEach(packageList, async packageObj => {
