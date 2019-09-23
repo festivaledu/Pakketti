@@ -28,6 +28,7 @@
 
 <script>
 import * as BlobUtil from 'blob-util'
+import crypto from "crypto-js"
 
 export default {
 	name: "MediaGroupSelector",
@@ -63,11 +64,33 @@ export default {
 			this.$refs["file-selector"].click();
 		},
 		fileChanged(e) {
+			let allowUpload = true
 			let files = [...e.target.files];
+			
+			this.$refs["file-selector"].value = null;
+
+			for (var file in files) {
+				let sha256 = crypto.SHA256(files[file]).toString(crypto.enc.hex);
+
+				if (this.value.find(screenshotObj => screenshotObj.sha256 == sha256)) {
+					allowUpload = false;
+					break;
+				}
+			}
+			
+			if (!allowUpload) {
+				new metroUI.ContentDialog({
+					title: this.$t('package_editor.media.screenshot_upload_error_title'),
+					content: this.$t('package_editor.media.screenshot_upload_error_message_multiple'),
+					commands: [{ text: this.$t('app.ok'), primary: true }]
+				}).show();
+				
+				return;
+			}
+			
 			files.forEach(file => {
 				this._handleFile(file);
 			});
-			this.$refs["file-selector"].value = null;
 		},
 		
 		_handleFile(file) {

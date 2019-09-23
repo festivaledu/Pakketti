@@ -636,7 +636,7 @@ export default {
 						screenClass: `${img.width}w-${img.height}h`,
 						width: img.width,
 						height: img.height,
-						sha256: crypto.SHA256(reader.result).toString(crypto.enc.hex)
+						sha256: crypto.SHA256(file).toString(crypto.enc.hex)
 					}]);
 					
 					if (screenshotList.error) {

@@ -238,7 +238,10 @@
 			"header_image_title": "Header Image",
 			"screenshots_title": "Screenshots",
 			"delete_item_title": "Delete this item?",
-			"delete_item_body": "<p>Are you sure you want to delete this item?<br>This action cannot be undone.</p>"
+			"delete_item_body": "<p>Are you sure you want to delete this item?<br>This action cannot be undone.</p>",
+			
+			"screenshot_upload_error_title": "Screenshot upload failed",
+			"screenshot_upload_error_message_multiple": "You can't upload the same screenshot multiple times."
 		},
 		"versions": {
 			"add": "Add Version",

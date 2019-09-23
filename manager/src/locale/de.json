@@ -238,7 +238,10 @@
 			"header_image_title": "Titelbild",
 			"screenshots_title": "Screenshots",
 			"delete_item_title": "Dieses Objekt löschen?",
-			"delete_item_body": "<p>Möchtest du dieses Objekt wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>"
+			"delete_item_body": "<p>Möchtest du dieses Objekt wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.</p>",
+			
+			"screenshot_upload_error_title": "Hochladen des Screenshots fehlgeschlagen",
+			"screenshot_upload_error_message_multiple": "Du kannst den selben Screenshot nicht mehrfach hochladen."
 		},
 		"versions": {
 			"add": "Version hinzufügen",
