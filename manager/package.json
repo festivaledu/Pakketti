@@ -42,7 +42,7 @@
     "last 2 versions"
   ],
   "vue": {
-	"publicPath": "/dashboard",
+    "publicPath": "/dashboard",
     "css": {
       "loaderOptions": {
         "less": {

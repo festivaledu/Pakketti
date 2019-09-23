@@ -308,7 +308,7 @@
 				<div class="mb-4">
 					<MetroTextBlock text-style="sub-title mb-2">{{ $t('package_editor.media.screenshots_title') }}</MetroTextBlock>
 					<MediaGroupSelector
-						defaultImgSrc="`/media/screenshot`"
+						defaultImgSrc="/media/screenshot"
 						v-model="packageData.screenshots"
 						@fileChanged="screenshotAdded"
 						@fileDeleted="screenshotDeleted"
@@ -338,7 +338,8 @@
 										<MetroTextBlock>{{ versionObj.downloadCount | number }}</MetroTextBlock>
 									</div>
 									<div class="td cell">
-										<MetroToggleSwitch :value="versionObj.visible"
+										<MetroToggleSwitch 
+											:value="versionObj.visible"
 											:offContent="$t('packages.visible_state.no')"
 											:onContent="$t('packages.visible_state.yes')"
 											:readonly="true"
@@ -738,7 +739,7 @@ export default {
 						/>
 						
 						<MetroRadioButton
-							group-name="package-visibility"
+							group-name="version-visibility"
 							name={false}
 							content={this.$t('package_editor.info.version_publishing_later')}
 							v-model={_versionObj.visible}

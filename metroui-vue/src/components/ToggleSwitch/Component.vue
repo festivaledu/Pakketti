@@ -33,6 +33,9 @@ export default {
 			checked: this.$props.value
 		}
 	},
+	updated() {
+		this.checked = this.$props.value;
+	},
 	methods: {
 		_onChange(e) {
 			this.$data.checked = e.target.checked;

@@ -1,6 +1,6 @@
 <template>
-	<div class="radio-button" @change="_onChange" :disabled="disabled">
-		<input type="radio" :id="uuid" :checked="checked" :name="groupName" :value="name" />
+	<div class="radio-button" :disabled="disabled">
+		<input type="radio" :name="groupName" :id="uuid" :checked="checked" :value="name" @change="_onChange" />
 		<label :for="uuid">{{ content }}</label>
 	</div>
 </template>

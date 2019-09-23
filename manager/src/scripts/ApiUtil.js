@@ -1,8 +1,8 @@
 import { SocketService } from "@/scripts/SocketService";
 import { get, post, put, delete as _delete } from "axios";
 
-// const apiUrl = `${window.location.origin}/api`
-const apiUrl = `http://${window.location.hostname}:3000/api`
+const apiUrl = `${window.location.origin}/api`
+// const apiUrl = `http://${window.location.hostname}:3000/api`
 
 const flattenObject = (obj) => {
 	var returnObj = {};
