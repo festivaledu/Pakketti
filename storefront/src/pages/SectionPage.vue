@@ -1,6 +1,6 @@
 <template>
 	<MetroPage page-id="section">
-		<!-- <vue-headful :title="`${$t(`section.${$route.params.sectionId}`)} – ${$t('app.name')}`" /> -->
+		<vue-headful :title="`${$t(`sections.charts`)} – ${$t('app.name')}`" />
 		
 		<template v-if="!packageData">
 			<MetroProgressRing :active="true" style="position: absolute; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: 80px; height: 80px" />
@@ -120,7 +120,8 @@ export default {
 				vm.orderBy = to.query.order;
 			}
 			
-			vm.$parent.setSelectedMenuItem(to.query.section.toLowerCase());
+			vm.$parent.setHeader(vm.$t(`sections.charts`));
+			vm.$parent.setSelectedMenuItem("start");
 		});
 	},
 	async beforeRouteUpdate(to, from, next) {
@@ -128,8 +129,8 @@ export default {
 			include: "ratings,versions"
 		});
 
-		// this.$parent.setHeader(this.$t(`section.${to.params.sectionId}`));
-		this.$parent.setSelectedMenuItem(to.query.section.toLowerCase());
+		// this.$parent.setHeader(this.$t(`sections.charts`));
+		// this.$parent.setSelectedMenuItem("start");
 		
 		if (to.query.section) {
 			this.section = to.query.section;
