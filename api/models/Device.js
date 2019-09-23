@@ -101,8 +101,11 @@ module.exports = (Sequelize, DataTypes) => {
 	/**
 	 * Define this model's association to other models
 	 */
-	Device.associate = ({}) => {
-		// associations can be defined here
+	Device.associate = ({ Account }) => {
+		Device.belongsTo(Account, {
+			foreignKey: "accountId",
+			onDelete: "CASCADE"
+		});
 	};
 	
 	return Device;
