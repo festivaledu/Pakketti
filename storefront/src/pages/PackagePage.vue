@@ -745,8 +745,6 @@ body[data-theme="dark"] {
 			}
 			
 			.header-clipper {
-				overflow-y: scroll;
-				
 				.pivot-header-item {
 					&:first-child {
 						margin-left: auto;
