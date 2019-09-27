@@ -70,6 +70,14 @@ const router = new Router({
 				minimumRole: UserRole.MODERATOR
 			}
 		},
+		{
+			path: '/users/:userId?',
+			name: 'users',
+			component: () => import(/* webpackChunkName: "Users" */ './pages/Users.vue'),
+			meta: {
+				minimumRole: UserRole.ROOT
+			}
+		},
 		
 		{
 			path: '/profile',

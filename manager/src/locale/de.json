@@ -110,7 +110,11 @@
 		
 		"requests_header": "Anfragen",
 		"requests_no_items": "Es gibt keine Anfragen, die angezeigt werden können",
-		"requests_see_all": "Alle Anfragen anzeigen"
+		"requests_see_all": "Alle Anfragen anzeigen",
+		
+		"users_header": "Benutzer",
+		"users_no_items": "Es gibt keine Benutzer, die angezeigt werden können",
+		"users_see_all": "Alle Benutzer anzeigen"
 	},
 	
 	"packages": {
@@ -386,6 +390,17 @@
 		},
 		
 		"view_log_item": "Log-Objekt ansehen"
+	},
+	
+	"users": {
+		"users_title": "Benutzer",
+		"developers_title": "Entwickler",
+		"moderators_title": "Moderatoren",
+		"administrators_title": "Administratoren",
+		
+		"username": "Benutzername",
+		"created_at": "Registriert seit",
+		"no_users": "Hier gibt es keine Benutzer, die angezeigt werden könnten."
 	},
 	
 	"profile": {

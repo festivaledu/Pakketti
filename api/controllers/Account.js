@@ -291,6 +291,41 @@ router.delete("/me/avatar", async (req, res) => {
 
 
 /**
+ * GET /account/all
+ * 
+ * root-only route to get all users at once.
+ * Used for managing users, moderators and administrators
+ */
+router.get("/all", async (req, res) => {
+	const { account } = req;
+
+	if (!account) return res.status(httpStatus.UNAUTHORIZED).send({
+		name: httpStatus[httpStatus.UNAUTHORIZED],
+		code: httpStatus.UNAUTHORIZED,
+		message: "Invalid authorization token"
+	});
+	
+	if (account.role < UserRole.ROOT) return res.status(httpStatus.FORBIDDEN).send({
+		error: {
+			name: httpStatus[httpStatus.FORBIDDEN],
+			code: httpStatus.FORBIDDEN,
+			message: "You are not allowed to perform this action"
+		}
+	});
+	
+	const { Account } = req.models;
+
+	let accountList = await Account.findAll({
+		where: (req.query.account || {}).filter(["id", "username", "email"]),
+		attributes: ["id", "username", "email", "profileImageMime", "role", "lastLogin", "createdAt"]
+	});
+	
+	return res.status(httpStatus.OK).send(accountList);
+});
+
+
+
+/**
  * GET /account
  * 
  * Gets public information about a specified User
@@ -361,8 +396,7 @@ router.put("/", async (req, res) => {
 	const { Account, LogItem } = req.models;
 	
 	let accountObj = await Account.findOne({
-		where: query,
-		attributes: ["id", "username", "profileImageMime", "role", "createdAt"]
+		where: query
 	});
 	
 	if (!accountObj || !Object.keys(accountObj).length) return res.status(httpStatus.NOT_FOUND).send({
@@ -449,8 +483,7 @@ router.delete("/", async (req, res) => {
 	const { Account, LogItem } = req.models;
 	
 	let accountObj = await Account.findOne({
-		where: query,
-		attributes: ["id", "username", "profileImageMime", "role", "createdAt"]
+		where: query
 	});
 	
 	if (!accountObj || !Object.keys(accountObj).length) return res.status(httpStatus.NOT_FOUND).send({

@@ -265,7 +265,7 @@ export default {
 				width: 100%;
 				margin-right: 0;
 				
-				&::before {
+				&:before {
 					content: '';
 					display: block;
 					padding-top: 75%;

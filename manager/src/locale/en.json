@@ -110,7 +110,11 @@
 		
 		"requests_header": "Requests",
 		"requests_no_items": "No Requests to display",
-		"requests_see_all": "Show all Requests"
+		"requests_see_all": "Show all Requests",
+		
+		"users_header": "Users",
+		"users_no_items": "No Users to display",
+		"users_see_all": "Show all Users"
 	},
 	
 	"packages": {
@@ -386,6 +390,17 @@
 		},
 		
 		"view_log_item": "View log item"
+	},
+	
+	"users": {
+		"users_title": "Users",
+		"developers_title": "Developers",
+		"moderators_title": "Moderators",
+		"administrators_title": "Administrators",
+		
+		"username": "Username",
+		"created_at": "Registered",
+		"no_users": "There are no users to be shown here."
 	},
 	
 	"profile": {

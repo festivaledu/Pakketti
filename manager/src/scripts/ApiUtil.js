@@ -76,6 +76,16 @@ export class AccountAPI {
 			}
 		});
 	}
+	
+	static async getAllUsers(parameters) {
+		const query = parseUrlFromObject(flattenObject(parameters));
+
+		return await SocketService.get(`/account/all?${query}`, {
+			headers: {
+				"authorization": `Bearer ${window.$cookies.get("authToken")}`
+			}
+		});
+	}
 
 	static async getUser(parameters) {
 		const query = parseUrlFromObject(flattenObject(parameters));

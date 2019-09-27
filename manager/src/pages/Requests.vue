@@ -390,6 +390,14 @@ export default {
 										oninput={() => { _accountData.role ^= UserRole.MODERATOR }}
 										value={Boolean(_accountData.role & UserRole.MODERATOR)}
 									/>
+									{this.isRoot && 
+									<MetroCheckbox
+										content={this.$t('requests.account_roles.administrator')}
+										disabled={accountData.role > this.accountRole}
+										oninput={() => { _accountData.role ^= UserRole.ADMINISTRATOR }}
+										value={Boolean(_accountData.role & UserRole.ADMINISTRATOR)}
+									/>
+									}
 								</div>
 							),
 							commands: [{ text: this.$t('app.cancel') }, { text: this.$t('app.ok'), primary: true }]

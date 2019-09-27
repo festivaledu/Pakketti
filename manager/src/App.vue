@@ -46,6 +46,13 @@
 							</template>
 						</MetroNavigationViewItem>
 					</router-link>
+					<router-link tag="div" to="/users" v-if="isRoot">
+						<MetroNavigationViewItem :content="$t('root.item_users')" page-id="users">
+							<template slot="icon">
+								<MetroSymbolIcon icon="people" />
+							</template>
+						</MetroNavigationViewItem>
+					</router-link>
 				</template>
 				
 				<template slot="pane-footer">
@@ -84,6 +91,9 @@ export default {
 		},
 		isAdministrator() {
 			return (this.$store.state.role & UserRole.ADMINISTRATOR) == UserRole.ADMINISTRATOR;
+		},
+		isRoot() {
+			return (this.$store.state.role & UserRole.ROOT) == UserRole.ROOT;
 		}
 	}
 }

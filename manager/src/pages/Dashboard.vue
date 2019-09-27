@@ -252,12 +252,55 @@
 					<MetroTextBlock text-style="caption">{{ $t('dashboard.requests_see_all') }}</MetroTextBlock>
 				</router-link>
 			</div>
+			
+			<div class="col-12 col-md-6">
+				<MetroTextBlock text-style="sub-title">{{ $t('dashboard.users_header') }}</MetroTextBlock>
+				
+				<MetroStackPanel horizontal-alignment="center" v-if="!userData">
+					<MetroProgressRing :active="true" style="width: 50px; height: 50px" />
+				</MetroStackPanel>
+				
+				<div class="data-grid request-list" v-if="userData">
+					<div class="data-grid-wrapper">
+						<div class="table">
+							<div class="column-headers-border" />
+							<div class="tr column-headers">
+								<div class="th column-header-item">{{ $t('users.username') }}</div>
+								<div class="th column-header-item">{{ $t('users.created_at') }}</div>
+							</div>
+							<router-link tag="div" :to="`/users/${userObj.id}`" class="row-wrapper" v-for="(userObj, index) in filteredUserData" :key="index">
+								<div class="tr row">
+									<div class="td cell">
+										<MetroTextBlock>{{ userObj.username }}</MetroTextBlock>
+									</div>
+									<div class="td cell">
+										<MetroTextBlock>{{ userObj.createdAt | date }}</MetroTextBlock>
+									</div>
+								</div>
+								<div class="row-background" :style="{'top': `${(index * 47) + 32}px`}" />
+							</router-link>
+							
+							<div class="row-wrapper" v-if="!userData.length">
+								<div class="tr row">
+									<div class="td cell">
+										<MetroTextBlock text-style="caption">{{ $t('dashboard.users_no_items') }}</MetroTextBlock>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<router-link to="/users" class="hyperlink-button" v-if="userData && userData.length > 5">
+					<MetroTextBlock text-style="caption">{{ $t('dashboard.users_see_all') }}</MetroTextBlock>
+				</router-link>
+			</div>
 		</div>
 	</MetroPage>
 </template>
 
 <script>
-import { DeviceAPI, PackageAPI, RequestAPI, StatisticsAPI } from '@/scripts/ApiUtil'
+import { AccountAPI, DeviceAPI, PackageAPI, RequestAPI, StatisticsAPI } from '@/scripts/ApiUtil'
 import { UserRole } from "@/scripts/Enumerations"
 import Platforms from '../../../platforms.json'
 import DeviceStrings from '../../../deviceStrings.json'
@@ -275,6 +318,7 @@ export default {
 		reviewData: null,
 		deviceData: null,
 		requestData: null,
+		userData: null,
 		
 		Platforms: Platforms,
 		DeviceStrings: DeviceStrings
@@ -288,13 +332,18 @@ export default {
 		let _reviewData = await PackageAPI.getReviews();
 		let _deviceData = await DeviceAPI.getDevices();
 		let _requestData = await RequestAPI.getRequests();
+		let _userData = await AccountAPI.getAllUsers();
 		
 		next(vm => {
 			vm.packageData = _packageData;
-			vm.statisticsData = _statisticsData
+			
+			if (vm.isModerator || vm.isAdministrator) vm.statisticsData = _statisticsData;
+			
 			vm.reviewData = _reviewData;
 			vm.deviceData = _deviceData;
 			vm.requestData = _requestData;
+			
+			if (vm.isRoot) vm.userData = _userData;
 			
 			vm.$parent.setHeader(vm.$t('root.item_dashboard'));
 			vm.$parent.setSelectedMenuItem("dashboard");
@@ -369,6 +418,9 @@ export default {
 		filteredRequestData() {
 			return [...this.requestData].slice(0,5);
 		},
+		filteredUserData() {
+			return [...this.userData].filter(userObj => userObj.id != this.accountId).slice(0,5);
+		},
 		
 		accountId() {
 			return this.$store.state.accountId;
@@ -381,6 +433,9 @@ export default {
 		},
 		isAdministrator() {
 			return (this.$store.state.role & UserRole.ADMINISTRATOR) == UserRole.ADMINISTRATOR;
+		},
+		isRoot() {
+			return (this.$store.state.role & UserRole.ROOT) == UserRole.ROOT;
 		}
 	},
 	filters: {
