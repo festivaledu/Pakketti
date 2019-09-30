@@ -267,6 +267,8 @@ export default {
 			
 			if (await dialog.showAsync() == metroUI.ContentDialogResult.Primary) {
 				window.$cookies.remove("authToken");
+				this.$store.commit("setAccountId", null);
+				this.$store.commit("setRole", null);
 				this.$router.replace("/login");
 			}
 		}

@@ -275,7 +275,9 @@ export default {
 			}
 		},
 		logout() {
+			window.$cookies.remove("authToken");
 			this.$store.commit("setAccountId", null);
+			this.$store.commit("setRole", null);
 			window.location.reload("true");
 		},
 	}
@@ -378,6 +380,10 @@ a {
 		height: 20px;
 		margin: 10px;
 	}
+}
+
+strong, b {
+	font-weight: bold;
 }
 
 h1, h2, h3, h4, h5, h6 {
