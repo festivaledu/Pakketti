@@ -124,6 +124,9 @@ router.beforeEach(async (to, from, next) => {
 					},
 					replace: true
 				});
+			} else {
+				store.commit("setAccountId", authData.accountId);
+				store.commit("setRole", authData.role);
 			}
 		}
 	}
