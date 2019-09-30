@@ -439,6 +439,7 @@ export default {
 							<MetroComboBox
 								header={this.$t('package.review_compose.select_device_title')}
 								placeholer-text={this.$t('package.review_compose.select_device_placeholder')}
+								required={true}
 								items-source={devices}
 								name="deviceId"
 								no-update={true}
