@@ -6,7 +6,7 @@
 			<MetroCommandBar>
 				<MetroAppBarButton icon="repeat-all" :label="$t('app.actions.reload')" @click="refresh()" />
 				<MetroAppBarSeparator />
-				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click="navigate('/packages/new')" />
+				<MetroAppBarButton icon="add" :label="$t('app.actions.add')" @click="navigate('/packages/new')" :disabled="!isDeveloper" />
 			</MetroCommandBar>
 		</template>
 		

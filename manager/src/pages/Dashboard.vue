@@ -253,7 +253,7 @@
 				</router-link>
 			</div>
 			
-			<div class="col-12 col-md-6">
+			<div class="col-12 col-md-6" v-if="isRoot">
 				<MetroTextBlock text-style="sub-title">{{ $t('dashboard.users_header') }}</MetroTextBlock>
 				
 				<MetroStackPanel horizontal-alignment="center" v-if="!userData">
