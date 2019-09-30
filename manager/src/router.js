@@ -28,7 +28,8 @@ const router = new Router({
 			name: 'packages',
 			component: () => import(/* webpackChunkName: "PackagesList" */ './pages/PackagesList.vue'),
 			meta: {
-				minimumRole: UserRole.DEVELOPER
+				minimumRole: UserRole.DEVELOPER,
+				overrideRoles: [UserRole.MODERATOR, UserRole.ADMINISTRATOR]
 			}
 		},
 		{
@@ -44,7 +45,8 @@ const router = new Router({
 			name: 'package-editor',
 			component: () => import(/* webpackChunkName: "PackageEditor" */ './pages/PackageEditor.vue'),
 			meta: {
-				minimumRole: UserRole.DEVELOPER
+				minimumRole: UserRole.DEVELOPER,
+				overrideRoles: [UserRole.MODERATOR, UserRole.ADMINISTRATOR]
 			}
 		},
 		{
@@ -128,11 +130,13 @@ router.beforeEach(async (to, from, next) => {
 	
 	if (to.matched.some(_ => _.meta.minimumRole)) {
 		let minimumRole = to.matched.map(_ => _.meta.minimumRole)[0];
+		let overrideRoles = to.matched.map(_ => _.meta.overrideRoles)[0] || [];
 		
-		if ((store.getters.role & minimumRole) != minimumRole) {
+		if ((store.getters.role & minimumRole) != minimumRole &&
+			!overrideRoles.find(role => (store.getters.role & role) == role)) {
 			return next({
 				path: "/error/403",
-				replace: true
+				replace: false
 			})
 		}
 	}
