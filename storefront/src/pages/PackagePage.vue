@@ -63,7 +63,7 @@
 						
 						<MetroStackPanel class="button-container">
 							<MetroTextBlock text-style="title">{{ $t('package.price_free') }}</MetroTextBlock>
-								<MetroButton class="system-accent-color" @click="downloadButtonClicked">
+								<MetroButton class="system-accent-color" :disabled="!packageData.versions.length" @click="downloadButtonClicked">
 									<MetroTextBlock text-style="base" text-alignment="center">{{ $t('package.download_button') }}</MetroTextBlock>
 								</MetroButton>
 						</MetroStackPanel>
