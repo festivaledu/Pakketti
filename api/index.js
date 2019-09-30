@@ -116,15 +116,14 @@ httpServer.use("/files", async (req, res, next) => {
 		
 		if (packageVersionObj) {
 			packageVersionObj.increment("downloadCount");
-				
-				db.models.LogItem.create({
-					id: String.prototype.concat(new Date().getTime, Math.random()),
-					type: LogItemType.VERSION_DOWNLOADED,
-					affectedPackageId: packageVersionObj.packageId,
-					affectedPackageVersionId: packageVersionObj.id,
-					detailText: `Package version ${packageVersionObj.version} <${packageVersionObj.id}> has been downloaded`,
-					status: LogItemStatus.LOG_USAGE
-				});
+		} else {
+			return res.status(httpStatus.NOT_FOUND).send({
+				error: {
+					name: httpStatus[httpStatus.NOT_FOUND],
+					code: httpStatus.NOT_FOUND,
+					message: "File not found"
+				}
+			});
 		}
 		
 		return serve(req, res);
