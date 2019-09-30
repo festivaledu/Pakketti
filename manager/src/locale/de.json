@@ -287,6 +287,8 @@
 			"optional": "Optional"
 		},
 		
+		"action_link": "Verknüpfen",
+		
 		"delete_device_confirm_title": "„%{name}“ löschen?",
 		"delete_device_confirm_body": "<p>Möchtest du „%{name}“ wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.<br><br>Zugehörige Rezensionen werden dadurch ebenfalls gelöscht.</p>"
 	},

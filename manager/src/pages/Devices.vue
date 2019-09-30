@@ -151,7 +151,7 @@ export default {
 						</div>
 					</div>
 				),
-				commands: [{ text: "Cancel" }, { text: "Link", primary: true }]
+				commands: [{ text: this.$t('app.cancel') }, { text: this.$t('devices.action_link'), primary: true }]
 			});
 			
 			if (await deviceDialog.showAsync() == metroUI.ContentDialogResult.Primary) {

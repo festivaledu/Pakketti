@@ -287,6 +287,8 @@
 			"optional": "Optional"
 		},
 		
+		"action_link": "Link",
+		
 		"delete_device_confirm_title": "Delete \"%{name}\"?",
 		"delete_device_confirm_body": "<p>Are you sure you want to delete \"%{name}\"?<br>This action cannot be undone.<br><br>Associated Reviews will also be deleted.</p>"
 	},
